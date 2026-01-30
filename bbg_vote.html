@@ -21,70 +21,47 @@
     <div id="page-home" class="page active w-full max-w-4xl text-center">
         <h1 class="text-4xl font-extrabold mb-12 tracking-tight">GAME <span class="text-blue-500">ARCHIVE</span></h1>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <button onclick="navTo('보드게임')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4">
-                <span class="text-4xl">🎲</span>
-                <span class="text-xl font-bold">보드게임</span>
-            </button>
-            <button onclick="navTo('지니어스')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4">
-                <span class="text-4xl">🧠</span>
-                <span class="text-xl font-bold">지니어스</span>
-            </button>
-            <button onclick="navTo('방탈출')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4">
-                <span class="text-4xl">🔑</span>
-                <span class="text-xl font-bold">방탈출</span>
-            </button>
-            <button onclick="navTo('머더 미스테리')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4">
-                <span class="text-4xl">🕵️</span>
-                <span class="text-xl font-bold">머더 미스테리</span>
-            </button>
+            <button onclick="navTo('보드게임')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400">🎲 보드게임</button>
+            <button onclick="navTo('지니어스')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400">🧠 지니어스</button>
+            <button onclick="navTo('방탈출')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400">🔑 방탈출</button>
+            <button onclick="navTo('머더 미스테리')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400">🕵️ 머더 미스테리</button>
         </div>
+        <button onclick="createAdminOnce()" class="mt-20 text-xs text-gray-600 hover:text-gray-400 opacity-30 underline">관리자 계정(100번) 원클릭 생성</button>
     </div>
 
-    <div id="page-login" class="page w-full max-w-sm">
+    <div id="page-login" class="page w-full max-w-sm text-center">
         <div class="glass p-8 rounded-3xl shadow-2xl">
-            <h2 class="text-2xl font-bold mb-6 text-center">인증이 필요합니다</h2>
+            <h2 class="text-2xl font-bold mb-6">인증이 필요합니다</h2>
             <div class="space-y-4">
-                <div>
-                    <label class="block text-xs text-gray-400 mb-1 ml-1">USER PIN</label>
-                    <input type="text" id="pin" placeholder="PIN 입력" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none focus:border-blue-500 transition">
-                </div>
-                <div>
-                    <label class="block text-xs text-gray-400 mb-1 ml-1">PASSWORD</label>
-                    <input type="password" id="pw" placeholder="PW 입력" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none focus:border-blue-500 transition">
-                </div>
-                <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl mt-4 shadow-lg shadow-blue-500/20 transition-all">시작하기</button>
+                <input type="text" id="pin" placeholder="PIN 입력" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white">
+                <input type="password" id="pw" placeholder="PW 입력" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white">
+                <button onclick="login()" class="w-full bg-blue-600 py-3 rounded-xl font-bold hover:bg-blue-500">시작하기</button>
             </div>
-            <button onclick="showPage('page-home')" class="w-full text-gray-500 text-sm mt-4 hover:text-white transition">돌아가기</button>
+            <button onclick="showPage('page-home')" class="mt-4 text-sm text-gray-500 hover:text-white">돌아가기</button>
         </div>
     </div>
 
     <div id="page-rank" class="page w-full max-w-3xl">
         <div class="flex justify-between items-end mb-8">
             <div>
-                <button onclick="showPage('page-home')" class="text-blue-400 text-sm mb-2 hover:underline">← 뒤로가기</button>
-                <h2 id="rank-title" class="text-3xl font-bold">카테고리 이름</h2>
+                <button onclick="showPage('page-home')" class="text-blue-400 text-sm hover:underline mb-2">← 뒤로가기</button>
+                <h2 id="rank-title" class="text-3xl font-bold">카테고리</h2>
             </div>
-            <button onclick="addGame()" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl text-sm font-medium transition">+ 새 항목 추가</button>
+            <button onclick="addGame()" class="bg-white/10 px-4 py-2 rounded-xl text-sm font-medium hover:bg-white/20">+ 새 항목 추가</button>
         </div>
-        
         <div class="glass rounded-3xl overflow-hidden">
             <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-white/5 text-gray-400 text-sm uppercase tracking-wider">
-                        <th class="p-5 font-semibold">순위</th>
-                        <th class="p-5 font-semibold">게임 이름</th>
-                        <th class="p-5 font-semibold">평점</th>
-                        <th class="p-5 font-semibold text-center">상태</th>
-                    </tr>
+                <thead class="bg-white/5 text-gray-400 text-xs uppercase tracking-wider">
+                    <tr><th class="p-5">순위</th><th class="p-5">게임 이름</th><th class="p-5">평점</th><th class="p-5 text-center">상태</th></tr>
                 </thead>
-                <tbody id="rank-list" class="divide-y divide-white/5">
-                    </tbody>
+                <tbody id="rank-list" class="divide-y divide-white/5"></tbody>
             </table>
         </div>
     </div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBVp-GgD8Ts-tGw5itr9Av_MnZAt-U4teE",
@@ -98,135 +75,95 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    let currentUser = null; 
+    let currentUser = null;
     let selectedCategory = "";
 
-    // [62명 명단 등록 - 필요 시 콘솔에서 호출]
-    window.bulkAddUsers = async function() {
-        const realNames = ["임세훈", "용구리", "기복", "김지수", "강석진", "강훈", "구리", "김민성", "김선우", "김은수", "김은우", "김이든", "김정원", "김지호", "김창범", "김호인", "남보현", "도영윤", "도현", "동건", "동현", "렬", "막시무스", "명진", "박", "박상훈", "범", "선우", "설재경", "성민", "성배", "성지훈", "수병", "양윤호", "영건", "용", "용종", "유난", "유상", "이영재", "이현빈", "임준홍", "재원", "정지언", "종운", "준혁", "창주", "팡태", "하은", "하준", "학민", "현", "호", "홍", "홍석", "후니피에프", "J", "Jeff", "kevin", "Sam Park", "..", "💚"];
-        for (let i = 0; i < realNames.length; i++) {
-            const pin = (101 + i).toString();
-            await setDoc(doc(db, "users", pin), { name: realNames[i], password: "1234" });
-        }
-        alert("62명 등록 완료!");
+    // [중요] 관리자 생성 원클릭 함수
+    window.createAdminOnce = async function() {
+        try {
+            await setDoc(doc(db, "users", "100"), { name: "관리자", password: "1004" });
+            alert("관리자 계정(100/1004) 생성 완료! 이제 로그인해보세요.");
+        } catch(e) { alert("오류: " + e.message); }
     };
 
     window.navTo = function(cat) {
         selectedCategory = cat;
         document.getElementById('rank-title').innerText = cat;
-        if (currentUser) renderList();
-        else showPage('page-login');
+        if (currentUser) renderList(); else showPage('page-login');
     };
 
     window.login = async function() {
-        const pinInput = document.getElementById('pin').value;
-        const pwInput = document.getElementById('pw').value;
+        const pin = document.getElementById('pin').value;
+        const pw = document.getElementById('pw').value;
         try {
-            const userSnap = await getDoc(doc(db, "users", pinInput));
-            if (userSnap.exists() && userSnap.data().password === pwInput) {
-                currentUser = { pin: pinInput, name: userSnap.data().name };
+            const snap = await getDoc(doc(db, "users", pin));
+            if (snap.exists() && snap.data().password === pw) {
+                currentUser = { pin, name: snap.data().name };
                 renderList();
-            } else { alert("인증 실패"); }
-        } catch (e) { alert("오류 발생"); }
+            } else { alert("인증 정보가 틀립니다."); }
+        } catch(e) { alert("로그인 오류"); }
     };
 
     window.showPage = function(pageId) {
-        document.querySelectorAll('.page').forEach(p => {
-            p.classList.remove('active');
-            setTimeout(() => p.style.display = 'none', 400);
-        });
-        const target = document.getElementById(pageId);
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         setTimeout(() => {
+            document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+            const target = document.getElementById(pageId);
             target.style.display = 'block';
             setTimeout(() => target.classList.add('active'), 50);
         }, 400);
     };
 
-    // [핵심] 리스트 출력 및 실시간 평균 계산
     window.renderList = async function() {
         const list = document.getElementById('rank-list');
-        list.innerHTML = `<tr><td colspan="4" class="p-10 text-center">랭킹 집계 중...</td></tr>`;
-
+        list.innerHTML = `<tr><td colspan="4" class="p-10 text-center opacity-50">랭킹 계산 중...</td></tr>`;
         try {
-            // 1. 해당 카테고리 게임들 가져오기
-            const q = query(collection(db, "games"), where("category", "==", selectedCategory));
-            const gameSnaps = await getDocs(q);
+            const gSnap = await getDocs(query(collection(db, "games"), where("category", "==", selectedCategory)));
+            const rSnap = await getDocs(collection(db, "ratings"));
+            const ratings = rSnap.docs.map(d => d.data());
             
-            // 2. 전체 점수 데이터(ratings) 미리 가져오기
-            const allRatingsSnap = await getDocs(collection(db, "ratings"));
-            const ratingsData = allRatingsSnap.docs.map(d => d.data());
-
-            let gameList = [];
-
-            gameSnaps.forEach(gameDoc => {
-                const game = gameDoc.data();
-                const gameId = gameDoc.id;
-
-                // 해당 게임에 달린 모든 점수 필터링
-                const targetRatings = ratingsData.filter(r => r.gameId === gameId);
-                const count = targetRatings.length;
-                const sum = targetRatings.reduce((acc, curr) => acc + curr.score, 0);
-                const avg = count > 0 ? (sum / count) : 0;
-
-                // 내 점수 찾기
-                const myRating = targetRatings.find(r => r.userPin === currentUser.pin);
-
-                gameList.push({
-                    id: gameId,
-                    name: game.name,
-                    avg: avg,
-                    count: count,
-                    myScore: myRating ? myRating.score : null
-                });
+            let games = [];
+            gSnap.forEach(d => {
+                const gData = d.data();
+                const tr = ratings.filter(r => r.gameId === d.id);
+                const avg = tr.length > 0 ? tr.reduce((a, c) => a + c.score, 0) / tr.length : 0;
+                const my = tr.find(r => r.userPin === currentUser.pin);
+                games.push({ id: d.id, name: gData.name, avg, count: tr.length, myScore: my ? my.score : null });
             });
+            games.sort((a, b) => b.avg - a.avg);
 
-            // 평균 점수 높은 순으로 정렬
-            gameList.sort((a, b) => b.avg - a.avg);
-
-            list.innerHTML = gameList.map((game, idx) => `
-                <tr class="hover:bg-white/5 transition">
-                    <td class="p-5 font-mono text-blue-400">#${idx + 1}</td>
-                    <td class="p-5 font-bold text-lg">${game.name} <span class="text-xs text-gray-500 font-normal">(${game.count}명 참여)</span></td>
-                    <td class="p-5 text-yellow-400 font-semibold">${game.avg.toFixed(1)}점</td>
+            list.innerHTML = games.map((g, i) => `
+                <tr class="hover:bg-white/5 border-b border-white/5">
+                    <td class="p-5 font-mono text-blue-400">#${i+1}</td>
+                    <td class="p-5 font-bold">${g.name} <span class="text-xs font-normal opacity-40">(${g.count}명)</span>
+                    ${currentUser.pin === "100" ? `<button onclick="delGame('${g.id}','${g.name}')" class="text-red-500 text-xs ml-2 hover:underline">[삭제]</button>` : ''}</td>
+                    <td class="p-5 text-yellow-400 font-semibold">${g.avg.toFixed(1)}</td>
                     <td class="p-5 text-center">
-                        <button onclick="inputScore('${game.id}', '${game.name}')" 
-                            class="px-4 py-1.5 rounded-xl text-sm font-bold transition ${game.myScore ? 'bg-gray-700 text-gray-400' : 'bg-blue-600/20 text-blue-400 border border-blue-500/30 hover:bg-blue-600 hover:text-white'}">
-                            ${game.myScore ? `내 점수: ${game.myScore}` : '점수 입력'}
-                        </button>
+                        <button onclick="inputScore('${g.id}','${g.name}')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition ${g.myScore !== null ? 'bg-white/10 text-gray-400' : 'bg-blue-600/20 text-blue-400 border border-blue-500/30 hover:bg-blue-600 hover:text-white'}">
+                        ${g.myScore !== null ? `내 점수: ${g.myScore}` : '점수 입력'}</button>
                     </td>
-                </tr>
-            `).join('');
-        } catch (e) { console.error(e); }
-        showPage('page-rank');
+                </tr>`).join('');
+            showPage('page-rank');
+        } catch(e) { console.error(e); }
     };
 
     window.addGame = async function() {
-        const name = prompt("새로운 게임 이름:");
-        if (!name) return;
-        await addDoc(collection(db, "games"), { name: name, category: selectedCategory, createdAt: new Date() });
-        renderList();
+        const n = prompt("새 게임 이름:");
+        if (n) { await addDoc(collection(db, "games"), { name: n, category: selectedCategory, createdAt: new Date() }); renderList(); }
     };
 
-    // [핵심] 사용자별 개별 점수 저장
-    window.inputScore = async function(gameId, name) {
-        const val = prompt(`${name}에 몇 점을 주시겠습니까? (0.0~100.0)`);
-        if (val === null) return;
-        const score = parseFloat(val);
-        if (isNaN(score) || score < 0 || score > 100) return alert("0~100 사이의 숫자를 입력하세요.");
+    window.delGame = async function(id, n) {
+        if (confirm(`'${n}'을(를) 삭제하시겠습니까?`)) { await deleteDoc(doc(db, "games", id)); renderList(); }
+    };
 
-        try {
-            // 문서 ID를 '유저PIN_게임ID'로 고정하여 1인 1점수 유지
-            const ratingId = `${currentUser.pin}_${gameId}`;
-            await setDoc(doc(db, "ratings", ratingId), {
-                gameId: gameId,
-                userPin: currentUser.pin,
-                userName: currentUser.name,
-                score: score,
-                updatedAt: new Date()
-            });
-            alert("점수가 반영되었습니다!");
-            renderList();
-        } catch (e) { alert("저장 실패"); }
+    window.inputScore = async function(id, n) {
+        const v = prompt(`${n} 점수 (0~100):`);
+        if (v !== null) {
+            const s = parseFloat(v);
+            if (isNaN(s) || s < 0 || s > 100) return alert("0~100 사이 숫자를 입력하세요.");
+            await setDoc(doc(db, "ratings", `${currentUser.pin}_${id}`), { gameId: id, userPin: currentUser.pin, score: s, updatedAt: new Date() });
+            alert("반영되었습니다!"); renderList();
+        }
     };
 </script>
 </body>
