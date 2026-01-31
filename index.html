@@ -14,9 +14,10 @@
         .category-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .category-card:hover { transform: translateY(-8px); background: rgba(255, 255, 255, 0.1); border-color: #3b82f6; }
         input::placeholder { color: rgba(255,255,255,0.3); }
-        /* 팝업 스타일 */
         #pin-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
         #pin-modal.active { display: flex; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-6">
@@ -28,10 +29,10 @@
     <div id="page-home" class="page active w-full max-w-4xl text-center pt-10">
         <h1 class="text-4xl font-extrabold mb-12 tracking-tight">GAME <span class="text-blue-500">ARCHIVE</span></h1>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <button onclick="navTo('보드게임')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400">🎲 보드게임</button>
-            <button onclick="navTo('지니어스')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400">🧠 지니어스</button>
-            <button onclick="navTo('방탈출')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400">🔑 방탈출</button>
-            <button onclick="navTo('머더 미스테리')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400">🕵️ 머더 미스테리</button>
+            <button onclick="navTo('보드게임')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400 font-bold text-xl">🎲 보드게임</button>
+            <button onclick="navTo('지니어스')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400 font-bold text-xl">🧠 지니어스</button>
+            <button onclick="navTo('방탈출')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400 font-bold text-xl">🔑 방탈출</button>
+            <button onclick="navTo('머더 미스테리')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400 font-bold text-xl">🕵️ 머더 미스테리</button>
         </div>
         <button onclick="togglePinModal(true)" class="mt-12 text-gray-400 hover:text-white text-sm underline">내 PIN 번호 확인하기</button>
     </div>
@@ -40,11 +41,21 @@
         <div class="glass p-8 rounded-3xl shadow-2xl">
             <h2 class="text-2xl font-bold mb-6">인증이 필요합니다</h2>
             <div class="space-y-4 text-left">
-                <label class="text-xs text-gray-400 ml-1">USER PIN</label>
-                <input type="text" id="pin" placeholder="PIN 입력" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-blue-500">
-                <label class="text-xs text-gray-400 ml-1">PASSWORD</label>
-                <input type="password" id="pw" placeholder="PW 입력" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-blue-500">
-                <button onclick="login()" class="w-full bg-blue-600 py-3 rounded-xl font-bold hover:bg-blue-500 shadow-lg shadow-blue-500/20 transition-all">시작하기</button>
+                <div>
+                    <label class="text-xs text-gray-400 ml-1">USER PIN</label>
+                    <input type="text" id="pin" placeholder="PIN 입력" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 ml-1">PASSWORD</label>
+                    <input type="password" id="pw" placeholder="PW 입력" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-blue-500">
+                </div>
+                
+                <div class="flex items-center gap-2 ml-1">
+                    <input type="checkbox" id="remember-pin" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 bg-white/5">
+                    <label for="remember-pin" class="text-sm text-gray-400 cursor-pointer">이 브라우저에서 PIN 기억하기</label>
+                </div>
+
+                <button onclick="login()" class="w-full bg-blue-600 py-3 rounded-xl font-bold hover:bg-blue-500 shadow-lg shadow-blue-500/20 transition-all mt-2">시작하기</button>
             </div>
             <div class="mt-6 flex flex-col gap-2">
                 <button onclick="togglePinModal(true)" class="text-xs text-blue-400 hover:underline">내 PIN 번호를 모르겠어요</button>
@@ -57,10 +68,9 @@
         <div class="glass w-full max-w-md p-6 rounded-3xl max-h-[80vh] flex flex-col">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-xl font-bold">PIN 번호 찾기</h3>
-                <button onclick="togglePinModal(false)" class="text-gray-400 hover:text-white">✕</button>
+                <button onclick="togglePinModal(false)" class="text-gray-400 hover:text-white text-2xl">✕</button>
             </div>
-            <div class="overflow-y-auto pr-2 custom-scrollbar" id="pin-list-content">
-                </div>
+            <div class="overflow-y-auto pr-2 custom-scrollbar" id="pin-list-content"></div>
             <button onclick="togglePinModal(false)" class="mt-6 w-full bg-white/10 py-3 rounded-xl font-bold hover:bg-white/20">닫기</button>
         </div>
     </div>
@@ -92,44 +102,65 @@
     let currentUser = null;
     let selectedCategory = "";
 
-    // [추가] PIN 팝업 제어 및 명단 생성
+    // [기능 추가] 페이지 로드 시 저장된 PIN 확인
+    window.onload = function() {
+        const savedPin = localStorage.getItem('user_pin');
+        if (savedPin) {
+            document.getElementById('pin').value = savedPin;
+            document.getElementById('remember-pin').checked = true;
+        }
+    };
+
     window.togglePinModal = async function(show) {
         const modal = document.getElementById('pin-modal');
         const content = document.getElementById('pin-list-content');
         if (show) {
-            content.innerHTML = `<div class="p-10 text-center opacity-50 text-sm">명단 불러오는 중...</div>`;
+            content.innerHTML = `<div class="p-10 text-center opacity-50 text-sm italic">명단 불러오는 중...</div>`;
             modal.classList.add('active');
             try {
                 const snap = await getDocs(collection(db, "users"));
                 let users = [];
                 snap.forEach(d => users.push({ pin: d.id, name: d.data().name }));
                 users.sort((a, b) => parseInt(a.pin) - parseInt(b.pin));
-                
                 content.innerHTML = users.map(u => `
-                    <div class="flex justify-between items-center p-3 border-b border-white/5 hover:bg-white/5">
+                    <div class="flex justify-between items-center p-3 border-b border-white/5 hover:bg-white/5 transition">
                         <span class="text-gray-400 font-mono">${u.pin}</span>
                         <span class="font-bold">${u.name}</span>
                     </div>
                 `).join('');
             } catch(e) { content.innerHTML = "명단을 불러오지 못했습니다."; }
-        } else {
-            modal.classList.remove('active');
-        }
+        } else { modal.classList.remove('active'); }
     };
 
     window.navTo = function(cat) {
         selectedCategory = cat;
         document.getElementById('rank-title').innerText = cat;
+        // 로그인 화면 진입 시 저장된 PIN 다시 세팅 (비동기 처리 등 방지)
+        const savedPin = localStorage.getItem('user_pin');
+        if (savedPin) document.getElementById('pin').value = savedPin;
+
         if (currentUser) renderList(); else showPage('page-login');
     };
 
     window.login = async function() {
-        const pin = document.getElementById('pin').value;
-        const pw = document.getElementById('pw').value;
+        const pinInput = document.getElementById('pin').value;
+        const pwInput = document.getElementById('pw').value;
+        const rememberCheckbox = document.getElementById('remember-pin').checked;
+
+        if(!pinInput) return alert("PIN을 입력해주세요.");
+
         try {
-            const snap = await getDoc(doc(db, "users", pin));
-            if (snap.exists() && snap.data().password === pw) {
-                currentUser = { pin, name: snap.data().name };
+            const snap = await getDoc(doc(db, "users", pinInput));
+            if (snap.exists() && snap.data().password === pwInput) {
+                currentUser = { pin: pinInput, name: snap.data().name };
+                
+                // [기능 추가] 체크박스 여부에 따라 로컬스토리지 저장/삭제
+                if (rememberCheckbox) {
+                    localStorage.setItem('user_pin', pinInput);
+                } else {
+                    localStorage.removeItem('user_pin');
+                }
+
                 renderList();
             } else { alert("인증 정보가 틀립니다."); }
         } catch(e) { alert("로그인 오류"); }
@@ -179,7 +210,7 @@
     };
 
     window.addGame = async function() {
-        const n = prompt("새 게임 이름:");
+        const n = prompt("새로운 게임 이름을 입력하세요:");
         if (n) { await addDoc(collection(db, "games"), { name: n, category: selectedCategory, createdAt: new Date() }); renderList(); }
     };
 
@@ -188,12 +219,12 @@
     };
 
     window.inputScore = async function(id, n) {
-        const v = prompt(`${n} 점수 (0~100):`);
+        const v = prompt(`${n}에 줄 점수를 입력하세요 (0~100):`);
         if (v !== null) {
             const s = parseFloat(v);
-            if (isNaN(s) || s < 0 || s > 100) return alert("0~100 사이 숫자를 입력하세요.");
+            if (isNaN(s) || s < 0 || s > 100) return alert("0~100 사이의 숫자를 입력해주세요.");
             await setDoc(doc(db, "ratings", `${currentUser.pin}_${id}`), { gameId: id, userPin: currentUser.pin, score: s, updatedAt: new Date() });
-            alert("반영되었습니다!"); renderList();
+            alert("점수가 성공적으로 반영되었습니다!"); renderList();
         }
     };
 </script>
