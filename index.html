@@ -14,11 +14,18 @@
         .category-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .category-card:hover { transform: translateY(-8px); background: rgba(255, 255, 255, 0.1); border-color: #3b82f6; }
         input::placeholder { color: rgba(255,255,255,0.3); }
+        /* 팝업 스타일 */
+        #pin-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+        #pin-modal.active { display: flex; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-6">
 
-    <div id="page-home" class="page active w-full max-w-4xl text-center">
+    <div class="fixed top-0 left-0 w-full bg-blue-600/20 backdrop-blur-md border-b border-white/10 p-2 text-center text-sm font-semibold text-blue-300 z-50">
+        💡 모든 사용자의 기본 비밀번호는 <span class="text-white underline">1234</span>입니다.
+    </div>
+
+    <div id="page-home" class="page active w-full max-w-4xl text-center pt-10">
         <h1 class="text-4xl font-extrabold mb-12 tracking-tight">GAME <span class="text-blue-500">ARCHIVE</span></h1>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <button onclick="navTo('보드게임')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400">🎲 보드게임</button>
@@ -26,37 +33,44 @@
             <button onclick="navTo('방탈출')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400">🔑 방탈출</button>
             <button onclick="navTo('머더 미스테리')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400">🕵️ 머더 미스테리</button>
         </div>
-        <button onclick="createAdminOnce()" class="mt-20 text-xs text-gray-600 hover:text-gray-400 opacity-30 underline">관리자 계정(100번) 원클릭 생성</button>
+        <button onclick="togglePinModal(true)" class="mt-12 text-gray-400 hover:text-white text-sm underline">내 PIN 번호 확인하기</button>
     </div>
 
     <div id="page-login" class="page w-full max-w-sm text-center">
         <div class="glass p-8 rounded-3xl shadow-2xl">
             <h2 class="text-2xl font-bold mb-6">인증이 필요합니다</h2>
-            <div class="space-y-4">
-                <input type="text" id="pin" placeholder="PIN 입력" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white">
-                <input type="password" id="pw" placeholder="PW 입력" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white">
-                <button onclick="login()" class="w-full bg-blue-600 py-3 rounded-xl font-bold hover:bg-blue-500">시작하기</button>
+            <div class="space-y-4 text-left">
+                <label class="text-xs text-gray-400 ml-1">USER PIN</label>
+                <input type="text" id="pin" placeholder="PIN 입력" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-blue-500">
+                <label class="text-xs text-gray-400 ml-1">PASSWORD</label>
+                <input type="password" id="pw" placeholder="PW 입력" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-blue-500">
+                <button onclick="login()" class="w-full bg-blue-600 py-3 rounded-xl font-bold hover:bg-blue-500 shadow-lg shadow-blue-500/20 transition-all">시작하기</button>
             </div>
-            <button onclick="showPage('page-home')" class="mt-4 text-sm text-gray-500 hover:text-white">돌아가기</button>
+            <div class="mt-6 flex flex-col gap-2">
+                <button onclick="togglePinModal(true)" class="text-xs text-blue-400 hover:underline">내 PIN 번호를 모르겠어요</button>
+                <button onclick="showPage('page-home')" class="text-xs text-gray-500 hover:text-white">돌아가기</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="pin-modal">
+        <div class="glass w-full max-w-md p-6 rounded-3xl max-h-[80vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">PIN 번호 찾기</h3>
+                <button onclick="togglePinModal(false)" class="text-gray-400 hover:text-white">✕</button>
+            </div>
+            <div class="overflow-y-auto pr-2 custom-scrollbar" id="pin-list-content">
+                </div>
+            <button onclick="togglePinModal(false)" class="mt-6 w-full bg-white/10 py-3 rounded-xl font-bold hover:bg-white/20">닫기</button>
         </div>
     </div>
 
     <div id="page-rank" class="page w-full max-w-3xl">
         <div class="flex justify-between items-end mb-8">
-            <div>
-                <button onclick="showPage('page-home')" class="text-blue-400 text-sm hover:underline mb-2">← 뒤로가기</button>
-                <h2 id="rank-title" class="text-3xl font-bold">카테고리</h2>
-            </div>
-            <button onclick="addGame()" class="bg-white/10 px-4 py-2 rounded-xl text-sm font-medium hover:bg-white/20">+ 새 항목 추가</button>
+            <div><button onclick="showPage('page-home')" class="text-blue-400 text-sm hover:underline mb-2">← 뒤로가기</button><h2 id="rank-title" class="text-3xl font-bold">카테고리</h2></div>
+            <button onclick="addGame()" class="bg-white/10 px-4 py-2 rounded-xl text-sm font-medium hover:bg-white/20 transition">+ 새 항목 추가</button>
         </div>
-        <div class="glass rounded-3xl overflow-hidden">
-            <table class="w-full text-left border-collapse">
-                <thead class="bg-white/5 text-gray-400 text-xs uppercase tracking-wider">
-                    <tr><th class="p-5">순위</th><th class="p-5">게임 이름</th><th class="p-5">평점</th><th class="p-5 text-center">상태</th></tr>
-                </thead>
-                <tbody id="rank-list" class="divide-y divide-white/5"></tbody>
-            </table>
-        </div>
+        <div class="glass rounded-3xl overflow-hidden"><table class="w-full text-left border-collapse"><thead class="bg-white/5 text-gray-400 text-xs uppercase tracking-wider"><tr><th class="p-5">순위</th><th class="p-5">게임 이름</th><th class="p-5">평점</th><th class="p-5 text-center">상태</th></tr></thead><tbody id="rank-list" class="divide-y divide-white/5"></tbody></table></div>
     </div>
 
 <script type="module">
@@ -78,12 +92,29 @@
     let currentUser = null;
     let selectedCategory = "";
 
-    // [중요] 관리자 생성 원클릭 함수
-    window.createAdminOnce = async function() {
-        try {
-            await setDoc(doc(db, "users", "100"), { name: "관리자", password: "1004" });
-            alert("관리자 계정(100/1004) 생성 완료! 이제 로그인해보세요.");
-        } catch(e) { alert("오류: " + e.message); }
+    // [추가] PIN 팝업 제어 및 명단 생성
+    window.togglePinModal = async function(show) {
+        const modal = document.getElementById('pin-modal');
+        const content = document.getElementById('pin-list-content');
+        if (show) {
+            content.innerHTML = `<div class="p-10 text-center opacity-50 text-sm">명단 불러오는 중...</div>`;
+            modal.classList.add('active');
+            try {
+                const snap = await getDocs(collection(db, "users"));
+                let users = [];
+                snap.forEach(d => users.push({ pin: d.id, name: d.data().name }));
+                users.sort((a, b) => parseInt(a.pin) - parseInt(b.pin));
+                
+                content.innerHTML = users.map(u => `
+                    <div class="flex justify-between items-center p-3 border-b border-white/5 hover:bg-white/5">
+                        <span class="text-gray-400 font-mono">${u.pin}</span>
+                        <span class="font-bold">${u.name}</span>
+                    </div>
+                `).join('');
+            } catch(e) { content.innerHTML = "명단을 불러오지 못했습니다."; }
+        } else {
+            modal.classList.remove('active');
+        }
     };
 
     window.navTo = function(cat) {
@@ -116,7 +147,7 @@
 
     window.renderList = async function() {
         const list = document.getElementById('rank-list');
-        list.innerHTML = `<tr><td colspan="4" class="p-10 text-center opacity-50">랭킹 계산 중...</td></tr>`;
+        list.innerHTML = `<tr><td colspan="4" class="p-10 text-center opacity-50 text-sm">랭킹 집계 중...</td></tr>`;
         try {
             const gSnap = await getDocs(query(collection(db, "games"), where("category", "==", selectedCategory)));
             const rSnap = await getDocs(collection(db, "ratings"));
@@ -133,13 +164,13 @@
             games.sort((a, b) => b.avg - a.avg);
 
             list.innerHTML = games.map((g, i) => `
-                <tr class="hover:bg-white/5 border-b border-white/5">
+                <tr class="hover:bg-white/5 border-b border-white/5 transition">
                     <td class="p-5 font-mono text-blue-400">#${i+1}</td>
                     <td class="p-5 font-bold">${g.name} <span class="text-xs font-normal opacity-40">(${g.count}명)</span>
-                    ${currentUser.pin === "100" ? `<button onclick="delGame('${g.id}','${g.name}')" class="text-red-500 text-xs ml-2 hover:underline">[삭제]</button>` : ''}</td>
-                    <td class="p-5 text-yellow-400 font-semibold">${g.avg.toFixed(1)}</td>
+                    ${currentUser.pin === "100" ? `<button onclick="delGame('${g.id}','${g.name}')" class="text-red-500 text-xs ml-2 hover:underline font-normal">[삭제]</button>` : ''}</td>
+                    <td class="p-5 text-yellow-400 font-semibold">${g.avg.toFixed(1)}점</td>
                     <td class="p-5 text-center">
-                        <button onclick="inputScore('${g.id}','${g.name}')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition ${g.myScore !== null ? 'bg-white/10 text-gray-400' : 'bg-blue-600/20 text-blue-400 border border-blue-500/30 hover:bg-blue-600 hover:text-white'}">
+                        <button onclick="inputScore('${g.id}','${g.name}')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition ${g.myScore !== null ? 'bg-white/10 text-gray-400 cursor-default' : 'bg-blue-600/20 text-blue-400 border border-blue-500/30 hover:bg-blue-600 hover:text-white'}">
                         ${g.myScore !== null ? `내 점수: ${g.myScore}` : '점수 입력'}</button>
                     </td>
                 </tr>`).join('');
@@ -153,7 +184,7 @@
     };
 
     window.delGame = async function(id, n) {
-        if (confirm(`'${n}'을(를) 삭제하시겠습니까?`)) { await deleteDoc(doc(db, "games", id)); renderList(); }
+        if (confirm(`'${n}'을(를) 정말 삭제하시겠습니까?`)) { await deleteDoc(doc(db, "games", id)); renderList(); }
     };
 
     window.inputScore = async function(id, n) {
