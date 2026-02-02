@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Game Archive v3.8.1</title>
+    <title>Game Archive v3.8.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -16,7 +16,8 @@
         .sticky-back { position: fixed; top: 20px; left: 20px; z-index: 5000; background: rgba(30, 41, 59, 0.9); padding: 10px 16px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.1); display: none; cursor: pointer; pointer-events: auto; }
         .page.active:not(#page-home):not(#page-login) ~ .sticky-back { display: block; }
         .user-icon { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: #334155; flex-shrink: 0; }
-        .category-tag { font-size: 8px; padding: 2px 6px; border-radius: 4px; background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); font-weight: 800; }
+        .difficulty-star { cursor: pointer; color: #64748b; transition: color 0.2s; }
+        .difficulty-star.active { color: #fbbf24; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
     </style>
@@ -26,12 +27,12 @@
     <button onclick="handleBack()" id="global-back-btn" class="sticky-back text-blue-400 hover:text-white transition font-black shadow-xl">← 뒤로가기</button>
 
     <div id="page-login" class="page active pt-24 max-w-sm text-center">
-        <div class="glass p-8 rounded-3xl shadow-2xl relative">
-            <h2 class="text-2xl font-extrabold mb-8 text-blue-400 italic uppercase">Login</h2>
+        <div class="glass p-8 rounded-3xl shadow-2xl">
+            <h2 class="text-2xl font-extrabold mb-8 text-blue-400 uppercase italic">Login</h2>
             <div class="space-y-4">
                 <input type="text" id="pin" placeholder="PIN 번호" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none text-white font-bold">
-                <input type="password" id="pw" placeholder="비밀번호" maxlength="4" oninput="if(this.value.length===4) login()" onkeypress="if(event.keyCode==13) login()" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none text-white font-bold">
-                <button onclick="login()" class="w-full bg-blue-600 py-4 rounded-xl font-extrabold shadow-lg mt-4 transition">접속하기</button>
+                <input type="password" id="pw" placeholder="비밀번호" maxlength="4" oninput="if(this.value.length===4) login()" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none text-white font-bold">
+                <button onclick="login()" class="w-full bg-blue-600 py-4 rounded-xl font-extrabold shadow-lg mt-4">접속하기</button>
             </div>
         </div>
     </div>
@@ -46,9 +47,8 @@
         </div>
         <h1 class="text-4xl font-extrabold mb-12 italic text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 uppercase tracking-tighter">Game Archive</h1>
         <div class="flex flex-wrap justify-center gap-3 mb-10 px-4">
-            <button onclick="navToStats()" class="bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-6 py-4 rounded-2xl font-extrabold hover:bg-yellow-500 transition shadow-lg">🏆 명예전당</button>
-            <button onclick="showPage('page-chat-info')" class="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-6 py-4 rounded-2xl font-extrabold hover:bg-blue-500 hover:text-white transition shadow-lg">📢 단톡방 정보</button>
-            <button id="admin-user-manage-btn" class="hidden bg-red-500/10 border border-red-500/30 text-red-400 px-5 py-3 rounded-2xl font-extrabold shadow-lg" onclick="openAdminModal()">⚙️ 명단 관리</button>
+            <button onclick="navToStats()" class="bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-6 py-4 rounded-2xl font-extrabold shadow-lg transition">🏆 명예전당</button>
+            <button onclick="showPage('page-chat-info')" class="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-6 py-4 rounded-2xl font-extrabold shadow-lg">📢 단톡방 정보</button>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4 font-bold">
             <button onclick="navTo('보드게임')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition shadow-xl">🎲 보드게임</button>
@@ -59,14 +59,14 @@
     </div>
 
     <div id="page-rank" class="page pt-12 font-bold">
-        <div class="flex justify-between items-end mb-8 px-4 font-bold">
+        <div class="flex justify-between items-end mb-8 px-4">
             <h2 id="rank-title" class="text-4xl font-black italic text-blue-400"></h2>
             <button onclick="addGame()" class="bg-blue-600/20 text-blue-400 border border-blue-500/30 px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg">+ 새 게임</button>
         </div>
         <div class="glass rounded-[40px] overflow-hidden overflow-x-auto custom-scrollbar mx-4 shadow-2xl border border-white/5 relative">
             <table class="w-full text-center min-w-[600px] font-bold">
                 <thead><tr class="bg-white/5 text-gray-500 text-[10px] border-b border-white/10 uppercase font-bold">
-                    <th class="p-5 w-16">순위</th><th class="p-5 text-left">게임 정보</th><th>평가</th><th>관리</th>
+                    <th class="p-5 w-16">순위</th><th class="p-5 text-left">게임 정보</th><th class="w-32">평가</th><th>기록</th>
                 </tr></thead>
                 <tbody id="rank-list" class="divide-y divide-white/5 font-bold"></tbody>
             </table>
@@ -76,17 +76,23 @@
     <div id="rate-modal" class="modal" onclick="closeOnBackdrop(event, 'rate-modal')">
         <div class="glass w-full max-w-xs p-8 rounded-[40px] flex flex-col font-bold" onclick="event.stopPropagation()">
             <h3 id="rate-modal-title" class="text-xl font-black text-yellow-400 mb-6 truncate text-center"></h3>
-            <div class="space-y-6 font-bold">
-                <div><label class="text-[10px] text-gray-500 block mb-2 font-bold font-bold font-bold">재미 점수 (0 ~ 100)</label><input type="number" id="rate-score" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none font-black text-center" placeholder="0 - 100"></div>
-                <div><label class="text-[10px] text-gray-500 block mb-2 font-bold font-bold font-bold">체감 난이도 (1 ~ 10)</label><input type="number" id="rate-diff" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none font-black text-center" placeholder="1 - 10"></div>
-                <button onclick="submitRating()" class="w-full bg-yellow-500 py-4 rounded-2xl font-black text-black shadow-xl hover:brightness-110">평가 등록</button>
+            <div id="rate-container-score" class="space-y-4">
+                <label class="text-[10px] text-gray-500 block text-center font-bold">재미 점수 (0 ~ 100)</label>
+                <input type="number" id="rate-score-input" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none font-black text-center text-2xl" placeholder="점수 입력">
+                <button onclick="submitRating('score')" class="w-full bg-yellow-500 py-4 rounded-2xl font-black text-black shadow-xl">점수 저장</button>
+            </div>
+            <div id="rate-container-diff" class="space-y-4 hidden">
+                <label class="text-[10px] text-gray-500 block text-center font-bold">체감 난이도 (낮음 1 ~ 높음 10)</label>
+                <div class="flex justify-center gap-2 py-4">
+                    <input type="range" id="rate-diff-input" min="1" max="10" step="1" class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                </div>
+                <div id="diff-value-display" class="text-center text-3xl font-black text-blue-400 mb-4">5</div>
+                <button onclick="submitRating('diff')" class="w-full bg-blue-600 py-4 rounded-2xl font-black text-white shadow-xl">난이도 저장</button>
             </div>
         </div>
     </div>
 
-    <div id="page-stats" class="page pt-12 font-bold text-center"><h2 class="text-3xl font-black text-yellow-400 mb-10 italic uppercase font-bold">명예전당 🏆</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-6 px-4 font-bold font-bold font-bold"><div class="space-y-4 font-bold font-bold font-bold"><h3 class="text-blue-400 font-black italic font-bold font-bold font-bold">🗳️ Voting King</h3><div id="vote-king" class="space-y-3 font-bold font-bold font-bold"></div></div><div class="space-y-4 font-bold font-bold font-bold font-bold"><h3 class="text-green-400 font-black italic font-bold font-bold font-bold font-bold">🆕 Creator King</h3><div id="game-add-king" class="space-y-3 font-bold font-bold font-bold font-bold font-bold"></div></div></div></div>
-    <div id="page-chat-info" class="page pt-12 font-bold font-bold font-bold"><h2 class="text-3xl font-black text-blue-400 mb-10 italic px-4 uppercase font-bold font-bold font-bold font-bold">Group Info 📢</h2><div id="chat-info-list" class="space-y-4 px-4 font-bold font-bold font-bold font-bold font-bold font-bold"></div></div>
-    <div id="profile-modal" class="modal" onclick="closeOnBackdrop(event, 'profile-modal')"><div class="glass w-full max-w-md p-8 rounded-[40px] flex flex-col font-bold font-bold text-center" onclick="event.stopPropagation()"><h3 class="text-3xl font-black text-blue-400 mb-8 uppercase italic font-bold">My Profile</h3><div class="flex flex-col items-center gap-6 mb-8 pb-8 border-b border-white/10 font-bold font-bold font-bold"><div class="relative group cursor-pointer" onclick="document.getElementById('file-input').click()"><img id="profile-preview" src="" class="w-24 h-24 rounded-full border-4 border-blue-600 shadow-2xl object-cover bg-slate-800"><div class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity font-bold">📸</div></div><div class="w-full space-y-4 font-bold font-bold"><input type="text" id="edit-nickname" class="w-full bg-white/5 p-4 rounded-2xl border border-white/10 outline-none font-black text-center font-bold" placeholder="닉네임"><input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleFileUpload(this)"><button onclick="document.getElementById('file-input').click()" class="w-full bg-white/10 py-3 rounded-xl text-xs font-bold font-bold font-bold">사진 변경 (또는 Ctrl+V)</button></div><button onclick="updateProfile()" class="w-full bg-blue-600 py-4 rounded-2xl font-black shadow-xl font-bold font-bold font-bold">저장</button></div><div id="my-history-list" class="flex-grow overflow-y-auto max-h-[180px] space-y-3 custom-scrollbar text-left font-bold font-bold font-bold font-bold font-bold"></div></div></div>
+    <div id="detail-modal" class="modal" onclick="closeOnBackdrop(event, 'detail-modal')"><div class="glass w-full max-w-md p-8 rounded-[40px] max-h-[90vh] flex flex-col font-bold" onclick="event.stopPropagation()"><div class="flex justify-between items-center mb-6"><h3 id="detail-title" class="text-xl font-black text-blue-400 truncate pr-2 font-bold"></h3><button onclick="toggleModal('detail-modal', false)" class="text-gray-500 text-3xl font-bold">✕</button></div><div id="detail-podium" class="bg-yellow-400/10 border border-yellow-500/20 p-5 rounded-3xl mb-6 hidden"><div id="detail-rank-result" class="text-sm space-y-1 font-bold"></div></div><div class="flex gap-2 mb-8"><button onclick="openRankPopup()" class="flex-1 bg-blue-600/20 py-4 rounded-2xl text-xs text-blue-300 font-bold">🥇 순위</button><button onclick="openCommentPopup()" class="flex-1 bg-green-600/20 py-4 rounded-2xl text-xs text-green-300 font-bold">💬 코멘트</button></div><div id="detail-comment-feed" class="flex-grow overflow-y-auto custom-scrollbar space-y-4 text-left font-bold"></div></div></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -97,12 +103,21 @@
         const DEFAULT_ICON = 'https://cdn-icons-png.flaticon.com/512/3241/3241724.png';
 
         let currentUser = null; let selectedCategory = ""; let activeGameId = null; let activeGameName = "";
-        let recordingRanks = []; let currentScheduleId = null; let tempMembers = []; let profileImageData = "";
+        let tempMembers = []; let currentScheduleId = null;
 
-        // [핵심 로직 1: 렌더링 & 절사평균 복구]
+        // [v3.8.2 제어 엔진 - 내비게이션 복구]
+        window.handleBack = () => { if(document.querySelector('.modal.active')) closeAllModals(); else showPage('page-home'); };
+        window.goHome = () => showPage('page-home');
+        window.showPage = (id) => {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(history.state?.page !== id) history.pushState({page: id}, '', '');
+        };
+
+        // [v3.8.2 렌더링 엔진 - 평가 인터페이스 개선]
         window.renderList = async () => {
             const list = document.getElementById('rank-list');
-            list.innerHTML = `<tr><td colspan="4" class="p-10 opacity-30 italic font-bold">Loading List...</td></tr>`;
+            list.innerHTML = `<tr><td colspan="4" class="p-10 opacity-30 italic font-bold">Loading...</td></tr>`;
             try {
                 const [gSnap, rSnap] = await Promise.all([getDocs(query(collection(db, "games"), where("category", "==", selectedCategory))), getDocs(collection(db, "ratings"))]);
                 const allRatings = rSnap.docs.map(d => d.data());
@@ -110,89 +125,92 @@
                 let games = gSnap.docs.map(d => {
                     const r = allRatings.filter(v => v.gameId === d.id);
                     const scores = r.map(v => v.score || 0).sort((a, b) => a - b);
-                    
-                    // 정교한 점수 계산 규칙 적용 (5표 이상 절사평균)
-                    let avgS = 0;
-                    if (r.length >= 5) {
-                        const skipCount = Math.floor(scores.length * 0.1) || 1; // 상하위 10% (최소 1개) 제외
-                        const trimmed = scores.slice(skipCount, -skipCount);
-                        avgS = trimmed.reduce((a, c) => a + c, 0) / trimmed.length;
-                    } else {
-                        avgS = r.length > 0 ? scores.reduce((a, c) => a + c, 0) / r.length : 0;
-                    }
-                    
+                    let avgS = r.length >= 5 ? scores.slice(1, -1).reduce((a, c) => a + c, 0) / (scores.length - 2) : (r.length > 0 ? scores.reduce((a, c) => a + c, 0) / r.length : 0);
                     const diffs = r.map(v => v.difficulty || 0).filter(v => v > 0);
                     let avgD = diffs.length > 0 ? diffs.reduce((a,c)=>a+c,0)/diffs.length : 0;
-                    
                     return { id: d.id, ...d.data(), avgScore: avgS, avgDiff: avgD, voteCount: r.length };
                 }).sort((a, b) => b.avgScore - a.avgScore);
 
                 list.innerHTML = games.map((g, i) => {
-                    const isRanked = i < 3 && g.voteCount >= 3; // 3표 이상만 트로피
-                    const rankIcon = isRanked ? ['🥇','🥈','🥉'][i] : '#'+(i+1);
+                    const stars = Math.round(g.avgDiff);
                     return `
                     <tr class="hover:bg-white/5 border-b border-white/5 font-bold transition">
-                        <td class="p-5 text-blue-400 font-bold">${rankIcon}</td>
-                        <td class="p-5 text-left font-black">
-                            <div class="text-sm font-bold font-bold font-bold font-bold font-bold font-bold">${g.name}</div>
-                            <div class="text-[9px] text-gray-500 font-bold">난이도: ${g.avgDiff > 0 ? g.avgDiff.toFixed(1) : '미측정'} | Votes: ${g.voteCount}</div>
+                        <td class="p-5 text-blue-400 font-bold">${i < 3 && g.voteCount >= 3 ? ['🥇','🥈','🥉'][i] : '#'+(i+1)}</td>
+                        <td class="p-5 text-left"><div class="text-sm font-black">${g.name}</div><div class="text-[9px] text-gray-500">Votes: ${g.voteCount}</div></td>
+                        <td class="p-2">
+                            <div class="flex flex-col items-center gap-1">
+                                <span onclick="openRate('score','${g.id}','${g.name}')" class="text-yellow-400 text-lg cursor-pointer hover:scale-110 transition font-black">${g.avgScore.toFixed(1)}</span>
+                                <div onclick="openRate('diff','${g.id}','${g.name}')" class="flex text-[10px] cursor-pointer hover:opacity-70 transition">
+                                    ${Array(10).fill(0).map((_, idx) => `<span class="${idx < stars ? 'text-blue-400' : 'text-gray-700'}">★</span>`).join('')}
+                                </div>
+                            </div>
                         </td>
-                        <td class="p-5 font-bold text-yellow-400 font-bold font-bold font-bold">${g.avgScore.toFixed(1)}</td>
-                        <td class="p-5"><div class="flex gap-1 justify-center font-bold font-bold font-bold font-bold font-bold">
-                            <button onclick="openRateModal('${g.id}','${g.name}')" class="bg-blue-600/20 text-blue-400 border border-blue-500/20 px-2.5 py-1.5 rounded-lg text-[9px] font-black hover:bg-blue-600 transition">평가</button>
-                            <button onclick="openSchedules('${g.id}','${g.name}')" class="bg-green-600/20 text-green-400 border border-green-500/20 px-2.5 py-1.5 rounded-lg text-[9px] font-black hover:bg-green-600 transition font-bold font-bold">기록</button>
-                        </div></td>
+                        <td class="p-5"><button onclick="openSchedules('${g.id}','${g.name}')" class="bg-green-600/20 text-green-400 border border-green-500/20 px-3 py-1.5 rounded-lg text-[10px] font-black hover:bg-green-600 transition">기록</button></td>
                     </tr>`;
                 }).join('');
-            } catch (e) { list.innerHTML = "Restoration Needed"; }
+            } catch (e) { list.innerHTML = "Error"; }
         };
 
-        // [핵심 로직 2: 평가 시스템 복구]
-        window.openRateModal = (id, name) => { activeGameId = id; document.getElementById('rate-modal-title').innerText = name; document.getElementById('rate-score').value = ""; document.getElementById('rate-diff').value = ""; toggleModal('rate-modal', true); };
-        window.submitRating = async () => {
-            const sc = parseFloat(document.getElementById('rate-score').value);
-            const df = parseFloat(document.getElementById('rate-diff').value);
-            if(isNaN(sc) || sc < 0 || sc > 100 || isNaN(df) || df < 1 || df > 10) return alert("입력값 확인(점수:0~100, 난이도:1~10)");
+        // [v3.8.2 평가 로직]
+        window.openRate = (type, id, name) => {
+            activeGameId = id;
+            document.getElementById('rate-modal-title').innerText = name;
+            document.getElementById('rate-container-score').classList.toggle('hidden', type !== 'score');
+            document.getElementById('rate-container-diff').classList.toggle('hidden', type !== 'diff');
+            toggleModal('rate-modal', true);
+        };
+
+        document.getElementById('rate-diff-input').oninput = function() { document.getElementById('diff-value-display').innerText = this.value; };
+
+        window.submitRating = async (type) => {
+            const val = type === 'score' ? parseFloat(document.getElementById('rate-score-input').value) : parseInt(document.getElementById('rate-diff-input').value);
+            if(type === 'score' && (isNaN(val) || val < 0 || val > 100)) return alert("0~100 사이 점수를 입력하세요.");
             try {
                 const q = query(collection(db, "ratings"), where("gameId", "==", activeGameId), where("userPin", "==", currentUser.pin));
                 const snap = await getDocs(q);
-                const rData = { gameId: activeGameId, userPin: currentUser.pin, score: sc, difficulty: df, updatedAt: serverTimestamp() };
+                const rData = { gameId: activeGameId, userPin: currentUser.pin, updatedAt: serverTimestamp() };
+                rData[type === 'score' ? 'score' : 'difficulty'] = val;
+                
                 if(!snap.empty) await updateDoc(doc(db, "ratings", snap.docs[0].id), rData);
                 else await addDoc(collection(db, "ratings"), rData);
-                alert("완료!"); toggleModal('rate-modal', false); renderList();
-            } catch(e) { alert("실패"); }
+                
+                alert("평가 완료!"); toggleModal('rate-modal', false); renderList();
+            } catch(e) { alert("저장 실패"); }
         };
 
-        // [제어 엔진]
-        window.handleBack = () => { if(document.querySelector('.modal.active')) closeAllModals(); else showPage('page-home'); };
-        window.onpopstate = (e) => { closeAllModals(); if(e.state?.page) showPage(e.state.page, false); };
-        window.showPage = (id, push=true) => { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); if(push) history.pushState({page:id},'',''); if(id==='page-chat-info') loadChatInfo(); };
+        // [인증 및 공통 기능]
+        window.addEventListener('DOMContentLoaded', async () => {
+            const auth = localStorage.getItem('game_archive_auth');
+            if (auth) {
+                const d = JSON.parse(auth);
+                const snap = await getDoc(doc(db, "users", d.pin));
+                if (snap.exists() && snap.data().password === d.pw) { currentUser = { pin: d.pin, ...snap.data() }; updateUI(); showPage('page-home'); return; }
+            }
+            showPage('page-login');
+        });
+
+        window.login = async () => {
+            const pin = document.getElementById('pin').value, pw = document.getElementById('pw').value;
+            const snap = await getDoc(doc(db, "users", pin));
+            if (snap.exists() && snap.data().password === pw) { currentUser = { pin, ...snap.data() }; localStorage.setItem('game_archive_auth', JSON.stringify({ pin, pw })); location.reload(); }
+        };
+
+        function updateUI() { document.getElementById('user-welcome').innerText = `${currentUser.name}님`; document.getElementById('my-profile-icon').src = currentUser.iconUrl || DEFAULT_ICON; if(currentUser.pin==="100") document.getElementById('admin-user-manage-btn')?.classList.remove('hidden'); }
+        window.logout = () => { localStorage.removeItem('game_archive_auth'); location.reload(); };
+        window.toggleProfileModal = (s) => { if(s && currentUser) { document.getElementById('edit-nickname').value = currentUser.name; loadMyHistory(); } toggleModal('profile-modal', s); };
+        window.navTo = (cat) => { selectedCategory = cat; document.getElementById('rank-title').innerText = cat; renderList(); showPage('page-rank'); };
+        
+        // [일정/기록 로직]
+        window.openSchedules = async (id, n) => { activeGameId = id; activeGameName = n; document.getElementById('schedule-game-title').innerText = n; const uS = await getDocs(collection(db, "users")); document.getElementById('member-select-grid').innerHTML = uS.docs.filter(d => d.id !== "100").map(d => `<button onclick="toggleSelectMember('${d.id}')" id="sel-${d.id}" class="member-btn bg-white/5 p-2 rounded-lg text-[9px] border border-white/10 font-bold">${d.data().name}</button>`).join(''); toggleModal('schedule-modal', true); loadSchedules(); };
+        async function loadSchedules() { const l = document.getElementById('schedule-list'); const sS = await getDocs(query(collection(db, "schedules"), where("gameId", "==", activeGameId))); l.innerHTML = sS.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(s => `<div onclick="openScheduleDetail('${s.id}')" class="bg-white/5 p-4 rounded-2xl border border-white/5 flex justify-between items-center mb-2 shadow-lg cursor-pointer hover:bg-white/10"><div class="text-left font-bold"><div class="text-sm text-green-300">${s.name}</div><div class="text-[9px] text-gray-500">${s.ranks?.length > 0 ? 'Recorded' : 'Waiting'}</div></div><span class="text-blue-400 text-xs">▶</span></div>`).join('') || "No records."; }
+        window.openScheduleDetail = async (id) => { currentScheduleId = id; const [sS, uS] = await Promise.all([getDoc(doc(db, "schedules", id)), getDocs(collection(db, "users"))]); const s = sS.data(); const uM = uS.docs.reduce((acc, d) => ({...acc, [d.id]: d.data()}), {}); document.getElementById('detail-title').innerText = s.name; const p = document.getElementById('detail-podium'); if(s.ranks?.length > 0) { p.classList.remove('hidden'); document.getElementById('detail-rank-result').innerHTML = s.ranks.map((p, i) => `<div class='text-xs'>${i+1}위 <b>${uM[p]?.name}</b></div>`).join(''); } else p.classList.add('hidden'); document.getElementById('detail-comment-feed').innerHTML = (s.feed || []).sort((a,b)=>b.time-a.time).map(l => `<div class="bg-white/5 p-4 rounded-2xl flex gap-3 font-bold border border-white/5"><img src="${uM[l.userPin]?.iconUrl || DEFAULT_ICON}" class="user-icon w-8 h-8"><div class="flex-grow"><div class="flex justify-between items-center text-[10px] text-gray-500 mb-1"><span>${uM[l.userPin]?.name}</span>${l.userPin === currentUser.pin ? `<button onclick='deleteComment(${JSON.stringify(l)})' class='text-red-500'>🗑️</button>`:''}</div><div class="text-sm text-white/90">${l.text}</div></div></div>`).join(''); toggleModal('detail-modal', true); };
+
+        window.toggleSelectMember = (p) => { const i = tempMembers.indexOf(p); const b = document.getElementById(`sel-${p}`); if(i>-1){ tempMembers.splice(i,1); b.classList.remove('selected'); } else { tempMembers.push(p); b.classList.add('selected'); } };
+        window.createSchedule = async () => { const n = document.getElementById('new-schedule-name').value.trim(); if(!n || tempMembers.length === 0) return alert("제목/인원 입력!"); await addDoc(collection(db, "schedules"), { gameId: activeGameId, gameName: activeGameName, gameCategory: selectedCategory, name: n, members: tempMembers, ranks: [], feed: [], createdAt: serverTimestamp() }); document.getElementById('new-schedule-name').value = ""; tempMembers = []; loadSchedules(); };
         window.toggleModal = (id, s) => document.getElementById(id).classList.toggle('active', s);
         window.closeAllModals = () => document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
         window.closeOnBackdrop = (e, id) => { if (e.target.id === id) toggleModal(id, false); };
-
-        // [인증 및 부가기능]
-        window.addEventListener('DOMContentLoaded', async () => {
-            const auth = localStorage.getItem('game_archive_auth');
-            if (auth) { const d = JSON.parse(auth); const snap = await getDoc(doc(db, "users", d.pin)); if (snap.exists() && snap.data().password === d.pw) { currentUser = { pin: d.pin, ...snap.data() }; updateUI(); showPage('page-home', false); return; } }
-            showPage('page-login', false);
-        });
-        window.login = async () => { const pin = document.getElementById('pin').value, pw = document.getElementById('pw').value; const snap = await getDoc(doc(db, "users", pin)); if (snap.exists() && snap.data().password === pw) { currentUser = { pin, ...snap.data() }; localStorage.setItem('game_archive_auth', JSON.stringify({ pin, pw })); location.reload(); } };
-        function updateUI() { document.getElementById('user-welcome').innerText = `${currentUser.name}님`; document.getElementById('my-profile-icon').src = currentUser.iconUrl || DEFAULT_ICON; if(currentUser.pin==="100") document.getElementById('admin-user-manage-btn')?.classList.remove('hidden'); }
-        window.toggleProfileModal = (s) => { if(s && currentUser) { document.getElementById('edit-nickname').value = currentUser.name; document.getElementById('profile-preview').src = currentUser.iconUrl || DEFAULT_ICON; loadMyHistory(); } toggleModal('profile-modal', s); };
-        window.handleFileUpload = (i) => { if(i.files[0]) { const r = new FileReader(); r.onload = (e) => { profileImageData = e.target.result; document.getElementById('profile-preview').src = e.target.result; }; r.readAsDataURL(i.files[0]); } };
-        window.addEventListener('paste', (e) => { if(!document.getElementById('profile-modal').classList.contains('active')) return; const items = e.clipboardData.items; for(let i=0; i<items.length; i++) { if(items[i].type.indexOf('image') !== -1) { const b = items[i].getAsFile(); const r = new FileReader(); r.onload = (ev) => { profileImageData = ev.target.result; document.getElementById('profile-preview').src = ev.target.result; }; r.readAsDataURL(b); } } });
-        window.updateProfile = async () => { const n = document.getElementById('edit-nickname').value.trim(); const up = { name: n }; if(profileImageData) up.iconUrl = profileImageData; await updateDoc(doc(db, "users", currentUser.pin), up); location.reload(); };
-        window.navToStats = async () => { showPage('page-stats'); const [rS, gS, uS] = await Promise.all([getDocs(collection(db,"ratings")), getDocs(collection(db,"games")), getDocs(collection(db,"users"))]); const uM = uS.docs.reduce((acc, d) => ({...acc, [d.id]: d.data()}), {}); const vC = rS.docs.map(d=>d.data()).reduce((acc, r) => { acc[r.userPin] = (acc[r.userPin]||0)+1; return acc; }, {}); document.getElementById('vote-king').innerHTML = Object.entries(vC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(v => `<div class='p-3 glass rounded-xl flex justify-between items-center'><div class='flex items-center gap-3'><img src='${uM[v[0]]?.iconUrl || DEFAULT_ICON}' class='user-icon w-8 h-8 font-bold'><span class='text-xs font-bold'>${uM[v[0]]?.name || '?'}</span></div><b class='text-blue-400 text-xs'>${v[1]}회</b></div>`).join(''); const gC = gS.docs.map(d=>d.data()).reduce((acc, g) => { if(g.creatorPin) acc[g.creatorPin] = (acc[g.creatorPin]||0)+1; return acc; }, {}); document.getElementById('game-add-king').innerHTML = Object.entries(gC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(v => `<div class='p-3 glass rounded-xl flex justify-between items-center'><div class='flex items-center gap-3'><img src='${uM[v[0]]?.iconUrl || DEFAULT_ICON}' class='user-icon w-8 h-8 font-bold'><span class='text-xs font-bold'>${uM[v[0]]?.name || '?'}</span></div><b class='text-green-400 text-xs'>${v[1]}개</b></div>`).join(''); };
-        window.navTo = (cat) => { selectedCategory = cat; document.getElementById('rank-title').innerText = cat; renderList(); showPage('page-rank'); };
-        window.openSchedules = async (id, n) => { activeGameId = id; activeGameName = n; document.getElementById('schedule-game-title').innerText = n; tempMembers = []; const uS = await getDocs(collection(db, "users")); document.getElementById('member-select-grid').innerHTML = uS.docs.filter(d => d.id !== "100").map(d => `<button onclick="toggleSelectMember('${d.id}')" id="sel-${d.id}" class="member-btn bg-white/5 p-2 rounded-lg text-[9px] border border-white/10 font-bold">${d.data().name}</button>`).join(''); toggleModal('schedule-modal', true); loadSchedules(); };
-        window.toggleSelectMember = (p) => { const i = tempMembers.indexOf(p); const b = document.getElementById(`sel-${p}`); if(i>-1){ tempMembers.splice(i,1); b.classList.remove('selected'); } else { tempMembers.push(p); b.classList.add('selected'); } };
-        window.createSchedule = async () => { const n = document.getElementById('new-schedule-name').value.trim(); if(!n || tempMembers.length === 0) return alert("입력 확인"); await addDoc(collection(db, "schedules"), { gameId: activeGameId, gameName: activeGameName, gameCategory: selectedCategory, name: n, members: tempMembers, ranks: [], feed: [], createdAt: serverTimestamp() }); document.getElementById('new-schedule-name').value = ""; tempMembers = []; loadSchedules(); };
-        async function loadSchedules() { const l = document.getElementById('schedule-list'); const sS = await getDocs(query(collection(db, "schedules"), where("gameId", "==", activeGameId))); l.innerHTML = sS.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(s => `<div onclick="openScheduleDetail('${s.id}')" class="bg-white/5 p-4 rounded-2xl border border-white/5 flex justify-between items-center shadow-lg font-bold"><div class="text-left font-bold"><div class="text-sm text-green-300 font-bold">${s.name}</div><div class="text-[9px] text-gray-500 uppercase">${s.ranks?.length > 0 ? 'Recorded' : 'Waiting'}</div></div><span class="text-blue-400 text-xs">▶</span></div>`).join(''); }
-        window.openScheduleDetail = async (id) => { currentScheduleId = id; const [sS, uS] = await Promise.all([getDoc(doc(db, "schedules", id)), getDocs(collection(db, "users"))]); const s = sS.data(); const uM = uS.docs.reduce((acc, d) => ({...acc, [d.id]: d.data()}), {}); document.getElementById('detail-title').innerText = s.name; const p = document.getElementById('detail-podium'); if(s.ranks?.length > 0) { p.classList.remove('hidden'); document.getElementById('detail-rank-result').innerHTML = s.ranks.map((p, i) => `<div class='text-xs font-bold'>${i+1}위 <b>${uM[p]?.name || '?'}</b></div>`).join(''); } else p.classList.add('hidden'); document.getElementById('detail-comment-feed').innerHTML = (s.feed || []).sort((a,b)=>b.time-a.time).map(l => `<div class="bg-white/5 p-4 rounded-2xl flex gap-3 font-bold border border-white/5"><img src="${uM[l.userPin]?.iconUrl || DEFAULT_ICON}" class="user-icon w-8 h-8"><div class="flex-grow font-bold"><div class="flex justify-between items-center text-[10px] text-gray-500 mb-1"><span>${uM[l.userPin]?.name || 'Unknown'}</span>${l.userPin === currentUser.pin ? `<button onclick='deleteComment(${JSON.stringify(l).replace(/'/g, "&apos;")})' class='text-red-500'>🗑️</button>`:''}</div><div class="text-sm text-white/90 leading-relaxed font-bold">${l.text}</div></div></div>`).join('') || `<div class='opacity-20 text-center py-10 italic font-bold'>기록 없음</div>`; toggleModal('detail-modal', true); };
-        async function loadChatInfo() { const s = await getDocs(query(collection(db, "chatInfo"), orderBy("createdAt", "desc"))); document.getElementById('chat-info-list').innerHTML = s.docs.map(d => `<div class='glass p-6 rounded-3xl text-left border border-white/10 shadow-xl font-bold'><h4 class='text-blue-300 mb-2 font-black'>${d.data().title}</h4><p class='text-sm opacity-80 whitespace-pre-wrap font-bold'>${d.data().content}</p></div>`).join('') || "No info."; }
-        async function loadMyHistory() { const l = document.getElementById('my-history-list'); const q = query(collection(db, "schedules"), where("members", "array-contains", currentUser.pin)); const sS = await getDocs(q); l.innerHTML = sS.docs.map(d => d.data()).sort((a,b) => (b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(s => `<div class="bg-white/5 p-4 rounded-2xl flex justify-between items-center mb-1 border border-white/5 font-black"><div><div class="flex items-center gap-2 mb-1"><span class="category-tag font-bold font-bold font-bold">${s.gameCategory||'보드게임'}</span><span class="text-[9px] text-blue-500 font-bold font-bold font-bold">${s.gameName||'Unknown'}</span></div><div class="text-sm font-bold font-bold font-bold">${s.name}</div></div><div class="text-xs font-bold text-yellow-400 font-bold font-bold font-bold">${s.ranks?.indexOf(currentUser.pin)>-1 ? (s.ranks.indexOf(currentUser.pin)+1)+'위' : '기록전'}</div></div>`).join(''); }
-        window.addGame = async () => { const n = prompt("이름:"); if(!n) return; await addDoc(collection(db, "games"), { name: n, category: selectedCategory, creatorPin: currentUser.pin, createdAt: serverTimestamp() }); renderList(); };
+        async function loadMyHistory() { const l = document.getElementById('my-history-list'); const q = query(collection(db, "schedules"), where("members", "array-contains", currentUser.pin)); const sS = await getDocs(q); l.innerHTML = sS.docs.map(d => d.data()).sort((a,b) => (b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(s => { const r = s.ranks ? s.ranks.indexOf(currentUser.pin) : -1; return `<div class="bg-white/5 p-4 rounded-2xl flex justify-between items-center mb-1 border border-white/5 font-black"><div><div class="flex items-center gap-2 mb-1"><span class="category-tag">${s.gameCategory||'보드게임'}</span><span class="text-[9px] text-blue-500 font-bold">${s.gameName||'Game'}</span></div><div class="text-sm font-bold">${s.name}</div></div><div class="text-xs font-bold text-yellow-400">${r>-1 ? (r+1)+'위' : '기록전'}</div></div>`; }).join('') || "No Records"; }
     </script>
 </body>
 </html>
