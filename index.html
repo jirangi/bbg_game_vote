@@ -3,186 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Archive v2.6.0</title>
+    <title>Game Archive v2.6.3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Pretendard', sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; }
+        body { font-family: 'Pretendard', sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .page { display: none; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; }
+        .page { display: none; opacity: 0; transform: translateY(10px); transition: all 0.3s ease; }
         .page.active { display: block; opacity: 1; transform: translateY(0); }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
         .modal.active { display: flex; }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-        .sticky-back { position: fixed; top: 60px; left: 20px; z-index: 40; background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(8px); padding: 8px 16px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); display: none; }
-        /* 뒤로가기 버튼 노출 조건 */
-        .page.active#page-rank ~ .sticky-back, 
-        .page.active#page-stats ~ .sticky-back,
-        .page.active#page-gathering-list ~ .sticky-back,
-        .page.active#page-gathering-detail ~ .sticky-back { display: block; }
         .user-icon { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: #334155; }
-        .chat-bubble { max-width: 80%; padding: 10px 14px; border-radius: 18px; font-size: 13px; margin-bottom: 8px; position: relative; }
+        .chat-bubble { max-width: 85%; padding: 10px 14px; border-radius: 18px; font-size: 13px; }
         .chat-mine { background: #3b82f6; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
         .chat-others { background: rgba(255,255,255,0.1); align-self: flex-start; border-bottom-left-radius: 4px; }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 text-sm">
-
-    <div class="fixed top-0 left-0 w-full bg-blue-600/20 backdrop-blur-md border-b border-white/10 p-2 text-center text-[10px] font-semibold text-blue-300 z-50">
-        💡 모든 사용자의 기본 비밀번호는 <span class="text-white underline">1234</span>입니다.
-    </div>
-    <button onclick="navBack()" id="global-back-btn" class="sticky-back text-blue-400 hover:text-white transition font-bold shadow-xl">← 뒤로가기</button>
+<body class="min-h-screen flex items-center justify-center p-4 text-sm text-center">
 
     <div id="page-home" class="page active w-full max-w-4xl text-center pt-10">
         <div class="flex justify-between items-center mb-6 max-w-md mx-auto px-4 text-left">
-            <div class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition" onclick="toggleProfileModal(true)">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="toggleProfileModal(true)">
                 <img id="my-profile-icon" src="" class="user-icon border-2 border-blue-500/50">
-                <span id="user-welcome" class="text-blue-400 text-xs font-bold underline underline-offset-4"></span>
+                <span id="user-welcome" class="text-blue-400 text-xs font-bold underline"></span>
             </div>
-            <button onclick="logout()" class="text-gray-500 hover:text-red-400 text-xs underline font-bold">로그아웃</button>
+            <button onclick="logout()" class="text-gray-500 text-xs font-bold">로그아웃</button>
         </div>
-        <h1 class="text-4xl font-extrabold mb-10 tracking-tight uppercase">Game Archive</h1>
+        <h1 class="text-4xl font-extrabold mb-10 tracking-tight uppercase italic">Game Archive</h1>
         <div class="flex flex-wrap justify-center gap-3 mb-8 px-4 font-bold">
-            <button onclick="navToStats()" class="bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-6 py-3 rounded-2xl hover:bg-yellow-500 hover:text-white transition w-[120px]">🏆 명예전당</button>
-            <button onclick="showGatheringList()" class="bg-green-500/10 border border-green-500/30 text-green-400 px-6 py-3 rounded-2xl hover:bg-green-500 hover:text-white transition w-[120px]">📅 모임게시판</button>
-            <button onclick="toggleProfileModal(true)" class="bg-blue-600/10 border border-blue-500/30 text-blue-400 px-6 py-3 rounded-2xl hover:bg-blue-600 hover:text-white transition w-[120px]">👤 프로필</button>
+            <button onclick="navToStats()" class="bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-6 py-3 rounded-2xl hover:bg-yellow-500 transition w-[120px]">🏆 명예전당</button>
+            <button onclick="showGatheringList()" class="bg-green-500/10 border border-green-500/30 text-green-400 px-6 py-3 rounded-2xl hover:bg-green-500 transition w-[120px]">📅 모임게시판</button>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto px-4 font-bold">
-            <button onclick="navTo('보드게임')" class="glass rounded-3xl p-8 hover:text-blue-400 transition hover:scale-105">🎲 보드게임</button>
-            <button onclick="navTo('지니어스')" class="glass rounded-3xl p-8 hover:text-blue-400 transition hover:scale-105">🧠 지니어스</button>
-            <button onclick="navTo('방탈출')" class="glass rounded-3xl p-8 hover:text-blue-400 transition hover:scale-105">🔑 방탈출</button>
-            <button onclick="navTo('머더 미스테리')" class="glass rounded-3xl p-8 hover:text-blue-400 transition hover:scale-105">🕵️ 머더 미스테리</button>
-        </div>
-    </div>
-
-    <div id="page-gathering-list" class="page w-full max-w-2xl pt-10">
-        <div class="flex justify-between items-center mb-6 px-2">
-            <h2 class="text-2xl font-bold text-green-400">📅 모임 게시판</h2>
-            <button onclick="createGathering()" class="bg-green-600 px-4 py-2 rounded-xl text-xs font-bold">+ 새 모임 생성</button>
-        </div>
-        <div id="gathering-list" class="space-y-3 px-2">
-            </div>
-    </div>
-
-    <div id="page-gathering-detail" class="page w-full max-w-2xl pt-10 flex flex-col h-[85vh]">
-        <h2 id="det-gather-title" class="text-xl font-bold text-center mb-4"></h2>
-        
-        <div class="flex flex-col flex-grow glass rounded-3xl overflow-hidden mb-4">
-            <div class="flex border-b border-white/10">
-                <button id="tab-chat-btn" onclick="setGatherTab('chat')" class="flex-1 py-3 text-xs font-bold bg-white/5 border-r border-white/10">대화창</button>
-                <button id="tab-record-btn" onclick="setGatherTab('record')" class="flex-1 py-3 text-xs font-bold">결과 기록</button>
-            </div>
-            
-            <div id="gather-chat-area" class="flex-grow overflow-y-auto p-4 flex flex-col custom-scrollbar">
-                <div id="gather-chat-messages" class="flex flex-col"></div>
-            </div>
-
-            <div id="gather-record-area" class="hidden flex-grow overflow-y-auto p-4 custom-scrollbar">
-                <textarea id="gather-record-input" class="w-full h-full bg-transparent border-none outline-none resize-none text-sm leading-relaxed" placeholder="오늘의 게임 결과, 승자, 점수 등을 기록하세요..."></textarea>
-                <button onclick="saveGatherRecord()" class="absolute bottom-6 right-6 bg-green-600 px-4 py-2 rounded-lg text-xs font-bold shadow-lg">기록 저장</button>
-            </div>
-        </div>
-
-        <div id="gather-chat-input-box" class="flex gap-2">
-            <input type="text" id="gather-chat-input" placeholder="메시지를 입력하세요..." class="flex-grow bg-white/5 border border-white/10 p-3 rounded-2xl outline-none font-bold">
-            <button onclick="sendGatherChat()" class="bg-blue-600 px-6 rounded-2xl font-bold">전송</button>
+            <button onclick="navTo('보드게임')" class="glass rounded-3xl p-8 hover:text-blue-400 transition hover:scale-105 font-extrabold">🎲 보드게임</button>
+            <button onclick="navTo('지니어스')" class="glass rounded-3xl p-8 hover:text-blue-400 transition hover:scale-105 font-extrabold">🧠 지니어스</button>
+            <button onclick="navTo('방탈출')" class="glass rounded-3xl p-8 hover:text-blue-400 transition hover:scale-105 font-extrabold">🔑 방탈출</button>
+            <button onclick="navTo('머더 미스테리')" class="glass rounded-3xl p-8 hover:text-blue-400 transition hover:scale-105 font-extrabold">🕵️ 머더 미스테리</button>
         </div>
     </div>
 
     <div id="page-rank" class="page w-full max-w-4xl pt-10 text-center font-bold">
+        <h2 id="rank-title" class="text-3xl font-bold mb-6 text-left px-4 text-blue-400"></h2>
+        <div class="glass rounded-3xl overflow-hidden mx-4">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-white/5 text-gray-400 text-[10px] uppercase font-bold text-center">
+                    <tr><th class="p-4 w-16">순위</th><th class="p-4">게임 정보</th><th class="p-4 w-32">평가</th></tr>
+                </thead>
+                <tbody id="rank-list" class="divide-y divide-white/5"></tbody>
+            </table>
         </div>
+    </div>
+
+    <div id="page-gathering-list" class="page w-full max-w-2xl pt-10">
+        <div class="flex justify-between items-center mb-6 px-4">
+            <h2 class="text-3xl font-extrabold text-green-400 italic">GATHERING</h2>
+            <button onclick="createGathering()" class="bg-green-600 px-4 py-2 rounded-xl text-xs font-bold shadow-lg">+ 새 모임</button>
+        </div>
+        <div id="gathering-list" class="space-y-3 px-4 text-left"></div>
+    </div>
+
+    <div id="page-gathering-detail" class="page w-full max-w-2xl pt-10 flex flex-col h-[88vh]">
+        <h2 id="det-gather-title" class="text-xl font-bold text-center mb-4 text-green-300"></h2>
+        <div class="flex flex-col flex-grow glass rounded-3xl overflow-hidden mb-4">
+            <div class="flex border-b border-white/10 bg-white/5 font-bold">
+                <button id="tab-chat-btn" onclick="setGatherTab('chat')" class="flex-1 py-4 text-xs">💬 대화창</button>
+                <button id="tab-record-btn" onclick="setGatherTab('record')" class="flex-1 py-4 text-xs">📝 결과 기록</button>
+            </div>
+            <div id="gather-chat-area" class="flex-grow overflow-y-auto p-4 flex flex-col bg-black/10">
+                <div id="gather-chat-messages" class="flex flex-col gap-3"></div>
+            </div>
+            <div id="gather-record-area" class="hidden flex-grow p-4 relative bg-black/10">
+                <textarea id="gather-record-input" class="w-full h-full bg-transparent border-none outline-none resize-none text-sm text-gray-200" placeholder="결과를 기록하세요..."></textarea>
+                <button onclick="saveGatherRecord()" class="absolute bottom-4 right-4 bg-green-600 px-4 py-2 rounded-lg text-[10px] font-bold">저장</button>
+            </div>
+        </div>
+        <div id="gather-chat-input-box" class="flex gap-2 px-1 mb-4">
+            <input type="text" id="gather-chat-input" placeholder="메시지 입력..." class="flex-grow bg-white/5 border border-white/10 p-4 rounded-2xl outline-none">
+            <button onclick="sendGatherChat()" class="bg-blue-600 px-6 rounded-2xl font-bold">전송</button>
+        </div>
+    </div>
+
+    <div id="page-stats" class="page w-full max-w-4xl pt-10 font-bold">
+        <h2 class="text-3xl font-bold text-yellow-400 mb-8 px-4">명예의 전당 🏆</h2>
+        <div id="stats-content" class="px-4 text-left">데이터를 불러오는 중...</div>
+    </div>
+
+    <div id="page-login" class="page w-full max-w-sm text-center">
+        <div class="glass p-8 rounded-3xl shadow-2xl">
+            <h2 class="text-2xl font-bold mb-6 italic">LOGIN</h2>
+            <div class="space-y-4">
+                <input type="text" id="pin-input" placeholder="PIN" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl">
+                <input type="password" id="pw-input" placeholder="PW" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl">
+                <button onclick="handleLogin()" class="w-full bg-blue-600 py-3 rounded-xl font-bold">로그인</button>
+            </div>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, updateDoc, query, where, serverTimestamp, orderBy, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, updateDoc, query, where, serverTimestamp, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const firebaseConfig = { /* 사용자의 Firebase Config 정보 사용 */ 
-            apiKey: "AIzaSyBVp-GgD8Ts-tGw5itr9Av_MnZAt-U4teE", 
-            authDomain: "game-archive-afacf.firebaseapp.com", 
-            projectId: "game-archive-afacf", 
-            storageBucket: "game-archive-afacf.firebasestorage.app", 
-            messagingSenderId: "927042381268", 
-            appId: "1:927042381268:web:e41f4106cf9202e45ca241" 
+        const firebaseConfig = { 
+            apiKey: "AIzaSyBVp-GgD8Ts-tGw5itr9Av_MnZAt-U4teE", authDomain: "game-archive-afacf.firebaseapp.com", projectId: "game-archive-afacf", storageBucket: "game-archive-afacf.firebasestorage.app", messagingSenderId: "927042381268", appId: "1:927042381268:web:e41f4106cf9202e45ca241" 
         };
-        const app = initializeApp(firebaseConfig); 
-        const db = getFirestore(app);
+        const app = initializeApp(firebaseConfig); const db = getFirestore(app);
 
-        let currentUser = null;
-        let activeGatheringId = null;
-        let chatUnsubscribe = null;
+        let currentUser = null; let selectedCategory = ""; let activeGatheringId = null; let chatUnsub = null;
 
-        /* --- 기존 로직 (로그인, 네비게이션 등) 통합 --- */
-        window.addEventListener('DOMContentLoaded', async () => { 
-            const saved = localStorage.getItem('game_archive_auth'); 
-            if (saved) { 
-                const data = JSON.parse(saved); 
-                const snap = await getDoc(doc(db, "users", data.pin)); 
-                if (snap.exists() && snap.data().password === data.pw) { 
-                    currentUser = { pin: data.pin, ...snap.data() }; 
-                    updateHeaderUI(); 
-                    showPage('page-home'); 
-                    return; 
-                } 
-            } 
-            showPage('page-login'); 
-        });
+        // --- 수정된 페이지 전환 및 히스토리 로직 ---
+        window.showPage = (id, push = true) => {
+            console.log("Showing page:", id); // 디버깅용
+            document.querySelectorAll('.page').forEach(p => { 
+                p.classList.remove('active');
+                p.style.display = 'none';
+            });
 
-        function updateHeaderUI() { 
-            document.getElementById('user-welcome').innerText = `${currentUser.name}님 (수정)`; 
-            document.getElementById('my-profile-icon').src = currentUser.iconUrl || 'https://cdn-icons-png.flaticon.com/512/3241/3241724.png'; 
-        }
+            const target = document.getElementById(id);
+            if (target) {
+                target.style.display = 'block';
+                setTimeout(() => target.classList.add('active'), 50);
 
-        window.showPage = (id) => { 
-            document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; }); 
-            const target = document.getElementById(id); 
-            if (target) { 
-                target.style.display = 'block'; 
-                setTimeout(() => { target.classList.add('active'); updateBackBtnVisibility(); }, 50); 
-            } 
+                // 히스토리 관리
+                if (push && (!history.state || history.state.page !== id)) {
+                    history.pushState({ page: id }, '', '');
+                }
+            }
+            if (id !== 'page-gathering-detail' && chatUnsub) { chatUnsub(); chatUnsub = null; }
         };
 
-        function updateBackBtnVisibility() { 
-            const btn = document.getElementById('global-back-btn'); 
-            const active = document.querySelector('.page.active')?.id; 
-            btn.style.display = (['page-rank', 'page-stats', 'page-gathering-list', 'page-gathering-detail'].includes(active)) ? 'block' : 'none'; 
-        }
+        window.onpopstate = (event) => {
+            const pageId = (event.state && event.state.page) ? event.state.page : 'page-home';
+            showPage(pageId, false);
+        };
 
-        window.navBack = () => {
-            if (chatUnsubscribe) chatUnsubscribe();
-            showPage('page-home');
+        /* --- 기본 탐색 함수 --- */
+        window.navTo = (cat) => {
+            selectedCategory = cat;
+            document.getElementById('rank-title').innerText = cat;
+            renderList();
+            showPage('page-rank');
+        };
+
+        window.navToStats = () => {
+            showPage('page-stats');
+            // 명예의 전당 데이터 로직 추가 가능
         };
 
         /* --- 모임 게시판 로직 --- */
         window.showGatheringList = async () => {
             showPage('page-gathering-list');
             const listDiv = document.getElementById('gathering-list');
-            listDiv.innerHTML = `<p class="text-center opacity-30 py-10">모임 정보를 불러오는 중...</p>`;
-            
+            listDiv.innerHTML = `<p class="text-center opacity-30 py-10">로딩 중...</p>`;
             const snap = await getDocs(query(collection(db, "gatherings"), orderBy("createdAt", "desc")));
-            listDiv.innerHTML = snap.docs.map(d => {
-                const data = d.data();
-                return `
-                <div onclick="openGatheringDetail('${d.id}', '${data.title}')" class="glass p-5 rounded-2xl flex justify-between items-center hover:bg-white/10 cursor-pointer transition">
-                    <div>
-                        <h3 class="font-bold text-lg">${data.title}</h3>
-                        <p class="text-[10px] text-gray-500 mt-1">${new Date(data.createdAt?.seconds * 1000).toLocaleDateString()} 생성</p>
-                    </div>
-                    <span class="text-green-400 text-xs font-bold">참여하기 →</span>
-                </div>`;
-            }).join('') || `<p class="text-center opacity-20 py-10 italic">생성된 모임이 없습니다.</p>`;
-        };
-
-        window.createGathering = async () => {
-            const title = prompt("모임 이름을 입력하세요 (예: 2월 19일 영등포팟)");
-            if (!title) return;
-            await addDoc(collection(db, "gatherings"), {
-                title,
-                creatorPin: currentUser.pin,
-                record: "",
-                createdAt: serverTimestamp()
-            });
-            showGatheringList();
+            listDiv.innerHTML = snap.docs.map(d => `
+                <div onclick="openGatheringDetail('${d.id}', '${d.data().title}')" class="glass p-5 rounded-2xl flex justify-between items-center hover:bg-white/10 cursor-pointer">
+                    <h3 class="font-bold text-lg">${d.data().title}</h3>
+                    <span class="text-green-400 font-bold">참여 →</span>
+                </div>`).join('') || `<p class="text-center opacity-20 py-10">모임이 없습니다.</p>`;
         };
 
         window.openGatheringDetail = async (id, title) => {
@@ -190,69 +167,92 @@
             document.getElementById('det-gather-title').innerText = title;
             showPage('page-gathering-detail');
             setGatherTab('chat');
-            
-            // 기록 불러오기
             const gSnap = await getDoc(doc(db, "gatherings", id));
             document.getElementById('gather-record-input').value = gSnap.data().record || "";
 
-            // 실시간 채팅 리스너 연결
-            if (chatUnsubscribe) chatUnsubscribe();
-            const chatQuery = query(collection(db, `gatherings/${id}/chats`), orderBy("createdAt", "asc"));
-            chatUnsubscribe = onSnapshot(chatQuery, (snap) => {
+            if (chatUnsub) chatUnsub();
+            chatUnsub = onSnapshot(query(collection(db, `gatherings/${id}/chats`), orderBy("createdAt", "asc")), (snap) => {
                 const chatDiv = document.getElementById('gather-chat-messages');
                 chatDiv.innerHTML = snap.docs.map(d => {
-                    const c = d.data();
-                    const isMe = c.userPin === currentUser.pin;
-                    return `
-                    <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-2">
-                        <span class="text-[9px] text-gray-500 mb-1 px-1">${c.userName}</span>
-                        <div class="chat-bubble ${isMe ? 'chat-mine' : 'chat-others'}">${c.text}</div>
-                    </div>`;
+                    const c = d.data(); const isMe = c.userPin === currentUser.pin;
+                    return `<div class="flex flex-col ${isMe?'items-end':'items-start'}"><span class="text-[9px] text-gray-500 mb-1 px-1">${c.userName}</span><div class="chat-bubble ${isMe?'chat-mine':'chat-others'}">${c.text}</div></div>`;
                 }).join('');
                 document.getElementById('gather-chat-area').scrollTop = document.getElementById('gather-chat-area').scrollHeight;
             });
         };
 
+        /* --- 데이터 렌더링 및 기타 --- */
+        window.renderList = async () => {
+            const list = document.getElementById('rank-list');
+            list.innerHTML = `<tr><td colspan="3" class="p-10 text-center opacity-30 italic">게임 목록 불러오는 중...</td></tr>`;
+            const gSnap = await getDocs(query(collection(db, "games"), where("category", "==", selectedCategory)));
+            list.innerHTML = gSnap.docs.map((d, i) => `
+                <tr class="border-b border-white/5">
+                    <td class="p-4 text-blue-400 text-center">#${i+1}</td>
+                    <td class="p-4 text-left font-bold">${d.data().name}</td>
+                    <td class="p-4 text-yellow-400 text-center font-bold">기록보기</td>
+                </tr>`).join('') || `<tr><td colspan="3" class="p-10 text-center opacity-20">등록된 게임이 없습니다.</td></tr>`;
+        };
+
+        window.handleLogin = async () => {
+            const pin = document.getElementById('pin-input').value;
+            const pw = document.getElementById('pw-input').value;
+            const snap = await getDoc(doc(db, "users", pin));
+            if (snap.exists() && snap.data().password === pw) {
+                currentUser = { pin, ...snap.data() };
+                localStorage.setItem('game_archive_auth', JSON.stringify({ pin, pw }));
+                updateHeaderUI();
+                showPage('page-home');
+            } else alert("비밀번호 혹은 PIN이 틀렸습니다.");
+        };
+
+        window.logout = () => { localStorage.removeItem('game_archive_auth'); location.reload(); };
+
         window.setGatherTab = (type) => {
-            const chatArea = document.getElementById('gather-chat-area');
-            const recordArea = document.getElementById('gather-record-area');
-            const inputArea = document.getElementById('gather-chat-input-box');
-            
-            if (type === 'chat') {
-                chatArea.classList.remove('hidden');
-                recordArea.classList.add('hidden');
-                inputArea.classList.remove('hidden');
-                document.getElementById('tab-chat-btn').classList.add('bg-white/5');
-                document.getElementById('tab-record-btn').classList.remove('bg-white/5');
-            } else {
-                chatArea.classList.add('hidden');
-                recordArea.classList.remove('hidden');
-                inputArea.classList.add('hidden');
-                document.getElementById('tab-chat-btn').classList.remove('bg-white/5');
-                document.getElementById('tab-record-btn').classList.add('bg-white/5');
-            }
+            const isChat = type === 'chat';
+            document.getElementById('gather-chat-area').classList.toggle('hidden', !isChat);
+            document.getElementById('gather-chat-input-box').classList.toggle('hidden', !isChat);
+            document.getElementById('gather-record-area').classList.toggle('hidden', isChat);
         };
 
         window.sendGatherChat = async () => {
-            const input = document.getElementById('gather-chat-input');
-            const text = input.value.trim();
-            if (!text) return;
-            input.value = "";
-            await addDoc(collection(db, `gatherings/${activeGatheringId}/chats`), {
-                text,
-                userPin: currentUser.pin,
-                userName: currentUser.name,
-                createdAt: serverTimestamp()
-            });
+            const i = document.getElementById('gather-chat-input');
+            if(!i.value.trim()) return;
+            await addDoc(collection(db, `gatherings/${activeGatheringId}/chats`), { text: i.value.trim(), userPin: currentUser.pin, userName: currentUser.name, createdAt: serverTimestamp() });
+            i.value = "";
+        };
+
+        window.createGathering = async () => {
+            const t = prompt("모임 이름 (예: 2월 19일 영등포팟)");
+            if (!t) return;
+            await addDoc(collection(db, "gatherings"), { title: t, creatorPin: currentUser.pin, record: "", createdAt: serverTimestamp() });
+            showGatheringList();
         };
 
         window.saveGatherRecord = async () => {
-            const text = document.getElementById('gather-record-input').value;
-            await updateDoc(doc(db, "gatherings", activeGatheringId), { record: text });
-            alert("기록이 저장되었습니다.");
+            await updateDoc(doc(db, "gatherings", activeGatheringId), { record: document.getElementById('gather-record-input').value });
+            alert("저장 완료!");
         };
 
-        // 기존 로그인/기타 함수 로직 생략 (이미 제공된 코드에 포함됨)
+        function updateHeaderUI() { document.getElementById('user-welcome').innerText = `${currentUser.name}님`; document.getElementById('my-profile-icon').src = currentUser.iconUrl || 'https://cdn-icons-png.flaticon.com/512/3241/3241724.png'; }
+
+        // 앱 시작점
+        window.addEventListener('DOMContentLoaded', async () => {
+            if (!history.state) history.replaceState({ page: 'page-home' }, '', '');
+            
+            const saved = localStorage.getItem('game_archive_auth');
+            if (saved) {
+                const data = JSON.parse(saved);
+                const snap = await getDoc(doc(db, "users", data.pin));
+                if (snap.exists() && snap.data().password === data.pw) {
+                    currentUser = { pin: data.pin, ...snap.data() };
+                    updateHeaderUI();
+                    showPage('page-home', false);
+                    return;
+                }
+            }
+            showPage('page-login', false);
+        });
     </script>
 </body>
 </html>
