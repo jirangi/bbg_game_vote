@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Archive v2.7.0</title>
+    <title>Game Archive v2.7.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Pretendard', sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; }
+        body { font-family: 'Pretendard', sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; margin: 0; padding: 0; }
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .page { display: none; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; }
+        .page { display: none; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; width: 100%; max-width: 800px; margin: 0 auto; }
         .page.active { display: block; opacity: 1; transform: translateY(0); }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
         .modal.active { display: flex; }
@@ -18,44 +18,51 @@
         .sticky-back { position: fixed; top: 60px; left: 20px; z-index: 40; background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(8px); padding: 8px 16px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); display: none; }
         .page.active:not(#page-home) ~ .sticky-back { display: block; }
         .user-icon { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: #334155; flex-shrink: 0; }
-        .star-container { display: inline-flex; gap: 1px; color: #a855f7; font-size: 0.9rem; }
-        .star { position: relative; display: inline-block; }
-        .star-half::before { content: '★'; position: absolute; left: 0; width: 50%; overflow: hidden; color: #a855f7; }
+        
+        /* [중요] 별점 렌더링 최적화 - 네모박스 방지 */
+        .star-container { display: inline-flex; gap: 1px; color: #a855f7; font-size: 1.1rem; }
+        .star { position: relative; display: inline-block; width: 1em; height: 1em; }
+        .star::before { content: '★'; }
+        .star-half::after { content: '★'; position: absolute; left: 0; top: 0; width: 50%; overflow: hidden; color: #a855f7; }
+        .star-half { color: rgba(255, 255, 255, 0.1); }
+        .star-empty { color: rgba(255, 255, 255, 0.1); }
+
         .sort-btn.active { background-color: #3b82f6; color: white; border-color: #3b82f6; }
-        .selected-member { border-color: #3b82f6; background: rgba(59, 130, 246, 0.2); }
+        .selected-member { border-color: #3b82f6 !important; background: rgba(59, 130, 246, 0.2) !important; }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 text-sm text-center">
+<body class="min-h-screen flex flex-col items-center p-4">
 
     <div class="fixed top-0 left-0 w-full bg-blue-600/20 backdrop-blur-md border-b border-white/10 p-2 text-center text-[10px] font-semibold text-blue-300 z-50">
         💡 모든 사용자의 기본 비밀번호는 <span class="text-white underline">1234</span>입니다.
     </div>
 
-    <button onclick="history.back()" id="global-back-btn" class="sticky-back text-blue-400 hover:text-white transition font-bold shadow-xl">← 뒤로가기</button>
+    <button onclick="window.history.back()" id="global-back-btn" class="sticky-back text-blue-400 hover:text-white transition font-bold shadow-xl">← 뒤로가기</button>
 
-    <div id="page-home" class="page active w-full max-w-4xl pt-10 font-bold">
-        <div class="flex justify-between items-center mb-6 max-w-md mx-auto px-4">
-            <div class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition" onclick="toggleProfileModal(true)">
+    <div id="page-home" class="page active pt-10 font-bold">
+        <div class="flex justify-between items-center mb-6 px-4">
+            <div class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition" onclick="toggleModal('profile-modal', true)">
                 <img id="my-profile-icon" src="" class="user-icon border-2 border-blue-500/50">
                 <span id="user-welcome" class="text-blue-400 text-xs font-bold underline underline-offset-4"></span>
             </div>
             <button onclick="logout()" class="text-gray-500 hover:text-red-400 text-xs underline">로그아웃</button>
         </div>
-        <h1 class="text-4xl font-extrabold mb-10 tracking-tight uppercase">Game Archive</h1>
+        <h1 class="text-4xl font-extrabold mb-10 tracking-tight uppercase text-center">Game Archive</h1>
         <div class="flex justify-center gap-3 mb-8 px-4">
-            <button onclick="navToStats()" class="bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-6 py-3 rounded-2xl font-bold hover:bg-yellow-500 hover:text-white transition w-[130px]">🏆 명예전당</button>
-            <button onclick="toggleProfileModal(true)" class="bg-blue-600/10 border border-blue-500/30 text-blue-400 px-6 py-3 rounded-2xl font-bold hover:bg-blue-600 hover:text-white transition w-[130px]">👤 마이페이지</button>
+            <button onclick="navToStats()" class="bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-6 py-3 rounded-2xl font-bold hover:bg-yellow-500 hover:text-white transition w-1/2">🏆 명예전당</button>
+            <button id="admin-user-manage-btn" class="hidden bg-red-500/10 border border-red-500/30 text-red-400 px-6 py-3 rounded-2xl font-bold hover:bg-red-500 hover:text-white transition w-1/2" onclick="toggleModal('admin-user-modal', true)">⚙️ 관리</button>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto font-bold">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4 font-bold">
             <button onclick="navTo('보드게임')" class="category-card glass rounded-3xl p-8 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400 font-bold text-lg transition hover:scale-105">🎲 보드게임</button>
             <button onclick="navTo('지니어스')" class="category-card glass rounded-3xl p-8 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400 font-bold text-lg transition hover:scale-105">🧠 지니어스</button>
             <button onclick="navTo('방탈출')" class="category-card glass rounded-3xl p-8 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400 font-bold text-lg transition hover:scale-105">🔑 방탈출</button>
             <button onclick="navTo('머더 미스테리')" class="category-card glass rounded-3xl p-8 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400 font-bold text-lg transition hover:scale-105">🕵️ 머더 미스테리</button>
         </div>
+        <div class="mt-10 text-[10px] text-gray-600 opacity-50 text-center">App Version v2.7.1</div>
     </div>
 
-    <div id="page-rank" class="page w-full max-w-5xl pt-10 font-bold">
-        <div class="flex flex-col mb-6 px-2 gap-4 text-left">
+    <div id="page-rank" class="page pt-10 font-bold">
+        <div class="flex flex-col mb-6 px-4 gap-4 text-left">
             <div class="flex justify-between items-end">
                 <h2 id="rank-title" class="text-3xl font-bold ml-2"></h2>
                 <button onclick="addGame()" class="bg-white/10 px-4 py-2 rounded-xl text-sm">+ 새 게임</button>
@@ -66,12 +73,12 @@
                 <button onclick="setSort('diff_asc')" id="sort-diff_asc" class="sort-btn px-3 py-1.5 rounded-full border border-white/10 text-[10px]">난이도 낮은순</button>
             </div>
         </div>
-        <div class="glass rounded-3xl overflow-x-auto custom-scrollbar">
+        <div class="glass rounded-3xl overflow-hidden overflow-x-auto custom-scrollbar mx-4">
             <table class="w-full border-collapse min-w-[500px]">
                 <thead class="bg-white/5 text-gray-400 text-[10px] uppercase">
-                    <tr><th class="p-4 w-12">순위</th><th class="p-4 text-left">게임 정보</th><th class="p-4 w-32">평가</th><th class="p-4 w-28">모임 일정</th></tr>
+                    <tr><th class="p-4 w-12 text-center">순위</th><th class="p-4 text-left">게임 정보</th><th class="p-4 w-32 text-center">평가</th><th class="p-4 w-28 text-center">모임 기록</th></tr>
                 </thead>
-                <tbody id="rank-list" class="divide-y divide-white/5"></tbody>
+                <tbody id="rank-list" class="divide-y divide-white/5 text-center"></tbody>
             </table>
         </div>
     </div>
@@ -79,7 +86,7 @@
     <div id="schedule-modal" class="modal" onclick="closeOnBackdrop(event, 'schedule-modal')">
         <div class="glass w-full max-w-lg p-6 rounded-3xl max-h-[85vh] flex flex-col font-bold" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-4 text-green-400">
-                <h3 id="schedule-game-title" class="text-xl font-bold">게임 일정</h3>
+                <h3 id="schedule-game-title" class="text-xl font-bold"></h3>
                 <button onclick="closeAllModals()" class="text-gray-400 text-2xl">✕</button>
             </div>
             <div class="flex gap-2 mb-6">
@@ -90,12 +97,25 @@
         </div>
     </div>
 
+    <div id="admin-user-modal" class="modal" onclick="closeOnBackdrop(event, 'admin-user-modal')">
+        <div class="glass w-full max-w-md p-6 rounded-3xl max-h-[85vh] flex flex-col font-bold" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-red-400">⚙️ 유저 명단 관리</h3>
+                <button onclick="closeAllModals()" class="text-gray-400 text-2xl">✕</button>
+            </div>
+            <div class="flex gap-2 mb-6">
+                <input type="text" id="new-user-name" placeholder="추가할 이름 입력" class="flex-grow bg-white/5 border border-white/10 p-3 rounded-xl outline-none">
+                <button onclick="adminAddUser()" class="bg-blue-600 px-4 rounded-xl">추가</button>
+            </div>
+            <div id="admin-user-list" class="flex-grow overflow-y-auto custom-scrollbar space-y-2"></div>
+        </div>
+    </div>
+
     <div id="member-modal" class="modal" onclick="closeOnBackdrop(event, 'member-modal')">
         <div class="glass w-full max-w-md p-6 rounded-3xl font-bold" onclick="event.stopPropagation()">
-            <h3 class="text-xl mb-4 text-blue-400">참석자 및 순위 등록</h3>
-            <p class="text-xs text-gray-400 mb-4">참석한 사람을 1등부터 순서대로 클릭하세요!</p>
+            <h3 class="text-xl mb-4 text-blue-400 text-center">참석자 순위 등록</h3>
             <div id="member-select-list" class="grid grid-cols-3 gap-2 mb-6"></div>
-            <div id="rank-preview" class="text-sm text-green-400 mb-6 bg-white/5 p-3 rounded-xl min-h-[50px]">순위: </div>
+            <div id="rank-preview" class="text-sm text-green-400 mb-6 bg-white/5 p-3 rounded-xl min-h-[50px] text-left">순위: </div>
             <div class="flex gap-2">
                 <button onclick="toggleModal('member-modal', false)" class="flex-1 bg-white/10 py-3 rounded-xl">취소</button>
                 <button onclick="submitSchedule()" class="flex-1 bg-blue-600 py-3 rounded-xl">기록 완료</button>
@@ -105,23 +125,30 @@
 
     <div id="profile-modal" class="modal" onclick="closeOnBackdrop(event, 'profile-modal')">
         <div class="glass w-full max-w-md p-8 rounded-3xl flex flex-col font-bold" onclick="event.stopPropagation()">
-            <h3 class="text-xl mb-6 text-blue-400">마이페이지</h3>
-            <div class="flex items-center gap-4 mb-6 pb-6 border-b border-white/10">
-                <img id="profile-preview" src="" class="w-16 h-16 rounded-full border-2 border-blue-500">
-                <div class="flex-grow text-left">
-                    <input type="text" id="edit-nickname" class="w-full bg-white/5 p-2 rounded mb-2 outline-none border border-white/10">
-                    <input type="text" id="edit-icon-url" placeholder="이미지 URL" class="w-full bg-white/5 p-2 rounded text-[10px] outline-none border border-white/10">
+            <h3 class="text-xl mb-6 text-blue-400 text-center">마이페이지</h3>
+            <div class="flex flex-col items-center gap-4 mb-6 pb-6 border-b border-white/10">
+                <img id="profile-preview" src="" class="w-20 h-20 rounded-full border-2 border-blue-500">
+                <div class="w-full space-y-2">
+                    <input type="text" id="edit-nickname" class="w-full bg-white/5 p-2 rounded outline-none border border-white/10">
+                    <input type="text" id="edit-icon-url" placeholder="이미지 URL" class="w-full bg-white/5 p-2 rounded text-xs outline-none border border-white/10">
                 </div>
-                <button onclick="updateProfile()" class="bg-blue-600 px-3 py-2 rounded-xl text-xs">저장</button>
+                <button onclick="updateProfile()" class="w-full bg-blue-600 py-2 rounded-xl">변경사항 저장</button>
             </div>
-            <h4 class="text-left text-sm mb-3 text-gray-400">나의 모임 히스토리</h4>
-            <div id="my-history-list" class="flex-grow overflow-y-auto max-h-[300px] space-y-2 custom-scrollbar text-left"></div>
+            <h4 class="text-left text-sm mb-3 text-gray-400">참석 모임 히스토리</h4>
+            <div id="my-history-list" class="flex-grow overflow-y-auto max-h-[250px] space-y-2 custom-scrollbar text-left"></div>
         </div>
     </div>
 
-    <div id="comment-modal" class="modal" onclick="closeOnBackdrop(event, 'comment-modal')"><div class="glass w-full max-w-md p-6 rounded-3xl max-h-[85vh] flex flex-col font-bold" onclick="event.stopPropagation()"><div class="flex justify-between items-center mb-4 font-bold"><h3 id="comment-game-title" class="text-xl font-bold text-blue-400 text-left">댓글</h3><button onclick="closeAllModals()" class="text-gray-400 text-2xl">✕</button></div><div id="comment-list" class="flex-grow overflow-y-auto custom-scrollbar space-y-3 mb-4 text-left"></div><div class="space-y-3 text-left"><div class="flex items-center gap-2"><input type="checkbox" id="anon-check" class="w-4 h-4 rounded bg-white/5"><label for="anon-check" class="text-xs text-gray-400">익명 작성</label></div><div class="flex gap-2"><input type="text" id="comment-input" placeholder="댓글..." class="flex-grow bg-white/5 border border-white/10 p-3 rounded-xl outline-none font-bold"><button onclick="addComment()" class="bg-blue-600 px-4 rounded-xl">등록</button></div></div></div></div>
-    <div id="eval-modal" class="modal" onclick="closeOnBackdrop(event, 'eval-modal')"><div class="glass w-full max-w-xs p-6 rounded-3xl text-center shadow-xl font-bold" onclick="event.stopPropagation()"><h3 id="eval-modal-title" class="text-xl font-bold mb-4 text-blue-400">평가 수정</h3><div class="space-y-4 text-left"><div id="score-input-box"><label class="text-xs text-gray-400 block mb-1 font-bold">점수 (0~100)</label><input type="number" id="single-score" step="0.1" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none"></div><div id="diff-input-box"><label class="text-xs text-gray-400 block mb-1 font-bold">난이도 (0~5)</label><input type="number" id="single-diff" step="0.1" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none"></div><div class="flex gap-2 pt-2"><button onclick="closeAllModals()" class="flex-1 bg-white/10 py-3 rounded-xl">취소</button><button onclick="submitSingleEval()" class="flex-1 bg-blue-600 py-3 rounded-xl">저장</button></div></div></div></div>
-    <div id="page-login" class="page w-full max-w-sm font-bold"><div class="glass p-8 rounded-3xl shadow-2xl"><h2 class="text-2xl font-bold mb-6">인증</h2><div class="space-y-4 text-left"><input type="text" id="pin" placeholder="PIN" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none"><input type="password" id="pw" placeholder="PW" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none"><button onclick="login()" class="w-full bg-blue-600 py-3 rounded-xl">로그인</button></div></div></div>
+    <div id="page-login" class="page pt-20 max-w-sm">
+        <div class="glass p-8 rounded-3xl shadow-2xl text-center">
+            <h2 class="text-2xl font-bold mb-6">로그인</h2>
+            <div class="space-y-4 text-left">
+                <input type="text" id="pin" placeholder="PIN 입력" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none">
+                <input type="password" id="pw" placeholder="비밀번호" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none">
+                <button onclick="login()" class="w-full bg-blue-600 py-3 rounded-xl font-bold">로그인</button>
+            </div>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -134,7 +161,7 @@
         let currentUser = null; let selectedCategory = ""; let activeGameId = null; let activeGameName = "";
         let selectedRanks = []; let currentSort = "score_desc"; let allRatingsData = [];
 
-        // [공통 유틸]
+        // [모달 및 네비게이션 제어]
         window.toggleModal = (id, show) => document.getElementById(id).classList.toggle('active', show);
         window.closeAllModals = () => document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
         window.closeOnBackdrop = (e, id) => { if (e.target.id === id) closeAllModals(); };
@@ -142,98 +169,71 @@
 
         window.showPage = (id) => {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            const target = document.getElementById(id);
-            if(target) { target.style.display='block'; setTimeout(()=>target.classList.add('active'), 50); }
+            setTimeout(() => {
+                document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+                const target = document.getElementById(id);
+                if(target) {
+                    target.style.display = 'block';
+                    setTimeout(() => target.classList.add('active'), 50);
+                }
+            }, 400);
             if (history.state?.page !== id) history.pushState({ page: id }, '', '');
         };
-
-        // [v2.7.0 모임 일정 및 순위 등록]
-        window.openSchedules = (id, name) => {
-            activeGameId = id; activeGameName = name;
-            document.getElementById('schedule-game-title').innerText = `${name} 모임 기록`;
-            toggleModal('schedule-modal', true);
-            loadSchedules();
+        window.onpopstate = (e) => {
+            const pageId = e.state?.page || 'page-home';
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+            document.getElementById(pageId).style.display = 'block';
+            document.getElementById(pageId).classList.add('active');
         };
 
-        async function loadSchedules() {
-            const listDiv = document.getElementById('schedule-list');
-            listDiv.innerHTML = `<p class="opacity-30 text-center py-4 text-xs">로드 중...</p>`;
-            const q = query(collection(db, "schedules"), where("gameId", "==", activeGameId), orderBy("createdAt", "desc"));
-            const [sSnap, uSnap] = await Promise.all([getDocs(q), getDocs(collection(db, "users"))]);
-            const users = uSnap.docs.reduce((acc, d) => ({...acc, [d.id]: d.data().name}), {});
-            
-            listDiv.innerHTML = sSnap.docs.map(d => {
-                const s = d.data();
-                const rankText = s.ranks.map((pin, idx) => `${idx+1}위: ${users[pin]||'?'}`).join(' / ');
-                return `<div class="glass p-4 rounded-2xl border border-white/10">
-                    <div class="text-blue-300 text-sm mb-2">${s.name}</div>
-                    <div class="text-[10px] text-gray-400 leading-relaxed">${rankText}</div>
-                </div>`;
-            }).join('') || `<p class="opacity-20 text-center py-4">등록된 일정이 없습니다.</p>`;
+        // [인증 로직]
+        window.addEventListener('DOMContentLoaded', async () => {
+            const saved = localStorage.getItem('game_archive_auth');
+            if (saved) {
+                const data = JSON.parse(saved);
+                const snap = await getDoc(doc(db, "users", data.pin));
+                if (snap.exists() && snap.data().password === data.pw) {
+                    currentUser = { pin: data.pin, ...snap.data() };
+                    updateHeaderUI();
+                    if(currentUser.pin === "100") document.getElementById('admin-user-manage-btn').classList.remove('hidden');
+                    showPage('page-home'); return;
+                }
+            }
+            showPage('page-login');
+        });
+
+        function updateHeaderUI() {
+            document.getElementById('user-welcome').innerText = `${currentUser.name}님`;
+            document.getElementById('my-profile-icon').src = currentUser.iconUrl || DEFAULT_ICON;
         }
 
-        window.openMemberSelect = async () => {
-            if(!document.getElementById('new-schedule-name').value.trim()) return alert("일정 이름을 지어주세요!");
-            selectedRanks = [];
-            const listDiv = document.getElementById('member-select-list');
-            const uSnap = await getDocs(collection(db, "users"));
-            listDiv.innerHTML = uSnap.docs.map(d => {
-                const u = d.data();
-                return `<button onclick="toggleMemberRank('${d.id}', '${u.name}')" id="btn-mem-${d.id}" class="glass p-2 rounded-xl text-[10px] border border-white/5 truncate">${u.name}</button>`;
-            }).join('');
-            document.getElementById('rank-preview').innerText = "순위: ";
-            toggleModal('member-modal', true);
+        window.login = async () => {
+            const pin = document.getElementById('pin').value;
+            const pw = document.getElementById('pw').value;
+            const snap = await getDoc(doc(db, "users", pin));
+            if (snap.exists() && snap.data().password === pw) {
+                currentUser = { pin, ...snap.data() };
+                localStorage.setItem('game_archive_auth', JSON.stringify({ pin, pw }));
+                location.reload();
+            } else alert("로그인 실패");
         };
 
-        window.toggleMemberRank = (pin, name) => {
-            const idx = selectedRanks.indexOf(pin);
-            if(idx > -1) {
-                selectedRanks.splice(idx, 1);
-                document.getElementById(`btn-mem-${pin}`).classList.remove('selected-member');
-            } else {
-                selectedRanks.push(pin);
-                document.getElementById(`btn-mem-${pin}`).classList.add('selected-member');
-            }
-            const namePath = selectedRanks.map((p, i) => `${i+1}위: ${document.getElementById(`btn-mem-${p}`).innerText}`).join(' → ');
-            document.getElementById('rank-preview').innerText = "순위: " + namePath;
+        window.logout = () => { localStorage.removeItem('game_archive_auth'); location.reload(); };
+
+        // [랭킹 및 일정 관리 로직]
+        window.navTo = (cat) => {
+            selectedCategory = cat;
+            document.getElementById('rank-title').innerText = cat;
+            renderList();
+            showPage('page-rank');
         };
 
-        window.submitSchedule = async () => {
-            const sName = document.getElementById('new-schedule-name').value.trim();
-            if(selectedRanks.length === 0) return alert("최소 1명 이상의 참석자를 선택하세요.");
-            await addDoc(collection(db, "schedules"), {
-                gameId: activeGameId, gameName: activeGameName, name: sName, ranks: selectedRanks, createdAt: serverTimestamp()
-            });
-            document.getElementById('new-schedule-name').value = "";
-            closeAllModals();
-            alert("기록되었습니다!");
-        };
-
-        // [마이페이지 히스토리 로드]
-        window.loadMyHistory = async () => {
-            const listDiv = document.getElementById('my-history-list');
-            listDiv.innerHTML = `<p class="opacity-30 text-xs">기록 불러오는 중...</p>`;
-            const q = query(collection(db, "schedules"), where("ranks", "array-contains", currentUser.pin), orderBy("createdAt", "desc"));
-            const sSnap = await getDocs(q);
-            listDiv.innerHTML = sSnap.docs.map(d => {
-                const s = d.data();
-                const myRank = s.ranks.indexOf(currentUser.pin) + 1;
-                const date = s.createdAt ? new Date(s.createdAt.seconds*1000).toLocaleDateString() : "";
-                return `<div class="glass p-3 rounded-xl border border-white/10 flex justify-between items-center">
-                    <div>
-                        <div class="text-[10px] text-blue-400">${s.gameName}</div>
-                        <div class="text-xs font-bold">${s.name}</div>
-                    </div>
-                    <div class="text-yellow-400 font-extrabold">${myRank}위</div>
-                </div>`;
-            }).join('') || `<p class="opacity-20 text-xs py-4">아직 참석한 모임이 없습니다.</p>`;
-        };
-
-        // [기존 정렬 및 렌더링 로직]
         window.setSort = (m) => { currentSort = m; document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active')); document.getElementById(`sort-${m}`).classList.add('active'); renderList(); };
+
         window.renderList = async () => {
             const list = document.getElementById('rank-list');
-            list.innerHTML = `<tr><td colspan="4" class="p-10 text-center opacity-30">데이터 분석 중...</td></tr>`;
+            list.innerHTML = `<tr><td colspan="4" class="p-10 text-center opacity-30">로딩 중...</td></tr>`;
             const [gSnap, rSnap] = await Promise.all([getDocs(query(collection(db,"games"), where("category","==",selectedCategory))), getDocs(collection(db,"ratings"))]);
             allRatingsData = rSnap.docs.map(d=>d.data());
             let games = gSnap.docs.map(d => {
@@ -256,76 +256,112 @@
 
             list.innerHTML = games.map((g, i) => {
                 const rankIcon = i<3 && g.voteCount>=3 ? ['🥇','🥈','🥉'][i] : `#${i+1}`;
-                return `<tr class="hover:bg-white/5 border-b border-white/5 transition font-bold">
-                    <td class="p-4 text-blue-400">${rankIcon}</td>
+                return `<tr>
+                    <td class="p-4 text-blue-400 text-center">${rankIcon}</td>
                     <td class="p-4 text-left">
-                        <span onclick="openComments('${g.id}','${g.name}')" class="cursor-pointer hover:underline text-base">${g.name}</span>
+                        <div class="text-base">${g.name}</div>
                         <div class="text-[9px] opacity-40">🗳️ ${g.voteCount}</div>
                     </td>
-                    <td class="p-2">
-                        <div class="cursor-pointer mb-1 text-yellow-400" onclick="openEvalModal('${g.id}','${g.name}','score')">${g.avgScore.toFixed(1)}점</div>
-                        <div class="cursor-pointer flex flex-col items-center" onclick="openEvalModal('${g.id}','${g.name}','diff')">
-                            ${renderStars(g.avgDiff)}
-                        </div>
+                    <td class="p-2 text-center">
+                        <div class="mb-1 text-yellow-400 text-sm font-bold">${g.avgScore.toFixed(1)}점</div>
+                        <div class="flex justify-center">${renderStars(g.avgDiff)}</div>
                     </td>
-                    <td class="p-4"><button onclick="openSchedules('${g.id}','${g.name}')" class="bg-green-600/20 text-green-400 px-3 py-2 rounded-xl text-[10px]">일정/기록</button></td>
+                    <td class="p-4 text-center"><button onclick="openSchedules('${g.id}','${g.name}')" class="bg-green-600/20 text-green-400 px-3 py-2 rounded-xl text-[10px]">기록</button></td>
                 </tr>`;
             }).join('');
         };
 
-        function renderStars(r) { let h = '<div class="star-container">'; for(let i=1;i<=5;i++){ if(r>=i) h+='<span class="star">★</span>'; else if(r>=i-0.5) h+='<span class="star star-half">★</span>'; else h+='<span class="star opacity-10">★</span>'; } return h+'</div>'; }
-
-        // [인증 및 초기화]
-        window.addEventListener('DOMContentLoaded', async () => {
-            const saved = localStorage.getItem('game_archive_auth');
-            if (saved) {
-                const data = JSON.parse(saved);
-                const snap = await getDoc(doc(db, "users", data.pin));
-                if (snap.exists() && snap.data().password === data.pw) {
-                    currentUser = { pin: data.pin, ...snap.data() };
-                    updateHeaderUI();
-                    showPage('page-home'); return;
-                }
-            }
-            showPage('page-login');
-        });
-
-        function updateHeaderUI() {
-            document.getElementById('user-welcome').innerText = `${currentUser.name}님`;
-            document.getElementById('my-profile-icon').src = currentUser.iconUrl || DEFAULT_ICON;
+        // [CSS 기반 별점 렌더링 - v2.7.1 수정본]
+        function renderStars(r) { 
+            let h = '<div class="star-container">'; 
+            for(let i=1;i<=5;i++){ 
+                if(r>=i) h+='<span class="star"></span>'; 
+                else if(r>=i-0.5) h+='<span class="star star-half"></span>'; 
+                else h+='<span class="star star-empty"></span>'; 
+            } 
+            return h+'</div>'; 
         }
 
-        window.login = async () => {
-            const pin = document.getElementById('pin').value, pw = document.getElementById('pw').value;
-            const snap = await getDoc(doc(db, "users", pin));
-            if (snap.exists() && snap.data().password === pw) {
-                currentUser = { pin, ...snap.data() };
-                localStorage.setItem('game_archive_auth', JSON.stringify({ pin, pw }));
-                location.reload();
-            } else alert("인증 실패");
+        window.openSchedules = (id, name) => {
+            activeGameId = id; activeGameName = name;
+            document.getElementById('schedule-game-title').innerText = `${name} 기록`;
+            toggleModal('schedule-modal', true);
+            loadSchedules();
         };
-        window.logout = () => { localStorage.removeItem('game_archive_auth'); location.reload(); };
-        window.navTo = (c) => { selectedCategory = c; document.getElementById('rank-title').innerText = c; renderList(); showPage('page-rank'); };
-        window.toggleProfileModal = (s) => { 
-            if(s) {
-                document.getElementById('edit-nickname').value = currentUser.name;
-                document.getElementById('edit-icon-url').value = currentUser.iconUrl||'';
-                document.getElementById('profile-preview').src = currentUser.iconUrl||DEFAULT_ICON;
-                loadMyHistory();
-            }
-            toggleModal('profile-modal', s); 
+
+        async function loadSchedules() {
+            const listDiv = document.getElementById('schedule-list');
+            listDiv.innerHTML = `<p class="opacity-30 text-center py-4">로드 중...</p>`;
+            const q = query(collection(db, "schedules"), where("gameId", "==", activeGameId), orderBy("createdAt", "desc"));
+            const [sSnap, uSnap] = await Promise.all([getDocs(q), getDocs(collection(db, "users"))]);
+            const users = uSnap.docs.reduce((acc, d) => ({...acc, [d.id]: d.data().name}), {});
+            listDiv.innerHTML = sSnap.docs.map(d => {
+                const s = d.data();
+                const rankText = s.ranks.map((pin, idx) => `${idx+1}위: ${users[pin]||'?'}`).join(' / ');
+                return `<div class="glass p-4 rounded-2xl border border-white/10"><div class="text-blue-300 text-sm mb-1">${s.name}</div><div class="text-[10px] text-gray-400">${rankText}</div></div>`;
+            }).join('') || `<p class="opacity-20 text-center py-4">기록이 없습니다.</p>`;
+        }
+
+        window.openMemberSelect = async () => {
+            if(!document.getElementById('new-schedule-name').value.trim()) return alert("기록 명칭을 입력하세요.");
+            selectedRanks = [];
+            const listDiv = document.getElementById('member-select-list');
+            const uSnap = await getDocs(collection(db, "users"));
+            listDiv.innerHTML = uSnap.docs.map(d => `<button onclick="toggleMemberRank('${d.id}')" id="btn-mem-${d.id}" class="glass p-2 rounded-xl text-[10px] border border-white/10 truncate">${d.data().name}</button>`).join('');
+            document.getElementById('rank-preview').innerText = "순위: ";
+            toggleModal('member-modal', true);
         };
+
+        window.toggleMemberRank = (pin) => {
+            const idx = selectedRanks.indexOf(pin);
+            const btn = document.getElementById(`btn-mem-${pin}`);
+            if(idx > -1) { selectedRanks.splice(idx, 1); btn.classList.remove('selected-member'); }
+            else { selectedRanks.push(pin); btn.classList.add('selected-member'); }
+            const namePath = selectedRanks.map((p, i) => `${i+1}위: ${document.getElementById(`btn-mem-${p}`).innerText}`).join(' → ');
+            document.getElementById('rank-preview').innerText = "순위: " + namePath;
+        };
+
+        window.submitSchedule = async () => {
+            const sName = document.getElementById('new-schedule-name').value.trim();
+            if(selectedRanks.length === 0) return alert("참석자를 선택하세요.");
+            await addDoc(collection(db, "schedules"), { gameId: activeGameId, gameName: activeGameName, name: sName, ranks: selectedRanks, createdAt: serverTimestamp() });
+            document.getElementById('new-schedule-name').value = "";
+            closeAllModals(); alert("기록 완료!");
+        };
+
+        // [관리자 유저 관리 로직]
+        async function refreshAdminUserList() {
+            const listDiv = document.getElementById('admin-user-list');
+            listDiv.innerHTML = `<p class="text-center py-4">로드 중...</p>`;
+            const snap = await getDocs(collection(db, "users"));
+            const users = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => parseInt(a.id) - parseInt(b.id));
+            listDiv.innerHTML = users.map(u => `
+                <div class="flex justify-between items-center p-3 bg-white/5 rounded-2xl border border-white/5 mb-2">
+                    <span class="text-blue-300 font-mono text-xs w-8">${u.id}</span>
+                    <span class="flex-grow ml-2">${u.name}</span>
+                    ${u.id !== '100' ? `<button onclick="adminDeleteUser('${u.id}')" class="text-red-500 text-xs px-2 py-1">삭제</button>` : ''}
+                </div>`).join('');
+        }
+
+        window.adminAddUser = async () => {
+            const name = document.getElementById('new-user-name').value.trim();
+            if(!name) return;
+            const snap = await getDocs(collection(db, "users"));
+            const newPin = Math.max(...snap.docs.map(d => parseInt(d.id))) + 1;
+            await setDoc(doc(db, "users", String(newPin)), { name, password: "1234", iconUrl: "", createdAt: serverTimestamp() });
+            document.getElementById('new-user-name').value = "";
+            refreshAdminUserList();
+        };
+
+        window.adminDeleteUser = async (id) => { if(confirm("삭제하시겠습니까?")) { await deleteDoc(doc(db, "users", id)); refreshAdminUserList(); } };
+
         window.updateProfile = async () => {
             const n = document.getElementById('edit-nickname').value.trim();
             const i = document.getElementById('edit-icon-url').value.trim();
             await updateDoc(doc(db, "users", currentUser.pin), { name: n, iconUrl: i });
-            currentUser.name = n; currentUser.iconUrl = i; updateHeaderUI(); alert("수정 완료");
+            currentUser.name = n; currentUser.iconUrl = i; updateHeaderUI(); alert("저장 완료");
         };
 
-        // 기타 기능 생략 없이 정상 작동
-        window.openEvalModal = (id, n, t) => { activeGameId = id; document.getElementById('eval-modal-title').innerText = n; toggleModal('eval-modal', true); };
-        window.submitSingleEval = async () => { /* 평가 로직 */ toggleModal('eval-modal', false); renderList(); };
-        window.addComment = async () => { /* 댓글 로직 */ };
     </script>
 </body>
 </html>
