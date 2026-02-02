@@ -3,30 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Game Archive v4.1.0 - Step 1</title>
+    <title>Game Archive v4.1.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Pretendard', sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; margin: 0; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .page { display: none; opacity: 0; transform: translateY(10px); transition: all 0.3s ease; width: 100%; max-width: 800px; margin: 0 auto; }
+        .page { display: none; opacity: 0; transform: translateY(10px); transition: all 0.3s ease; width: 100%; max-width: 800px; margin: 0 auto; pointer-events: auto; }
         .page.active { display: block; opacity: 1; transform: translateY(0); }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9000; align-items: center; justify-content: center; padding: 20px; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; padding: 20px; pointer-events: auto; }
         .modal.active { display: flex; }
         #global-back-btn { position: fixed; top: 24px; left: 20px; z-index: 8000; background: #1e293b; color: #60a5fa; padding: 10px 18px; border-radius: 14px; border: 1px solid rgba(96, 165, 250, 0.3); font-weight: 900; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: none; cursor: pointer; }
+        .user-icon { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: #334155; flex-shrink: 0; }
+        .category-tag { font-size: 8px; padding: 2px 6px; border-radius: 4px; background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); font-weight: 800; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center p-4">
 
     <button onclick="handleBack()" id="global-back-btn">← 뒤로가기</button>
 
-    <div id="page-login" class="page active pt-24 max-w-sm text-center">
+    <div id="page-login" class="page active pt-24 max-w-sm text-center font-bold">
         <div class="glass p-8 rounded-3xl shadow-2xl">
             <h2 class="text-2xl font-extrabold mb-8 text-blue-400 italic">LOGIN</h2>
             <div class="space-y-4">
-                <input type="text" id="pin" placeholder="PIN 번호" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none font-bold">
+                <input type="text" id="pin" placeholder="PIN" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none font-bold">
                 <input type="password" id="pw" placeholder="비밀번호" maxlength="4" oninput="if(this.value.length===4) login()" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none font-bold">
-                <button onclick="login()" class="w-full bg-blue-600 py-4 rounded-xl font-extrabold mt-4">접속하기</button>
+                <button onclick="login()" class="w-full bg-blue-600 py-4 rounded-xl font-extrabold shadow-lg mt-4">접속하기</button>
             </div>
         </div>
     </div>
@@ -34,151 +38,146 @@
     <div id="page-home" class="page pt-10 font-bold text-center">
         <div class="flex justify-between items-center mb-10 px-4">
             <div class="flex items-center gap-3 cursor-pointer p-1" onclick="toggleProfileModal(true)">
-                <img id="my-profile-icon" src="" class="w-10 h-10 rounded-full border-2 border-blue-500/50 object-cover">
+                <img id="my-profile-icon" src="" class="user-icon border-2 border-blue-500/50 w-10 h-10">
                 <span id="user-welcome" class="text-blue-300 text-sm font-extrabold"></span>
             </div>
-            <button onclick="logout()" class="text-gray-500 text-xs border border-white/10 px-3 py-1.5 rounded-lg">로그아웃</button>
+            <button onclick="logout()" class="text-gray-500 text-xs border border-white/10 px-3 py-1.5 rounded-lg transition hover:text-red-400">로그아웃</button>
         </div>
         <h1 class="text-4xl font-extrabold mb-12 italic text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 uppercase">Game Archive</h1>
-        <div class="flex flex-wrap justify-center gap-3 mb-10 px-4">
-            <button onclick="navToStats()" class="bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-6 py-4 rounded-2xl font-extrabold hover:bg-yellow-500 hover:text-black transition">🏆 명예전당</button>
-            <button onclick="showPage('page-chat-info')" class="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-6 py-4 rounded-2xl font-extrabold shadow-lg">📢 단톡방 정보</button>
+        <div class="flex flex-wrap justify-center gap-3 mb-10 px-4 font-bold">
+            <button onclick="navToStats()" class="bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-6 py-4 rounded-2xl font-extrabold hover:bg-yellow-500 transition shadow-lg">🏆 명예전당</button>
+            <button onclick="showPage('page-chat-info')" class="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-6 py-4 rounded-2xl font-extrabold hover:bg-blue-500 transition shadow-lg">📢 단톡방 정보</button>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4 font-bold">
-            <button onclick="navTo('보드게임')" class="glass rounded-3xl p-10 text-xl font-black">🎲 보드게임</button>
-            <button onclick="navTo('지니어스')" class="glass rounded-3xl p-10 text-xl font-black">🧠 지니어스</button>
-            <button onclick="navTo('방탈출')" class="glass rounded-3xl p-10 text-xl font-black">🔑 방탈출</button>
-            <button onclick="navTo('머더 미스테리')" class="glass rounded-3xl p-10 text-xl font-black">🕵️ 머더 미스테리</button>
+            <button onclick="navTo('보드게임')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition">🎲 보드게임</button>
+            <button onclick="navTo('지니어스')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition">🧠 지니어스</button>
+            <button onclick="navTo('방탈출')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition">🔑 방탈출</button>
+            <button onclick="navTo('머더 미스테리')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition">🕵️ 머더 미스테리</button>
+        </div>
+    </div>
+
+    <div id="page-rank" class="page pt-24 font-bold">
+        <div class="flex justify-between items-end mb-8 px-4 font-bold">
+            <h2 id="rank-title" class="text-4xl font-black italic text-blue-400"></h2>
+            <button onclick="addGame()" class="bg-blue-600/20 text-blue-400 border border-blue-500/30 px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg">+ 새 게임</button>
+        </div>
+        <div class="glass rounded-[40px] overflow-hidden overflow-x-auto custom-scrollbar mx-4 shadow-2xl border border-white/5">
+            <table class="w-full text-center min-w-[500px] font-bold">
+                <thead><tr class="bg-white/5 text-gray-500 text-[10px] border-b border-white/10 uppercase font-black">
+                    <th class="p-5 w-16">순위</th><th class="p-5 text-left">게임 정보</th><th class="w-32">평가</th><th>기록</th>
+                </tr></thead>
+                <tbody id="rank-list" class="divide-y divide-white/5 font-bold"></tbody>
+            </table>
         </div>
     </div>
 
     <div id="page-stats" class="page pt-24 font-bold text-center">
-        <h2 class="text-3xl font-black text-yellow-400 mb-10 italic uppercase">명예전당 🏆</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 px-4">
-            <div class="space-y-4">
-                <h3 class="text-blue-400 font-black italic">🗳️ Voting King (투표왕)</h3>
-                <div id="vote-king" class="space-y-3">
-                    <div class="p-10 opacity-30 italic">Loading Ranking...</div>
-                </div>
-            </div>
-            <div class="space-y-4">
-                <h3 class="text-green-400 font-black italic">🆕 Creator King (제작왕)</h3>
-                <div id="game-add-king" class="space-y-3">
-                    <div class="p-10 opacity-30 italic">Loading Ranking...</div>
-                </div>
-            </div>
+        <h2 class="text-3xl font-black text-yellow-400 mb-10 italic uppercase font-bold">명예전당 🏆</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 px-4 font-bold">
+            <div class="space-y-4"><h3 class="text-blue-400 italic mb-4 font-bold">🗳️ Voting King</h3><div id="vote-king" class="space-y-3"></div></div>
+            <div class="space-y-4"><h3 class="text-green-400 italic mb-4 font-bold">🆕 Creator King</h3><div id="game-add-king" class="space-y-3"></div></div>
         </div>
     </div>
 
-    <div id="page-rank" class="page pt-24 font-bold"><h2 id="rank-title" class="text-4xl font-black italic text-blue-400 ml-4 mb-8"></h2><div class="glass mx-4 rounded-3xl overflow-hidden"><table class="w-full text-center"><tbody id="rank-list"></tbody></table></div></div>
-    <div id="page-chat-info" class="page pt-24 font-bold px-4"></div>
-    <div id="profile-modal" class="modal" onclick="closeOnBackdrop(event, 'profile-modal')"><div class="glass w-full max-w-md p-8 rounded-[40px] text-center" onclick="event.stopPropagation()"><h3 class="text-2xl font-black text-blue-400 mb-6 uppercase">My Profile</h3><div id="my-history-list" class="space-y-2 max-h-60 overflow-y-auto"></div></div></div>
+    <div id="page-chat-info" class="page pt-24 font-bold px-4">
+        <h2 class="text-3xl font-black text-blue-400 mb-10 italic uppercase font-bold">Group Info 📢</h2>
+        <div id="chat-info-list" class="space-y-4"></div>
+    </div>
+
+    <div id="profile-modal" class="modal" onclick="closeOnBackdrop(event, 'profile-modal')">
+        <div class="glass w-full max-w-md p-8 rounded-[40px] flex flex-col font-bold text-center" onclick="event.stopPropagation()">
+            <h3 class="text-2xl font-black text-blue-400 mb-8 uppercase italic font-bold">My Profile</h3>
+            <div class="flex flex-col items-center gap-6 mb-8 border-b border-white/10 pb-8 font-bold">
+                <img id="profile-preview" src="" class="w-24 h-24 rounded-full border-4 border-blue-600 object-cover bg-slate-800">
+                <input type="text" id="edit-nickname" class="w-full bg-white/5 p-4 rounded-2xl border border-white/10 outline-none font-black text-center" placeholder="닉네임">
+                <button onclick="updateProfile()" class="w-full bg-blue-600 py-4 rounded-2xl font-black shadow-xl">저장하기</button>
+            </div>
+            <h4 class="text-left text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-4">Participation History</h4>
+            <div id="my-history-list" class="flex-grow overflow-y-auto max-h-[180px] space-y-3 custom-scrollbar text-left font-bold"></div>
+        </div>
+    </div>
+
+    <div id="schedule-modal" class="modal" onclick="closeOnBackdrop(event, 'schedule-modal')"><div class="glass modal-content w-full max-w-md p-8 rounded-[40px] max-h-[85vh] flex flex-col font-bold" onclick="event.stopPropagation()"><div class="flex justify-between items-center mb-6"><h3 id="schedule-game-title" class="text-xl font-black text-green-400 truncate"></h3><button onclick="closeAllModals()" class="text-gray-500 text-2xl font-bold">✕</button></div><div id="schedule-list" class="flex-grow overflow-y-auto custom-scrollbar space-y-3"></div></div></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, getDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, updateDoc, query, where, serverTimestamp, deleteDoc, orderBy, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyBVp-GgD8Ts-tGw5itr9Av_MnZAt-U4teE", authDomain: "game-archive-afacf.firebaseapp.com", projectId: "game-archive-afacf", storageBucket: "game-archive-afacf.firebasestorage.app", messagingSenderId: "927042381268", appId: "1:927042381268:web:e41f4106cf9202e45ca241" };
         const app = initializeApp(firebaseConfig); const db = getFirestore(app);
         const DEFAULT_ICON = 'https://cdn-icons-png.flaticon.com/512/3241/3241724.png';
 
-        let currentUser = null;
+        let currentUser = null; let selectedCategory = ""; let activeGameId = null; let activeGameName = "";
 
-        // [v4.1.0 네비게이션]
+        // [네비게이션 및 뒤로가기 복구]
+        window.handleBack = () => { if(document.querySelector('.modal.active')) closeAllModals(); else showPage('page-home'); };
         window.showPage = (id) => {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             document.getElementById('global-back-btn').style.display = (id === 'page-home' || id === 'page-login') ? 'none' : 'block';
+            if(id === 'page-chat-info') loadChatInfo();
         };
 
-        window.handleBack = () => showPage('page-home');
+        // [게임 리스트 렌더링 복구]
+        window.navTo = (cat) => { selectedCategory = cat; document.getElementById('rank-title').innerText = cat; renderList(); showPage('page-rank'); };
+        window.renderList = async () => {
+            const list = document.getElementById('rank-list');
+            list.innerHTML = `<tr><td colspan="4" class="p-10 opacity-30 italic font-bold">Loading List...</td></tr>`;
+            try {
+                const [gSnap, rSnap] = await Promise.all([getDocs(query(collection(db, "games"), where("category", "==", selectedCategory))), getDocs(collection(db, "ratings"))]);
+                const ratings = rSnap.docs.map(d => d.data());
+                let games = gSnap.docs.map(d => {
+                    const r = ratings.filter(v => v.gameId === d.id);
+                    const sc = r.map(v => v.score || 0).sort((a,b)=>a-b);
+                    let avgS = (r.length >= 5) ? sc.slice(1, -1).reduce((a,c)=>a+c,0)/(sc.length-2) : (r.length > 0 ? sc.reduce((a,c)=>a+c,0)/r.length : 0);
+                    return { id: d.id, ...d.data(), avgScore: avgS, voteCount: r.length };
+                }).sort((a,b) => b.avgScore - a.avgScore);
 
-        // [1번 수정 기능: 명예전당 데이터 로드 로직 복구]
+                list.innerHTML = games.map((g, i) => `<tr class="hover:bg-white/5 border-b border-white/5 font-bold transition"><td class="p-5 text-blue-400 font-bold">${i < 3 && g.voteCount >= 3 ? ['🥇','🥈','🥉'][i] : '#'+(i+1)}</td><td class="p-5 text-left font-black"><div class="text-sm">${g.name}</div><div class="text-[9px] opacity-40">Votes: ${g.voteCount}</div></td><td class="p-5 font-bold text-yellow-400">${g.avgScore.toFixed(1)}</td><td class="p-5"><button onclick="openSchedules('${g.id}','${g.name}')" class="bg-green-600/20 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-lg text-[10px] font-black">기록</button></td></tr>`).join('');
+            } catch (e) { list.innerHTML = "Restoration Failed"; }
+        };
+
+        // [명예전당 데이터 연동]
         window.navToStats = async () => {
             showPage('page-stats');
-            const vList = document.getElementById('vote-king');
-            const gList = document.getElementById('game-add-king');
-
-            try {
-                // 데이터 병렬 로드
-                const [rSnap, gSnap, uSnap] = await Promise.all([
-                    getDocs(collection(db, "ratings")),
-                    getDocs(collection(db, "games")),
-                    getDocs(collection(db, "users"))
-                ]);
-
-                const uMap = uSnap.docs.reduce((acc, d) => ({...acc, [d.id]: d.data().name}), {});
-
-                // 1. 투표왕 집계 (ratings)
-                const voteCounts = {};
-                rSnap.docs.forEach(d => {
-                    const pin = d.data().userPin;
-                    if(pin) voteCounts[pin] = (voteCounts[pin] || 0) + 1;
-                });
-                
-                vList.innerHTML = Object.entries(voteCounts)
-                    .sort((a,b) => b[1] - a[1])
-                    .slice(0, 5)
-                    .map(([pin, count], i) => `
-                        <div class="glass p-4 rounded-2xl flex justify-between items-center border border-white/5">
-                            <span class="text-blue-300 font-bold">${i+1}위 ${uMap[pin] || '알수없음'}</span>
-                            <span class="text-white/50 text-xs">${count}회 참여</span>
-                        </div>
-                    `).join('') || "<div class='opacity-20'>데이터 없음</div>";
-
-                // 2. 제작왕 집계 (games)
-                const createCounts = {};
-                gSnap.docs.forEach(d => {
-                    const pin = d.data().creatorPin;
-                    if(pin) createCounts[pin] = (createCounts[pin] || 0) + 1;
-                });
-
-                gList.innerHTML = Object.entries(createCounts)
-                    .sort((a,b) => b[1] - a[1])
-                    .slice(0, 5)
-                    .map(([pin, count], i) => `
-                        <div class="glass p-4 rounded-2xl flex justify-between items-center border border-white/5">
-                            <span class="text-green-300 font-bold">${i+1}위 ${uMap[pin] || '알수없음'}</span>
-                            <span class="text-white/50 text-xs">${count}개 등록</span>
-                        </div>
-                    `).join('') || "<div class='opacity-20'>데이터 없음</div>";
-
-            } catch (e) {
-                console.error(e);
-                vList.innerHTML = gList.innerHTML = "<div class='text-red-400'>데이터를 불러오지 못했습니다.</div>";
-            }
+            const [rS, gS, uS] = await Promise.all([getDocs(collection(db,"ratings")), getDocs(collection(db,"games")), getDocs(collection(db,"users"))]);
+            const uM = uS.docs.reduce((acc, d) => ({...acc, [d.id]: d.data()}), {});
+            const vC = rS.docs.map(d=>d.data()).reduce((acc, r) => { acc[r.userPin] = (acc[r.userPin]||0)+1; return acc; }, {});
+            document.getElementById('vote-king').innerHTML = Object.entries(vC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(v => `<div class='p-3 glass rounded-xl flex justify-between items-center'><div class='flex items-center gap-3'><img src='${uM[v[0]]?.iconUrl || DEFAULT_ICON}' class='user-icon w-8 h-8 font-bold'><span class='text-xs font-bold'>${uM[v[0]]?.name || '?'}</span></div><b class='text-blue-400 text-xs'>${v[1]}회</b></div>`).join('');
+            const gC = gS.docs.map(d=>d.data()).reduce((acc, g) => { if(g.creatorPin) acc[g.creatorPin] = (acc[g.creatorPin]||0)+1; return acc; }, {});
+            document.getElementById('game-add-king').innerHTML = Object.entries(gC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(v => `<div class='p-3 glass rounded-xl flex justify-between items-center'><div class='flex items-center gap-3'><img src='${uM[v[0]]?.iconUrl || DEFAULT_ICON}' class='user-icon w-8 h-8 font-bold'><span class='text-xs font-bold'>${uM[v[0]]?.name || '?'}</span></div><b class='text-green-400 text-xs'>${v[1]}개</b></div>`).join('');
         };
 
-        // 기본 로그인/UI 로직 (유지)
-        window.login = async () => {
-            const pin = document.getElementById('pin').value, pw = document.getElementById('pw').value;
-            const snap = await getDoc(doc(db, "users", pin));
-            if (snap.exists() && snap.data().password === pw) {
-                currentUser = { pin, ...snap.data() };
-                localStorage.setItem('game_archive_auth', JSON.stringify({ pin, pw }));
-                location.reload();
-            } else { alert("인증 실패"); }
-        };
+        // [마이페이지 히스토리 복구]
+        async function loadMyHistory() {
+            const listDiv = document.getElementById('my-history-list');
+            const q = query(collection(db, "schedules"), where("members", "array-contains", currentUser.pin));
+            const sSnap = await getDocs(q);
+            listDiv.innerHTML = sSnap.docs.map(d => d.data()).sort((a,b) => (b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(s => `<div class="bg-white/5 p-4 rounded-xl text-xs font-bold border border-white/5 mb-1"><b>${s.gameName}</b><br>${s.name}</div>`).join('') || "No Records";
+        }
 
-        window.logout = () => { localStorage.removeItem('game_archive_auth'); location.reload(); };
+        // [단톡방 정보 로드]
+        async function loadChatInfo() {
+            const snap = await getDocs(query(collection(db, "chatInfo"), orderBy("createdAt", "desc")));
+            document.getElementById('chat-info-list').innerHTML = snap.docs.map(d => `<div class='glass p-6 rounded-3xl border border-white/10 shadow-xl font-bold'><h4 class='text-blue-300 mb-2'>${d.data().title}</h4><p class='text-sm opacity-80 whitespace-pre-wrap'>${d.data().content}</p></div>`).join('') || "No info.";
+        }
 
+        // [인증]
         window.addEventListener('DOMContentLoaded', async () => {
             const auth = localStorage.getItem('game_archive_auth');
-            if (auth) {
-                const d = JSON.parse(auth);
-                const snap = await getDoc(doc(db, "users", d.pin));
-                if (snap.exists() && snap.data().password === d.pw) {
-                    currentUser = { pin: d.pin, ...snap.data() };
-                    document.getElementById('user-welcome').innerText = `${currentUser.name}님`;
-                    document.getElementById('my-profile-icon').src = currentUser.iconUrl || DEFAULT_ICON;
-                    showPage('page-home');
-                }
-            }
+            if (auth) { const d = JSON.parse(auth); const snap = await getDoc(doc(db, "users", d.pin)); if (snap.exists() && snap.data().password === d.pw) { currentUser = { pin: d.pin, ...snap.data() }; updateUI(); showPage('page-home'); return; } }
+            showPage('page-login');
         });
-        
-        window.toggleProfileModal = (s) => document.getElementById('profile-modal').classList.toggle('active', s);
-        window.closeOnBackdrop = (e, id) => { if (e.target.id === id) document.getElementById(id).classList.remove('active'); };
-        window.navTo = (cat) => { /* 4번 수정 시 카테고리 로직 추가 예정 */ showPage('page-rank'); document.getElementById('rank-title').innerText = cat; };
+        window.login = async () => { const pin = document.getElementById('pin').value, pw = document.getElementById('pw').value; const snap = await getDoc(doc(db, "users", pin)); if (snap.exists() && snap.data().password === pw) { currentUser = { pin, ...snap.data() }; localStorage.setItem('game_archive_auth', JSON.stringify({ pin, pw })); location.reload(); } };
+        window.logout = () => { localStorage.removeItem('game_archive_auth'); location.reload(); };
+        function updateUI() { document.getElementById('user-welcome').innerText = `${currentUser.name}님`; document.getElementById('my-profile-icon').src = currentUser.iconUrl || DEFAULT_ICON; }
+        window.toggleProfileModal = (s) => { if(s && currentUser) { document.getElementById('edit-nickname').value = currentUser.name; document.getElementById('profile-preview').src = currentUser.iconUrl || DEFAULT_ICON; loadMyHistory(); } toggleModal('profile-modal', s); };
+        window.toggleModal = (id, s) => document.getElementById(id).classList.toggle('active', s);
+        window.closeAllModals = () => document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+        window.closeOnBackdrop = (e, id) => { if (e.target.id === id) toggleModal(id, false); };
+        window.openSchedules = async (id, n) => { activeGameId = id; activeGameName = n; document.getElementById('schedule-game-title').innerText = n; toggleModal('schedule-modal', true); };
+        window.updateProfile = async () => { await updateDoc(doc(db, "users", currentUser.pin), { name: document.getElementById('edit-nickname').value.trim() }); location.reload(); };
+        window.addGame = async () => { const n = prompt("이름:"); if(!n) return; await addDoc(collection(db, "games"), { name: n, category: selectedCategory, creatorPin: currentUser.pin, createdAt: serverTimestamp() }); renderList(); };
     </script>
 </body>
 </html>
