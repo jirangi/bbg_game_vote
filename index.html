@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Ranking Archive</title>
+    <title>Game Archive - Hall of Fame</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -13,7 +13,6 @@
         .page.active { display: block; opacity: 1; transform: translateY(0); }
         .category-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .category-card:hover { transform: translateY(-8px); background: rgba(255, 255, 255, 0.1); border-color: #3b82f6; }
-        input::placeholder { color: rgba(255,255,255,0.3); }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
         .modal.active { display: flex; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
@@ -22,23 +21,45 @@
 </head>
 <body class="min-h-screen flex items-center justify-center p-6 text-sm">
 
-    <div class="fixed top-0 left-0 w-full bg-blue-600/20 backdrop-blur-md border-b border-white/10 p-2 text-center text-sm font-semibold text-blue-300 z-50">
+    <div class="fixed top-0 left-0 w-full bg-blue-600/20 backdrop-blur-md border-b border-white/10 p-2 text-center text-xs font-semibold text-blue-300 z-50">
         💡 모든 사용자의 기본 비밀번호는 <span class="text-white underline">1234</span>입니다.
     </div>
 
     <div id="page-home" class="page active w-full max-w-4xl text-center pt-10">
         <div class="flex justify-between items-center mb-4 max-w-md mx-auto">
-            <span id="user-welcome" class="text-blue-400 text-sm font-bold"></span>
+            <span id="user-welcome" class="text-blue-400 text-xs font-bold"></span>
             <button onclick="logout()" class="text-gray-500 hover:text-red-400 text-xs underline">로그아웃</button>
         </div>
-        <h1 class="text-4xl font-extrabold mb-12 tracking-tight uppercase tracking-widest">Game Archive</h1>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <button onclick="navTo('보드게임')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400 font-bold text-xl">🎲 보드게임</button>
-            <button onclick="navTo('지니어스')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400 font-bold text-xl">🧠 지니어스</button>
-            <button onclick="navTo('방탈출')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400 font-bold text-xl">🔑 방탈출</button>
-            <button onclick="navTo('머더 미스테리')" class="category-card glass rounded-3xl p-10 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400 font-bold text-xl">🕵️ 머더 미스테리</button>
+        <h1 class="text-4xl font-extrabold mb-10 tracking-tight uppercase">Game Archive</h1>
+        
+        <button onclick="navToStats()" class="mb-8 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-6 py-3 rounded-2xl font-bold hover:bg-yellow-500 hover:text-white transition shadow-lg shadow-yellow-500/10">🏆 명예의 전당 (통계) 보러가기</button>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <button onclick="navTo('보드게임')" class="category-card glass rounded-3xl p-8 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400 font-bold text-lg">🎲 보드게임</button>
+            <button onclick="navTo('지니어스')" class="category-card glass rounded-3xl p-8 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400 font-bold text-lg">🧠 지니어스</button>
+            <button onclick="navTo('방탈출')" class="category-card glass rounded-3xl p-8 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400 font-bold text-lg">🔑 방탈출</button>
+            <button onclick="navTo('머더 미스테리')" class="category-card glass rounded-3xl p-8 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400 font-bold text-lg">🕵️ 머더 미스테리</button>
         </div>
-        <button onclick="togglePinModal(true)" class="mt-12 text-gray-400 hover:text-white text-sm underline">내 PIN 번호 확인하기</button>
+        <button onclick="togglePinModal(true)" class="mt-10 text-gray-400 hover:text-white text-xs underline">내 PIN 번호 확인하기</button>
+    </div>
+
+    <div id="page-stats" class="page w-full max-w-3xl">
+        <div class="mb-8">
+            <button onclick="history.back()" class="text-blue-400 text-sm hover:underline mb-2">← 뒤로가기</button>
+            <h2 class="text-3xl font-bold text-yellow-400">명예의 전당 🏆</h2>
+            <p class="text-gray-500 text-xs mt-1">우리 모임의 활동 왕들을 소개합니다.</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="glass p-6 rounded-3xl border-yellow-500/20">
+                <h3 class="text-lg font-bold mb-4 flex items-center gap-2">🍕 베스트 댓글 왕</h3>
+                <div id="best-comment-king" class="space-y-4"></div>
+            </div>
+            <div class="glass p-6 rounded-3xl border-blue-500/20">
+                <h3 class="text-lg font-bold mb-4 flex items-center gap-2">🗳️ 최다 투표 왕</h3>
+                <div id="vote-king" class="space-y-4"></div>
+            </div>
+        </div>
     </div>
 
     <div id="page-login" class="page w-full max-w-sm text-center">
@@ -47,7 +68,7 @@
             <div class="space-y-4 text-left">
                 <input type="text" id="pin" placeholder="PIN 입력" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-blue-500">
                 <input type="password" id="pw" placeholder="PW 입력" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-blue-500">
-                <button onclick="login()" class="w-full bg-blue-600 py-3 rounded-xl font-bold hover:bg-blue-500 shadow-lg shadow-blue-500/20 transition-all mt-2">로그인</button>
+                <button onclick="login()" class="w-full bg-blue-600 py-3 rounded-xl font-bold hover:bg-blue-500 shadow-lg shadow-blue-600/20 transition-all mt-2">로그인</button>
             </div>
             <button onclick="togglePinModal(true)" class="mt-6 text-xs text-blue-400 hover:underline">내 PIN 번호를 모르겠어요</button>
         </div>
@@ -58,14 +79,7 @@
             <div><button onclick="history.back()" class="text-blue-400 text-sm hover:underline mb-2">← 뒤로가기</button><h2 id="rank-title" class="text-3xl font-bold">카테고리</h2></div>
             <button onclick="addGame()" class="bg-white/10 px-4 py-2 rounded-xl text-sm font-medium hover:bg-white/20 transition">+ 새 항목 추가</button>
         </div>
-        <div class="glass rounded-3xl overflow-hidden">
-            <table class="w-full text-left border-collapse">
-                <thead class="bg-white/5 text-gray-400 text-xs uppercase tracking-wider">
-                    <tr><th class="p-5">순위</th><th class="p-5">게임 이름</th><th class="p-5">평점</th><th class="p-5 text-center">상태</th></tr>
-                </thead>
-                <tbody id="rank-list" class="divide-y divide-white/5"></tbody>
-            </table>
-        </div>
+        <div class="glass rounded-3xl overflow-hidden"><table class="w-full text-left border-collapse"><thead class="bg-white/5 text-gray-400 text-xs uppercase tracking-wider"><tr><th class="p-5">순위</th><th class="p-5">게임 이름</th><th class="p-5">평점</th><th class="p-5 text-center">상태</th></tr></thead><tbody id="rank-list" class="divide-y divide-white/5"></tbody></table></div>
     </div>
 
     <div id="comment-modal" class="modal">
@@ -74,7 +88,7 @@
                 <h3 id="comment-game-title" class="text-xl font-extrabold text-blue-400">댓글</h3>
                 <button onclick="toggleCommentModal(false)" class="text-gray-400 hover:text-white text-2xl">✕</button>
             </div>
-            <div id="comment-list" class="flex-grow overflow-y-auto custom-scrollbar space-y-3 mb-4 pr-2"></div>
+            <div id="comment-list" class="flex-grow overflow-y-auto custom-scrollbar space-y-3 mb-4 pr-2 text-left"></div>
             <div class="space-y-3">
                 <div class="flex items-center gap-2 ml-1">
                     <input type="checkbox" id="anon-check" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 bg-white/5">
@@ -82,7 +96,7 @@
                 </div>
                 <div class="flex gap-2">
                     <input type="text" id="comment-input" placeholder="댓글을 입력하세요..." class="flex-grow bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-blue-500">
-                    <button onclick="addComment()" class="bg-blue-600 px-4 rounded-xl font-bold hover:bg-blue-500 transition shadow-lg shadow-blue-600/20">등록</button>
+                    <button onclick="addComment()" class="bg-blue-600 px-4 rounded-xl font-bold hover:bg-blue-500 transition">등록</button>
                 </div>
             </div>
         </div>
@@ -91,7 +105,7 @@
     <div id="pin-modal" class="modal">
         <div class="glass w-full max-w-md p-6 rounded-3xl max-h-[80vh] flex flex-col text-center">
             <div class="flex justify-between items-center mb-4 text-left">
-                <h3 class="text-xl font-bold ml-2 text-left">PIN 번호 찾기</h3>
+                <h3 class="text-xl font-bold ml-2">PIN 번호 찾기</h3>
                 <button onclick="togglePinModal(false)" class="text-gray-400 hover:text-white text-2xl">✕</button>
             </div>
             <div id="pin-list-content" class="overflow-y-auto pr-2 custom-scrollbar text-left"></div>
@@ -164,6 +178,57 @@
 
     window.logout = () => { localStorage.removeItem('game_archive_auth'); window.location.reload(); };
 
+    // [통계 기능 추가]
+    window.navToStats = async function() {
+        showPage('page-stats');
+        const commentKingList = document.getElementById('best-comment-king');
+        const voteKingList = document.getElementById('vote-king');
+        commentKingList.innerHTML = `<p class="opacity-50 text-xs">데이터 집계 중...</p>`;
+        voteKingList.innerHTML = `<p class="opacity-50 text-xs">데이터 집계 중...</p>`;
+
+        try {
+            const cSnap = await getDocs(collection(db, "comments"));
+            const rSnap = await getDocs(collection(db, "ratings"));
+            const uSnap = await getDocs(collection(db, "users"));
+            
+            const comments = cSnap.docs.map(d => d.data());
+            const ratings = rSnap.docs.map(d => d.data());
+            const users = uSnap.docs.reduce((acc, d) => ({ ...acc, [d.id]: d.data().name }), {});
+
+            // 1. 베스트 댓글 (좋아요 기준)
+            let bestComments = [...comments].sort((a,b) => (b.likes || 0) - (a.likes || 0)).slice(0, 5);
+            commentKingList.innerHTML = bestComments.map((c, i) => `
+                <div class="flex items-center gap-3 p-3 bg-white/5 rounded-2xl border border-white/5">
+                    <span class="text-yellow-400 font-black text-lg">#${i+1}</span>
+                    <div class="flex-grow overflow-hidden">
+                        <div class="flex justify-between">
+                            <span class="text-[10px] text-gray-400 font-bold">${c.isAnonymous ? '익명' : c.userName}</span>
+                            <span class="text-[10px] text-yellow-500 font-bold">🍕 ${c.likes || 0}</span>
+                        </div>
+                        <p class="text-xs truncate text-gray-300 mt-1">${c.text}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            // 2. 최다 투표 왕 (유저별 참여 횟수)
+            const voteCounts = ratings.reduce((acc, r) => {
+                acc[r.userPin] = (acc[r.userPin] || 0) + 1;
+                return acc;
+            }, {});
+            let topVoters = Object.entries(voteCounts).sort((a,b) => b[1] - a[1]).slice(0, 5);
+            voteKingList.innerHTML = topVoters.map((v, i) => `
+                <div class="flex items-center justify-between p-3 bg-white/5 rounded-2xl border border-white/5">
+                    <div class="flex items-center gap-3">
+                        <span class="text-blue-400 font-black">#${i+1}</span>
+                        <span class="font-bold">${users[v[0]] || '알 수 없음'}</span>
+                    </div>
+                    <span class="text-xs text-blue-300 font-bold">🗳️ ${v[1]}회 참여</span>
+                </div>
+            `).join('');
+
+        } catch(e) { console.error(e); }
+    };
+
     window.navTo = function(cat) {
         selectedCategory = cat;
         document.getElementById('rank-title').innerText = cat;
@@ -172,7 +237,7 @@
 
     window.renderList = async function() {
         const list = document.getElementById('rank-list');
-        list.innerHTML = `<tr><td colspan="4" class="p-10 text-center opacity-50">데이터 분석 중...</td></tr>`;
+        list.innerHTML = `<tr><td colspan="4" class="p-10 text-center opacity-50">데이터 불러오는 중...</td></tr>`;
         try {
             const gSnap = await getDocs(query(collection(db, "games"), where("category", "==", selectedCategory)));
             const rSnap = await getDocs(collection(db, "ratings"));
