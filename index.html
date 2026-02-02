@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Archive v2.3.0</title>
+    <title>Game Archive v2.3.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -17,6 +17,8 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
         .sticky-back { position: fixed; top: 60px; left: 20px; z-index: 40; background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(8px); padding: 8px 16px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); display: none; }
         .page.active#page-rank ~ .sticky-back, .page.active#page-stats ~ .sticky-back { display: block; }
+        
+        /* 별점 스타일 */
         .star-container { display: inline-flex; gap: 1px; color: #a855f7; font-size: 1.25rem; }
         .star { position: relative; display: inline-block; }
         .star-half::before { content: '★'; position: absolute; left: 0; width: 50%; overflow: hidden; color: #a855f7; }
@@ -51,29 +53,29 @@
             <button onclick="navTo('머더 미스테리')" class="category-card glass rounded-3xl p-8 flex flex-col items-center justify-center gap-4 text-white hover:text-blue-400 font-bold text-lg transition hover:scale-105">🕵️ 머더 미스테리</button>
         </div>
         <div class="mt-10 flex flex-col items-center gap-2">
-            <button onclick="togglePinModal(true)" class="text-gray-400 hover:text-white text-xs underline font-bold font-bold font-bold">내 PIN 번호 확인</button>
-            <div class="text-[10px] text-gray-600 opacity-50 font-bold">App Version v2.3.0</div>
+            <button onclick="togglePinModal(true)" class="text-gray-400 hover:text-white text-xs underline font-bold">내 PIN 번호 확인</button>
+            <div class="text-[10px] text-gray-600 opacity-50 font-bold">App Version v2.3.1</div>
         </div>
     </div>
 
     <div id="profile-modal" class="modal">
         <div class="glass w-full max-w-xs p-8 rounded-3xl text-center shadow-2xl">
-            <h3 class="text-xl font-bold mb-6 text-blue-400 font-bold">마이 프로필 수정</h3>
-            <div class="space-y-5 text-left font-bold">
+            <h3 class="text-xl font-bold mb-6 text-blue-400">마이 프로필 수정</h3>
+            <div class="space-y-5 text-left">
                 <div class="flex justify-center mb-2">
                     <img id="profile-preview" src="" class="w-20 h-20 rounded-full border-4 border-blue-500/30 object-cover">
                 </div>
                 <div>
-                    <label class="text-[10px] text-gray-400 block mb-1 ml-1">닉네임</label>
-                    <input type="text" id="edit-nickname" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none font-bold">
+                    <label class="text-[10px] text-gray-400 block mb-1">닉네임</label>
+                    <input type="text" id="edit-nickname" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none">
                 </div>
                 <div>
-                    <label class="text-[10px] text-gray-400 block mb-1 ml-1">프로필 이미지 URL</label>
-                    <input type="text" id="edit-icon-url" oninput="document.getElementById('profile-preview').src=this.value" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none font-bold">
+                    <label class="text-[10px] text-gray-400 block mb-1">프로필 이미지 URL</label>
+                    <input type="text" id="edit-icon-url" oninput="document.getElementById('profile-preview').src=this.value" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none">
                 </div>
                 <div class="flex gap-2 pt-2">
-                    <button onclick="toggleProfileModal(false)" class="flex-1 bg-white/10 py-3 rounded-xl font-bold font-bold">취소</button>
-                    <button onclick="updateProfile()" class="flex-1 bg-blue-600 py-3 rounded-xl font-bold font-bold">저장하기</button>
+                    <button onclick="toggleProfileModal(false)" class="flex-1 bg-white/10 py-3 rounded-xl">취소</button>
+                    <button onclick="updateProfile()" class="flex-1 bg-blue-600 py-3 rounded-xl font-bold">저장하기</button>
                 </div>
             </div>
         </div>
@@ -97,7 +99,7 @@
     <div id="comment-modal" class="modal">
         <div class="glass w-full max-w-md p-6 rounded-3xl max-h-[85vh] flex flex-col">
             <div class="flex justify-between items-center mb-4">
-                <h3 id="comment-game-title" class="text-xl font-extrabold text-blue-400 font-bold text-left font-bold font-bold">댓글</h3>
+                <h3 id="comment-game-title" class="text-xl font-extrabold text-blue-400 font-bold text-left">댓글</h3>
                 <button onclick="toggleCommentModal(false)" class="text-gray-400 hover:text-white text-2xl">✕</button>
             </div>
             <div id="comment-list" class="flex-grow overflow-y-auto custom-scrollbar space-y-3 mb-4 text-left"></div>
@@ -105,24 +107,96 @@
                 <div class="flex items-center gap-2"><input type="checkbox" id="anon-check" class="w-4 h-4 rounded bg-white/5"><label for="anon-check" class="text-xs text-gray-400 font-bold">익명 작성</label></div>
                 <div class="flex gap-2">
                     <input type="text" id="comment-input" placeholder="댓글을 입력하세요..." class="flex-grow bg-white/5 border border-white/10 p-3 rounded-xl outline-none font-bold">
-                    <button onclick="addComment()" class="bg-blue-600 px-4 rounded-xl font-bold font-bold">등록</button>
+                    <button onclick="addComment()" class="bg-blue-600 px-4 rounded-xl font-bold">등록</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="page-login" class="page w-full max-w-sm text-center"><div class="glass p-8 rounded-3xl shadow-2xl"><h2 class="text-2xl font-bold mb-6 font-bold font-bold font-bold">인증이 필요합니다</h2><div class="space-y-4 text-left font-bold font-bold font-bold"><input type="text" id="pin" placeholder="PIN 입력" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none font-bold font-bold font-bold font-bold"><input type="password" id="pw" placeholder="PW 입력" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none font-bold font-bold font-bold font-bold font-bold"><button onclick="login()" class="w-full bg-blue-600 py-3 rounded-xl font-bold hover:bg-blue-500 transition-all mt-2 font-bold font-bold font-bold font-bold font-bold font-bold">로그인</button></div><button onclick="togglePinModal(true)" class="mt-6 text-xs text-blue-400 hover:underline font-bold font-bold font-bold font-bold font-bold font-bold font-bold">PIN을 모르겠어요</button></div></div>
-    <div id="pin-modal" class="modal"><div class="glass w-full max-w-md p-6 rounded-3xl max-h-[80vh] flex flex-col text-center font-bold font-bold"><div class="flex justify-between items-center mb-4 text-left font-bold font-bold font-bold"><h3 class="text-xl font-bold ml-2 font-bold font-bold font-bold">PIN 찾기</h3><button onclick="togglePinModal(false)" class="text-gray-400 hover:text-white text-2xl font-bold font-bold font-bold font-bold">✕</button></div><div id="pin-list-content" class="overflow-y-auto pr-2 custom-scrollbar text-left font-bold font-bold font-bold font-bold font-bold font-bold"></div><button onclick="togglePinModal(false)" class="mt-6 w-full bg-white/10 py-3 rounded-xl font-bold hover:bg-white/20 transition font-bold font-bold font-bold font-bold font-bold font-bold font-bold font-bold">닫기</button></div></div>
+    <div id="page-stats" class="page w-full max-w-5xl text-left">
+        <h2 class="text-3xl font-bold text-yellow-400 mb-8 pt-10">명예의 전당 🏆</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="glass p-6 rounded-3xl border-yellow-500/20"><h3 class="text-base font-bold mb-4 text-center">🍕 베스트 댓글 왕</h3><div id="best-comment-king" class="space-y-4"></div></div>
+            <div class="glass p-6 rounded-3xl border-blue-500/20"><h3 class="text-base font-bold mb-4 text-center">🗳️ 최다 투표 왕</h3><div id="vote-king" class="space-y-4"></div></div>
+            <div class="glass p-6 rounded-3xl border-green-500/20"><h3 class="text-base font-bold mb-4 text-center">🆕 최다 게임 등록 왕</h3><div id="game-add-king" class="space-y-4"></div></div>
+        </div>
+    </div>
+
+    <div id="page-login" class="page w-full max-w-sm text-center">
+        <div class="glass p-8 rounded-3xl shadow-2xl">
+            <h2 class="text-2xl font-bold mb-6">인증이 필요합니다</h2>
+            <div class="space-y-4 text-left">
+                <input type="text" id="pin" placeholder="PIN 입력" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none">
+                <input type="password" id="pw" placeholder="PW 입력" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none">
+                <button onclick="login()" class="w-full bg-blue-600 py-3 rounded-xl font-bold hover:bg-blue-500 transition-all mt-2">로그인</button>
+            </div>
+            <button onclick="togglePinModal(true)" class="mt-6 text-xs text-blue-400 hover:underline font-bold">PIN을 모르겠어요</button>
+        </div>
+    </div>
+    <div id="pin-modal" class="modal"><div class="glass w-full max-w-md p-6 rounded-3xl max-h-[80vh] flex flex-col text-center"><div class="flex justify-between items-center mb-4 text-left"><h3 class="text-xl font-bold ml-2">PIN 찾기</h3><button onclick="togglePinModal(false)" class="text-gray-400 hover:text-white text-2xl">✕</button></div><div id="pin-list-content" class="overflow-y-auto pr-2 custom-scrollbar text-left font-bold"></div><button onclick="togglePinModal(false)" class="mt-6 w-full bg-white/10 py-3 rounded-xl font-bold hover:bg-white/20 transition">닫기</button></div></div>
+
+    <div id="eval-modal" class="modal">
+        <div class="glass w-full max-w-xs p-6 rounded-3xl text-center">
+            <h3 id="eval-modal-title" class="text-xl font-bold mb-4 text-blue-400">평가 수정</h3>
+            <div class="space-y-4 text-left font-bold">
+                <div id="score-input-box">
+                    <label class="text-xs text-gray-400 block mb-2 ml-1">재미 점수 (0~100)</label>
+                    <input type="number" id="single-score" step="0.1" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none">
+                </div>
+                <div id="diff-input-box">
+                    <label class="text-xs text-gray-400 block mb-2 ml-1">난이도 별점 (0~5.0)</label>
+                    <input type="number" id="single-diff" step="0.1" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none">
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button onclick="toggleEvalModal(false)" class="flex-1 bg-white/10 py-3 rounded-xl">취소</button>
+                    <button onclick="submitSingleEval()" class="flex-1 bg-blue-600 py-3 rounded-xl font-bold">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, updateDoc, query, where, serverTimestamp, increment, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, updateDoc, query, where, serverTimestamp, increment, arrayUnion, arrayRemove, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBVp-GgD8Ts-tGw5itr9Av_MnZAt-U4teE", authDomain: "game-archive-afacf.firebaseapp.com", projectId: "game-archive-afacf", storageBucket: "game-archive-afacf.firebasestorage.app", messagingSenderId: "927042381268", appId: "1:927042381268:web:e41f4106cf9202e45ca241" };
     const app = initializeApp(firebaseConfig); const db = getFirestore(app);
 
-    let currentUser = null; let allUsers = {}; let allRatingsData = [];
+    let currentUser = null; let selectedCategory = ""; let activeGameId = null; let evalType = ""; 
+    let allRatingsData = [];
 
+    // [유틸] 별점 렌더링
+    function renderStars(rating) {
+        let starsHtml = '<div class="star-container">';
+        for (let i = 1; i <= 5; i++) {
+            if (rating >= i) starsHtml += '<span class="star">★</span>';
+            else if (rating >= i - 0.5) starsHtml += '<span class="star star-half">★</span>';
+            else starsHtml += '<span class="star opacity-10">★</span>';
+        }
+        starsHtml += '</div>';
+        return starsHtml;
+    }
+
+    // [페이지 전환]
+    window.showPage = (id) => {
+        document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+        const target = document.getElementById(id);
+        if (target) {
+            target.style.display = 'block';
+            setTimeout(() => { target.classList.add('active'); updateBackBtnVisibility(); }, 50);
+            if (history.state?.page !== id) history.pushState({ page: id }, '', '');
+        }
+    };
+
+    window.onpopstate = (e) => { showPage(e.state?.page || 'page-home'); };
+
+    function updateBackBtnVisibility() {
+        const btn = document.getElementById('global-back-btn');
+        const active = document.querySelector('.page.active')?.id;
+        btn.style.display = (active === 'page-rank' || active === 'page-stats') ? 'block' : 'none';
+    }
+
+    // [인증]
     window.addEventListener('DOMContentLoaded', async () => {
         const saved = localStorage.getItem('game_archive_auth');
         if (saved) {
@@ -136,12 +210,24 @@
         showPage('page-login');
     });
 
+    window.login = async () => {
+        const pin = document.getElementById('pin').value; const pw = document.getElementById('pw').value;
+        const snap = await getDoc(doc(db, "users", pin));
+        if (snap.exists() && snap.data().password === pw) {
+            currentUser = { pin, ...snap.data() };
+            localStorage.setItem('game_archive_auth', JSON.stringify({ pin, pw }));
+            location.reload();
+        } else alert("인증 실패");
+    };
+
+    window.logout = () => { localStorage.removeItem('game_archive_auth'); location.reload(); };
+
     function updateHeaderUI() {
         document.getElementById('user-welcome').innerText = `${currentUser.name}님 (수정)`;
         document.getElementById('my-profile-icon').src = currentUser.iconUrl || 'https://via.placeholder.com/32';
     }
 
-    // [마이 프로필 업데이트]
+    // [프로필]
     window.toggleProfileModal = (show) => {
         if(show) {
             document.getElementById('edit-nickname').value = currentUser.name;
@@ -154,60 +240,181 @@
     window.updateProfile = async () => {
         const newName = document.getElementById('edit-nickname').value.trim();
         const newIcon = document.getElementById('edit-icon-url').value.trim();
-        if(!newName) return alert("닉네임을 입력해주세요.");
-        
-        try {
-            await updateDoc(doc(db, "users", currentUser.pin), { name: newName, iconUrl: newIcon });
-            currentUser.name = newName; currentUser.iconUrl = newIcon;
-            updateHeaderUI(); toggleProfileModal(false);
-            alert("프로필이 변경되었습니다!");
-        } catch(e) { alert("저장 실패"); }
+        if(!newName) return alert("닉네임 입력!");
+        await updateDoc(doc(db, "users", currentUser.pin), { name: newName, iconUrl: newIcon });
+        currentUser.name = newName; currentUser.iconUrl = newIcon;
+        updateHeaderUI(); toggleProfileModal(false); alert("변경 완료!");
     };
 
-    // [댓글 로드 로직 - 실시간 유저 정보 반영]
+    // [카테고리 이동]
+    window.navTo = (cat) => {
+        selectedCategory = cat;
+        document.getElementById('rank-title').innerText = cat;
+        renderList();
+        showPage('page-rank');
+    };
+
+    // [랭킹 리스트]
+    window.renderList = async () => {
+        const list = document.getElementById('rank-list');
+        list.innerHTML = `<tr><td colspan="4" class="p-10 text-center opacity-50 italic font-bold">로딩 중...</td></tr>`;
+        
+        const [gSnap, rSnap, cSnap] = await Promise.all([
+            getDocs(query(collection(db, "games"), where("category", "==", selectedCategory))),
+            getDocs(collection(db, "ratings")),
+            getDocs(collection(db, "comments"))
+        ]);
+
+        allRatingsData = rSnap.docs.map(d => d.data());
+        const comments = cSnap.docs.map(d => d.data());
+
+        let games = [];
+        gSnap.forEach(d => {
+            const gameId = d.id; const gData = d.data();
+            const gRatings = allRatingsData.filter(r => r.gameId === gameId);
+            const scores = gRatings.map(r => r.score || 0).sort((a,b) => a-b);
+            let finalAvg = 0;
+            if (scores.length >= 3) {
+                let trim = (scores.length >= 5) ? 1 : 0;
+                const trimmed = scores.slice(trim, scores.length - trim);
+                finalAvg = trimmed.reduce((a,c) => a+c, 0) / trimmed.length;
+            } else { finalAvg = scores.length ? scores.reduce((a,c) => a+c, 0) / scores.length : 0; }
+            const avgDiff = gRatings.length ? gRatings.reduce((acc, r) => acc + (r.difficulty || 0), 0) / gRatings.length : 0;
+
+            games.push({ id: gameId, ...gData, avgScore: finalAvg, avgDiff, voteCount: gRatings.length, commentCount: comments.filter(c => c.gameId === gameId).length, my: gRatings.find(r => r.userPin === currentUser.pin) });
+        });
+
+        games.sort((a,b) => b.avgScore - a.avgScore);
+        list.innerHTML = games.map((g, i) => {
+            let rankDisp = i < 3 ? ['🥇','🥈','🥉'][i] : `#${i+1}`;
+            return `
+            <tr class="hover:bg-white/5 border-b border-white/5 transition text-center font-bold">
+                <td class="p-4 font-mono text-blue-400 text-left text-lg">${rankDisp}</td>
+                <td class="p-4 text-left">
+                    <div class="flex items-center gap-2">
+                        <span onclick="openComments('${g.id}', '${g.name}')" class="font-bold text-base cursor-pointer hover:underline">${g.name}</span>
+                        <button onclick="editGameName('${g.id}', '${g.name}', '${g.creatorPin}')" class="text-gray-500 hover:text-white text-[10px]">✏️</button>
+                    </div>
+                    <div class="flex gap-2 mt-1 opacity-50 text-[9px]"><span>🗳️ ${g.voteCount}</span><span class="text-blue-300">💬 ${g.commentCount}</span></div>
+                </td>
+                <td class="p-4 cursor-pointer hover:bg-white/10 rounded-xl" onclick="openEvalModal('${g.id}', '${g.name}', 'score')">
+                    <div class="text-yellow-400 font-bold text-base">${g.avgScore.toFixed(1)}점</div>
+                    ${g.my ? `<div class="text-[9px] text-blue-300 opacity-60 font-bold">(내 점수: ${g.my.score})</div>` : ''}
+                </td>
+                <td class="p-4 cursor-pointer hover:bg-white/10 rounded-xl" onclick="openEvalModal('${g.id}', '${g.name}', 'diff')">
+                    <div class="text-purple-400 font-bold">
+                        ${renderStars(g.avgDiff)}
+                        <div class="text-[10px] opacity-60 font-bold mt-1">${g.avgDiff.toFixed(1)}</div>
+                    </div>
+                    ${g.my ? `<div class="text-[9px] text-blue-300 opacity-60 font-bold">(내 난이도: ${g.my.difficulty})</div>` : ''}
+                </td>
+            </tr>`}).join('');
+    };
+
+    // [평가 모달]
+    window.openEvalModal = (id, name, type) => {
+        activeGameId = id; evalType = type;
+        document.getElementById('eval-modal-title').innerText = `${name} - ${type === 'score' ? '재미 평가' : '난이도 평가'}`;
+        const myRating = allRatingsData.find(r => r.gameId === id && r.userPin === currentUser.pin);
+        document.getElementById('score-input-box').style.display = type === 'score' ? 'block' : 'none';
+        document.getElementById('diff-input-box').style.display = type === 'diff' ? 'block' : 'none';
+        document.getElementById('single-score').value = myRating?.score || '';
+        document.getElementById('single-diff').value = myRating?.difficulty || '';
+        toggleEvalModal(true);
+    };
+
+    window.toggleEvalModal = (s) => document.getElementById('eval-modal').classList.toggle('active', s);
+    window.submitSingleEval = async () => {
+        const myRating = allRatingsData.find(r => r.gameId === activeGameId && r.userPin === currentUser.pin);
+        let s = parseFloat(document.getElementById('single-score').value);
+        let d = parseFloat(document.getElementById('single-diff').value);
+        let finalS = evalType === 'score' ? s : (myRating?.score || 0);
+        let finalD = evalType === 'diff' ? d : (myRating?.difficulty || 0);
+        await setDoc(doc(db, "ratings", `${currentUser.pin}_${activeGameId}`), { gameId: activeGameId, userPin: currentUser.pin, score: finalS, difficulty: finalD, updatedAt: serverTimestamp() });
+        toggleEvalModal(false); renderList();
+    };
+
+    // [댓글]
+    window.openComments = (id, name) => { activeGameId = id; document.getElementById('comment-game-title').innerText = name; toggleCommentModal(true); loadComments(); };
+    window.toggleCommentModal = (s) => document.getElementById('comment-modal').classList.toggle('active', s);
+    
     async function loadComments() {
         const list = document.getElementById('comment-list');
-        list.innerHTML = `<p class="p-5 italic opacity-50 font-bold">로딩 중...</p>`;
-        
+        list.innerHTML = `<p class="p-5 italic font-bold opacity-50">로딩 중...</p>`;
         const [cSnap, uSnap] = await Promise.all([
             getDocs(query(collection(db, "comments"), where("gameId", "==", activeGameId))),
             getDocs(collection(db, "users"))
         ]);
-        
         const users = uSnap.docs.reduce((acc, d) => ({ ...acc, [d.id]: d.data() }), {});
         let ds = cSnap.docs.map(d => ({id: d.id, ...d.data()}));
         ds.sort((a,b) => (b.likes||0)-(a.likes||0) || (b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-
         list.innerHTML = ds.map(data => {
             const isMe = data.userPin === currentUser.pin;
             const writer = users[data.userPin] || { name: "알 수 없음", iconUrl: "" };
             const dName = data.isAnonymous ? (isMe ? "익명(나)" : "익명") : writer.name;
             const dIcon = data.isAnonymous ? "https://via.placeholder.com/32" : (writer.iconUrl || "https://via.placeholder.com/32");
-
             return `
                 <div class="p-3 rounded-2xl ${isMe ? 'bg-blue-600/20 ml-8 border-blue-500/20' : 'bg-white/5 mr-8 border-white/5'} mb-3 border shadow-lg">
                     <div class="flex justify-between items-center mb-2">
-                        <div class="flex items-center gap-2">
-                            <img src="${dIcon}" class="user-icon">
-                            <span class="text-[10px] font-bold ${isMe?'text-blue-300':'text-gray-400'} font-bold">${dName}</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button onclick="likeComment('${data.id}')" class="text-[10px] font-bold">🍕 ${data.likes||0}</button>
-                            ${isMe?`<button onclick="delComment('${data.id}')" class="text-[9px] text-red-500 opacity-50 font-bold">삭제</button>`:''}
-                        </div>
+                        <div class="flex items-center gap-2"><img src="${dIcon}" class="user-icon"><span class="text-[10px] font-bold ${isMe?'text-blue-300':'text-gray-400'}">${dName}</span></div>
+                        <div class="flex items-center gap-2"><button onclick="likeComment('${data.id}')" class="text-[10px] font-bold">🍕 ${data.likes||0}</button>${isMe?`<button onclick="delComment('${data.id}')" class="text-[9px] text-red-500 opacity-50">삭제</button>`:''}</div>
                     </div>
                     <p class="text-sm leading-relaxed font-bold pl-1">${data.text}</p>
                 </div>`;
         }).join('');
     }
 
-    // [기존 유틸 함수 유지 및 필요한 부분 수정]
-    window.login = async () => { /* 이전 로그인 로직과 동일 */ const pin = document.getElementById('pin').value; const pw = document.getElementById('pw').value; const snap = await getDoc(doc(db, "users", pin)); if (snap.exists() && snap.data().password === pw) { localStorage.setItem('game_archive_auth', JSON.stringify({ pin, pw })); location.reload(); } else alert("인증 실패"); };
-    window.logout = () => { localStorage.removeItem('game_archive_auth'); location.reload(); };
-    window.addComment = async () => { const i = document.getElementById('comment-input'); const a = document.getElementById('anon-check').checked; if(!i.value.trim()) return; await addDoc(collection(db, "comments"), { gameId: activeGameId, userPin: currentUser.pin, isAnonymous: a, text: i.value.trim(), likes: 0, likedUsers: [], createdAt: serverTimestamp() }); i.value = ""; document.getElementById('anon-check').checked = false; loadComments(); };
-    
-    // [랭킹 및 기타 함수 중략 - v2.1.7 로직 그대로 통합]
-    // (renderList, openEvalModal, submitSingleEval, navTo, navToStats 등 기존 기능을 이 script 안에 포함시키세요)
+    window.addComment = async () => {
+        const i = document.getElementById('comment-input'); if(!i.value.trim()) return;
+        await addDoc(collection(db, "comments"), { gameId: activeGameId, userPin: currentUser.pin, isAnonymous: document.getElementById('anon-check').checked, text: i.value.trim(), likes: 0, likedUsers: [], createdAt: serverTimestamp() });
+        i.value = ""; document.getElementById('anon-check').checked = false; loadComments();
+    };
+
+    window.likeComment = async (id) => {
+        const ref = doc(db, "comments", id); const snap = await getDoc(ref); const liked = snap.data().likedUsers?.includes(currentUser.pin);
+        await updateDoc(ref, { likes: increment(liked?-1:1), likedUsers: liked?arrayRemove(currentUser.pin):arrayUnion(currentUser.pin) }); loadComments();
+    };
+    window.delComment = async (id) => { if(confirm("삭제?")) { await deleteDoc(doc(db, "comments", id)); loadComments(); } };
+
+    // [통계]
+    window.navToStats = async () => {
+        showPage('page-stats');
+        const [cSnap, rSnap, gSnap, uSnap] = await Promise.all([getDocs(collection(db, "comments")), getDocs(collection(db, "ratings")), getDocs(collection(db, "games")), getDocs(collection(db, "users"))]);
+        const comments = cSnap.docs.map(d => d.data()); const ratings = rSnap.docs.map(d => d.data()); const games = gSnap.docs.map(d => d.data()); const users = uSnap.docs.reduce((acc, d) => ({ ...acc, [d.id]: d.data().name }), {});
+        
+        let topC = [...comments].sort((a,b) => (b.likes||0)-(a.likes||0)).slice(0,5);
+        document.getElementById('best-comment-king').innerHTML = topC.map(c => `<div class="p-3 bg-white/5 rounded-2xl border border-white/5"><span class="text-[9px] text-gray-500">${c.isAnonymous?'익명':(users[c.userPin]||'알수없음')}</span><p class="text-xs truncate text-gray-300 mt-1 font-bold">${c.text}</p><div class="text-right text-[10px] text-yellow-500">🍕 ${c.likes||0}</div></div>`).join('');
+        
+        const vCount = ratings.reduce((acc, r) => { acc[r.userPin] = (acc[r.userPin] || 0) + 1; return acc; }, {});
+        let topV = Object.entries(vCount).sort((a,b) => b[1]-a[1]).slice(0,5);
+        document.getElementById('vote-king').innerHTML = topV.map(v => `<div class="flex justify-between items-center p-3 bg-white/5 rounded-2xl border border-white/5"><b>${users[v[0]]||'익명'}</b><span class="text-xs text-blue-400 font-mono">${v[1]}회</span></div>`).join('');
+        
+        const gCount = games.reduce((acc, g) => { if(g.creatorPin) acc[g.creatorPin] = (acc[g.creatorPin]||0)+1; return acc; }, {});
+        let topG = Object.entries(gCount).sort((a,b) => b[1]-a[1]).slice(0,5);
+        document.getElementById('game-add-king').innerHTML = topG.map(a => `<div class="flex justify-between items-center p-3 bg-white/5 rounded-2xl border border-white/5"><b>${users[a[0]]||'익명'}</b><span class="text-xs text-green-400 font-mono">${a[1]}개</span></div>`).join('');
+    };
+
+    // [기타]
+    window.addGame = async () => {
+        const n = prompt("게임 이름:"); if(!n) return;
+        const norm = n.replace(/\s+/g, '').toLowerCase();
+        const gS = await getDocs(collection(db, "games"));
+        let dup = false; gS.forEach(d => { if(d.data().name.replace(/\s+/g, '').toLowerCase() === norm) dup = true; });
+        if(dup) return alert("이미 존재");
+        await addDoc(collection(db, "games"), { name: n, category: selectedCategory, creatorPin: currentUser.pin, createdAt: serverTimestamp() }); renderList();
+    };
+
+    window.editGameName = async (id, old, creator) => {
+        if (currentUser.pin !== creator && currentUser.pin !== "100") return alert("권한 없음");
+        const n = prompt("수정:", old); if (n && n !== old) { await updateDoc(doc(db, "games", id), { name: n }); renderList(); }
+    };
+
+    window.togglePinModal = async (s) => {
+        const m = document.getElementById('pin-modal'); if(!s) return m.classList.remove('active');
+        m.classList.add('active'); const snap = await getDocs(collection(db, "users"));
+        let us = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => parseInt(a.id)-parseInt(b.id));
+        document.getElementById('pin-list-content').innerHTML = us.map(u => `<div class="flex justify-between p-3 border-b border-white/5"><span>${u.id}</span><b>${u.name}</b></div>`).join('');
+    };
 </script>
 </body>
 </html>
