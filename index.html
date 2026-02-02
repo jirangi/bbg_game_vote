@@ -200,10 +200,13 @@
         loadComments();
     };
 
-    async function loadComments() {
-        const list = document.getElementById('comment-list');
-        list.innerHTML = `<div class="p-5 text-center text-xs opacity-50">댓글 로딩 중...</div>`;
-        const q = query(collection(db, "comments"), where("gameId", "==", activeGameId), orderBy("createdAt", "asc"));
+async function loadComments() {
+    const list = document.getElementById('comment-list');
+    list.innerHTML = `<div class="p-5 text-center text-xs opacity-50">댓글 로딩 중...</div>`;
+    
+    try {
+        // 색인 오류 방지를 위해 정렬 없이 데이터만 가져옴
+        const q = query(collection(db, "comments"), where("gameId", "==", activeGameId));
         const snap = await getDocs(q);
         
         if (snap.empty) {
@@ -211,37 +214,86 @@
             return;
         }
 
-        list.innerHTML = snap.docs.map(d => {
-            const data = d.data();
+        // 1. 데이터를 배열로 변환
+        let docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+        // 2. 추천수(likes) 높은 순 -> 최신순(createdAt)으로 브라우저에서 정렬
+        docs.sort((a, b) => {
+            const likesDiff = (b.likes || 0) - (a.likes || 0);
+            if (likesDiff !== 0) return likesDiff;
+            return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
+        });
+
+        list.innerHTML = docs.map(data => {
             const isMe = data.userPin === currentUser.pin;
+            const likedByMe = data.likedUsers && data.likedUsers.includes(currentUser.pin);
+            
             return `
-                <div class="p-3 rounded-2xl ${isMe ? 'bg-blue-600/20 ml-8 border border-blue-500/20' : 'bg-white/5 mr-8 border border-white/5'}">
+                <div class="p-3 rounded-2xl ${isMe ? 'bg-blue-600/20 ml-8 border-blue-500/20' : 'bg-white/5 mr-8 border-white/5'} mb-3 border text-left transition-all">
                     <div class="flex justify-between items-center mb-1">
                         <span class="text-[10px] font-bold ${isMe ? 'text-blue-300' : 'text-gray-400'}">${data.userName}</span>
-                        ${isMe ? `<button onclick="delComment('${d.id}')" class="text-[9px] text-red-500 opacity-50 hover:opacity-100">삭제</button>` : ''}
+                        <div class="flex items-center gap-2">
+                            <button onclick="likeComment('${data.id}')" class="flex items-center gap-1 text-[10px] ${likedByMe ? 'text-yellow-400' : 'text-gray-500'} hover:text-yellow-400 transition">
+                                🍕 <span>${data.likes || 0}</span>
+                            </button>
+                            ${isMe ? `<button onclick="delComment('${data.id}')" class="text-[9px] text-red-500 opacity-50 hover:opacity-100">삭제</button>` : ''}
+                        </div>
                     </div>
                     <p class="text-sm leading-relaxed">${data.text}</p>
                 </div>
             `;
         }).join('');
-        list.scrollTop = list.scrollHeight;
+    } catch (e) {
+        list.innerHTML = `<div class="p-5 text-center text-red-400 text-xs">로딩 실패: ${e.message}</div>`;
     }
+}
 
-    window.addComment = async function() {
-        const input = document.getElementById('comment-input');
-        if (!input.value.trim()) return;
-        try {
-            await addDoc(collection(db, "comments"), {
-                gameId: activeGameId,
-                userPin: currentUser.pin,
-                userName: currentUser.name,
-                text: input.value.trim(),
-                createdAt: serverTimestamp()
+    import { updateDoc, arrayUnion, arrayRemove, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+window.likeComment = async function(commentId) {
+    const docRef = doc(db, "comments", commentId);
+    const snap = await getDoc(docRef);
+    const data = snap.data();
+    
+    // 이미 추천했는지 확인
+    const isLiked = data.likedUsers && data.likedUsers.includes(currentUser.pin);
+
+    try {
+        if (isLiked) {
+            // 이미 추천했다면 취소
+            await updateDoc(docRef, {
+                likes: increment(-1),
+                likedUsers: arrayRemove(currentUser.pin)
             });
-            input.value = "";
-            loadComments();
-        } catch(e) { alert("댓글 등록 실패"); }
-    };
+        } else {
+            // 처음 추천하면 추가
+            await updateDoc(docRef, {
+                likes: increment(1),
+                likedUsers: arrayUnion(currentUser.pin)
+            });
+        }
+        loadComments(); // 화면 갱신
+    } catch (e) { console.error("추천 실패", e); }
+};
+    
+    
+window.addComment = async function() {
+    const input = document.getElementById('comment-input');
+    if (!input.value.trim()) return;
+    try {
+        await addDoc(collection(db, "comments"), {
+            gameId: activeGameId,
+            userPin: currentUser.pin,
+            userName: currentUser.name,
+            text: input.value.trim(),
+            likes: 0,           // 추천수 초기화
+            likedUsers: [],     // 추천한 유저 리스트 초기화
+            createdAt: serverTimestamp()
+        });
+        input.value = "";
+        loadComments();
+    } catch(e) { alert("댓글 등록 실패"); }
+};
 
     window.delComment = async function(id) {
         if (!confirm("댓글을 삭제하시겠습니까?")) return;
@@ -286,3 +338,4 @@
 </script>
 </body>
 </html>
+
