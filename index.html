@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Archive v2.1.3</title>
+    <title>Game Archive v2.1.4</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -42,7 +42,7 @@
         </div>
         <div class="mt-10 flex flex-col items-center gap-2">
             <button onclick="togglePinModal(true)" class="text-gray-400 hover:text-white text-xs underline">내 PIN 번호 확인</button>
-            <div class="text-[10px] text-gray-600 opacity-50">App Version v2.1.3</div>
+            <div class="text-[10px] text-gray-600 opacity-50">App Version v2.1.4</div>
         </div>
     </div>
 
@@ -52,9 +52,9 @@
             <button onclick="addGame()" class="bg-white/10 px-4 py-2 rounded-xl text-sm font-medium hover:bg-white/20 transition">+ 새 게임 추가</button>
         </div>
         <div class="glass rounded-3xl overflow-hidden overflow-x-auto custom-scrollbar">
-            <table class="w-full text-left border-collapse min-w-[700px]">
+            <table class="w-full text-left border-collapse min-w-[600px]">
                 <thead class="bg-white/5 text-gray-400 text-[10px] uppercase tracking-wider text-center">
-                    <tr><th class="p-4 text-left">순위</th><th class="p-4 text-left">게임 정보</th><th class="p-4">전체 재미</th><th class="p-4">전체 난이도</th><th class="p-4">나의 평가</th></tr>
+                    <tr><th class="p-4 text-left">순위</th><th class="p-4 text-left">게임 정보</th><th class="p-4">전체 재미</th><th class="p-4">전체 난이도</th><th class="p-4">상태</th></tr>
                 </thead>
                 <tbody id="rank-list" class="divide-y divide-white/5"></tbody>
             </table>
@@ -93,7 +93,7 @@
     const firebaseConfig = { apiKey: "AIzaSyBVp-GgD8Ts-tGw5itr9Av_MnZAt-U4teE", authDomain: "game-archive-afacf.firebaseapp.com", projectId: "game-archive-afacf", storageBucket: "game-archive-afacf.firebasestorage.app", messagingSenderId: "927042381268", appId: "1:927042381268:web:e41f4106cf9202e45ca241" };
     const app = initializeApp(firebaseConfig); const db = getFirestore(app);
 
-    let currentUser = null; let selectedCategory = ""; let activeGameId = null; let evalType = ""; // 'score' or 'diff'
+    let currentUser = null; let selectedCategory = ""; let activeGameId = null; let evalType = ""; 
     let allRatingsData = [];
 
     function renderStars(rating) {
@@ -148,7 +148,7 @@
 
     window.renderList = async () => {
         const list = document.getElementById('rank-list');
-        list.innerHTML = `<tr><td colspan="5" class="p-10 text-center opacity-50">데이터 집계 중...</td></tr>`;
+        list.innerHTML = `<tr><td colspan="5" class="p-10 text-center opacity-50 text-xs italic">최신 랭킹 집계 중...</td></tr>`;
         const [gSnap, rSnap, cSnap] = await Promise.all([
             getDocs(query(collection(db, "games"), where("category", "==", selectedCategory))),
             getDocs(collection(db, "ratings")),
@@ -186,78 +186,57 @@
                     </div>
                     <div class="flex gap-2 mt-1 opacity-50 text-[9px]"><span>🗳️ ${g.voteCount}</span><span class="text-blue-300">💬 ${g.commentCount}</span></div>
                 </td>
-                <td class="p-4 text-yellow-400 font-bold cursor-pointer hover:bg-white/10 rounded-xl" onclick="openEvalModal('${g.id}', '${g.name}', 'score')">${g.avgScore.toFixed(1)}점</td>
-                <td class="p-4 text-purple-400 font-bold cursor-pointer hover:bg-white/10 rounded-xl" onclick="openEvalModal('${g.id}', '${g.name}', 'diff')">
-                    <span class="text-sm block">${renderStars(g.avgDiff)}</span>
-                    <span class="text-[10px] opacity-60">${g.avgDiff.toFixed(1)}</span>
+                <td class="p-4 cursor-pointer hover:bg-white/10 rounded-xl" onclick="openEvalModal('${g.id}', '${g.name}', 'score')">
+                    <div class="text-yellow-400 font-bold">${g.avgScore.toFixed(1)}점</div>
+                    ${g.my ? `<div class="text-[9px] text-blue-300 opacity-60 font-bold">(내 점수: ${g.my.score})</div>` : ''}
                 </td>
-                <td class="p-4">
-                    <div class="text-[10px] ${g.my ? 'text-blue-300 font-bold' : 'text-gray-600 italic'}">
-                        ${g.my ? `점수: ${g.my.score} / 난이도: ${g.my.difficulty}` : '미평가'}
+                <td class="p-4 cursor-pointer hover:bg-white/10 rounded-xl" onclick="openEvalModal('${g.id}', '${g.name}', 'diff')">
+                    <div class="text-purple-400 font-bold">
+                        <span class="text-sm block">${renderStars(g.avgDiff)}</span>
+                        <span class="text-[10px] opacity-60">${g.avgDiff.toFixed(1)}</span>
                     </div>
+                    ${g.my ? `<div class="text-[9px] text-blue-300 opacity-60 font-bold">(내 난이도: ${g.my.difficulty})</div>` : ''}
+                </td>
+                <td class="p-4 text-[10px] ${g.my ? 'text-blue-400 font-bold' : 'text-gray-600 italic'}">
+                    ${g.my ? '평가됨' : '미평가'}
                 </td>
             </tr>`).join('');
     };
 
-    // [평가 개별 팝업 로직]
     window.openEvalModal = (id, name, type) => {
         activeGameId = id; evalType = type;
         document.getElementById('eval-modal-title').innerText = `${name} - ${type === 'score' ? '재미 평가' : '난이도 평가'}`;
-        
         const myRating = allRatingsData.find(r => r.gameId === id && r.userPin === currentUser.pin);
-        const sBox = document.getElementById('score-input-box');
-        const dBox = document.getElementById('diff-input-box');
-        const sInput = document.getElementById('single-score');
-        const dInput = document.getElementById('single-diff');
+        const sBox = document.getElementById('score-input-box'); const dBox = document.getElementById('diff-input-box');
+        const sInput = document.getElementById('single-score'); const dInput = document.getElementById('single-diff');
 
-        if(type === 'score') {
-            sBox.style.display = 'block'; dBox.style.display = 'none';
-            sInput.value = myRating?.score || '';
-        } else {
-            sBox.style.display = 'none'; dBox.style.display = 'block';
-            dInput.value = myRating?.difficulty || '';
-        }
+        if(type === 'score') { sBox.style.display = 'block'; dBox.style.display = 'none'; sInput.value = myRating?.score || ''; }
+        else { sBox.style.display = 'none'; dBox.style.display = 'block'; dInput.value = myRating?.difficulty || ''; }
         toggleEvalModal(true);
     };
 
     window.toggleEvalModal = (s) => document.getElementById('eval-modal').classList.toggle('active', s);
-
     window.submitSingleEval = async () => {
-        const sInput = document.getElementById('single-score').value;
-        const dInput = document.getElementById('single-diff').value;
+        const sInput = document.getElementById('single-score').value; const dInput = document.getElementById('single-diff').value;
         const myRating = allRatingsData.find(r => r.gameId === activeGameId && r.userPin === currentUser.pin);
-
-        let finalScore = myRating?.score || 0;
-        let finalDiff = myRating?.difficulty || 0;
-
-        if(evalType === 'score') {
-            const s = parseFloat(sInput);
-            if(isNaN(s) || s < 0 || s > 100) return alert("점수(0~100)를 정확히 입력해주세요.");
-            finalScore = s;
-        } else {
-            const d = parseFloat(dInput);
-            if(isNaN(d) || d < 0 || d > 5) return alert("난이도(0~5)를 정확히 입력해주세요.");
-            finalDiff = d;
-        }
-
-        await setDoc(doc(db, "ratings", `${currentUser.pin}_${activeGameId}`), {
-            gameId: activeGameId, userPin: currentUser.pin, score: finalScore, difficulty: finalDiff, updatedAt: serverTimestamp()
-        });
-        
+        let finalScore = myRating?.score || 0; let finalDiff = myRating?.difficulty || 0;
+        if(evalType === 'score') { const s = parseFloat(sInput); if(isNaN(s) || s < 0 || s > 100) return alert("0~100 사이 입력"); finalScore = s; }
+        else { const d = parseFloat(dInput); if(isNaN(d) || d < 0 || d > 5) return alert("0~5 사이 입력"); finalDiff = d; }
+        await setDoc(doc(db, "ratings", `${currentUser.pin}_${activeGameId}`), { gameId: activeGameId, userPin: currentUser.pin, score: finalScore, difficulty: finalDiff, updatedAt: serverTimestamp() });
         toggleEvalModal(false); renderList();
     };
 
-    // [기존 유틸 함수들]
-    window.navToStats = async () => { showPage('page-stats'); const cK = document.getElementById('best-comment-king'); const vK = document.getElementById('vote-king'); const gK = document.getElementById('game-add-king'); [cK, vK, gK].forEach(el => el.innerHTML = `<p class="opacity-30">분석 중...</p>`); const [cSnap, rSnap, gSnap, uSnap] = await Promise.all([getDocs(collection(db, "comments")), getDocs(collection(db, "ratings")), getDocs(collection(db, "games")), getDocs(collection(db, "users"))]); const comments = cSnap.docs.map(d => d.data()); const ratings = rSnap.docs.map(d => d.data()); const games = gSnap.docs.map(d => d.data()); const users = uSnap.docs.reduce((acc, d) => ({ ...acc, [d.id]: d.data().name }), {}); let topC = [...comments].sort((a,b) => (b.likes||0)-(a.likes||0)).slice(0,5); cK.innerHTML = topC.map(c => `<div class="p-3 bg-white/5 rounded-2xl border border-white/5 flex justify-between items-center"><div class="overflow-hidden"><span class="text-[9px] text-gray-500 font-bold">${c.isAnonymous?'익명':c.userName}</span><p class="text-xs truncate text-gray-300 mt-1">${c.text}</p></div><span class="text-yellow-500 font-bold ml-2">🍕${c.likes||0}</span></div>`).join(''); const vC = ratings.reduce((acc, r) => { acc[r.userPin] = (acc[r.userPin] || 0) + 1; return acc; }, {}); let topV = Object.entries(vC).sort((a,b) => b[1]-a[1]).slice(0,5); vK.innerHTML = topV.map(v => `<div class="flex justify-between items-center p-3 bg-white/5 rounded-2xl border border-white/5"><span class="font-bold">${users[v[0]]||'익명'}</span><span class="text-xs text-blue-400 font-mono font-bold">${v[1]}회</span></div>`).join(''); const gC = games.reduce((acc, g) => { if(g.creatorPin) acc[g.creatorPin] = (acc[g.creatorPin]||0)+1; return acc; }, {}); let topG = Object.entries(gC).sort((a,b) => b[1]-a[1]).slice(0,5); gK.innerHTML = topG.map(a => `<div class="flex justify-between items-center p-3 bg-white/5 rounded-2xl border border-white/5"><span class="font-bold">${users[a[0]]||'익명'}</span><span class="text-xs text-green-400 font-mono font-bold">${a[1]}개</span></div>`).join(''); };
+    // [유틸 함수: 통계, 댓글, PIN 모달]
+    window.navToStats = async () => { showPage('page-stats'); const cK = document.getElementById('best-comment-king'); const vK = document.getElementById('vote-king'); const gK = document.getElementById('game-add-king'); [cK, vK, gK].forEach(el => el.innerHTML = `<p class="opacity-30">데이터 수집 중...</p>`); const [cSnap, rSnap, gSnap, uSnap] = await Promise.all([getDocs(collection(db, "comments")), getDocs(collection(db, "ratings")), getDocs(collection(db, "games")), getDocs(collection(db, "users"))]); const comments = cSnap.docs.map(d => d.data()); const ratings = rSnap.docs.map(d => d.data()); const games = gSnap.docs.map(d => d.data()); const users = uSnap.docs.reduce((acc, d) => ({ ...acc, [d.id]: d.data().name }), {}); let topC = [...comments].sort((a,b) => (b.likes||0)-(a.likes||0)).slice(0,5); cK.innerHTML = topC.map(c => `<div class="p-3 bg-white/5 rounded-2xl border border-white/5 flex justify-between items-center"><div class="overflow-hidden"><span class="text-[9px] text-gray-500 font-bold">${c.isAnonymous?'익명':c.userName}</span><p class="text-xs truncate text-gray-300 mt-1">${c.text}</p></div><span class="text-yellow-500 font-bold ml-2">🍕${c.likes||0}</span></div>`).join(''); const vC = ratings.reduce((acc, r) => { acc[r.userPin] = (acc[r.userPin] || 0) + 1; return acc; }, {}); let topV = Object.entries(vC).sort((a,b) => b[1]-a[1]).slice(0,5); vK.innerHTML = topV.map(v => `<div class="flex justify-between items-center p-3 bg-white/5 rounded-2xl border border-white/5"><span class="font-bold">${users[v[0]]||'익명'}</span><span class="text-xs text-blue-400 font-mono font-bold">${v[1]}회</span></div>`).join(''); const gC = games.reduce((acc, g) => { if(g.creatorPin) acc[g.creatorPin] = (acc[g.creatorPin]||0)+1; return acc; }, {}); let topG = Object.entries(gC).sort((a,b) => b[1]-a[1]).slice(0,5); gK.innerHTML = topG.map(a => `<div class="flex justify-between items-center p-3 bg-white/5 rounded-2xl border border-white/5"><span class="font-bold">${users[a[0]]||'익명'}</span><span class="text-xs text-green-400 font-mono font-bold">${a[1]}개</span></div>`).join(''); };
     window.addGame = async () => { const n = prompt("새 게임 이름:"); if (!n) return; const norm = n.replace(/\s+/g, '').toLowerCase(); const gS = await getDocs(collection(db, "games")); let dup = false; gS.forEach(d => { if(d.data().name.replace(/\s+/g, '').toLowerCase() === norm) dup = true; }); if(dup) return alert("이미 등록됨"); await addDoc(collection(db, "games"), { name: n, category: selectedCategory, creatorPin: currentUser.pin, createdAt: serverTimestamp() }); renderList(); };
     window.editGameName = async (id, old, creator) => { if (currentUser.pin !== creator && currentUser.pin !== "100") return alert("권한 없음"); const n = prompt("수정:", old); if (n && n !== old) { await updateDoc(doc(db, "games", id), { name: n }); renderList(); } };
     window.openComments = (id, name) => { activeGameId = id; document.getElementById('comment-game-title').innerText = name; toggleCommentModal(true); loadComments(); };
     window.toggleCommentModal = (s) => document.getElementById('comment-modal').classList.toggle('active', s);
-    async function loadComments() { const list = document.getElementById('comment-list'); list.innerHTML = `<p class="p-5 italic opacity-50">불러오는 중...</p>`; const q = query(collection(db, "comments"), where("gameId", "==", activeGameId)); const snap = await getDocs(q); if(snap.empty) { list.innerHTML = `<p class="p-5 opacity-30 italic">댓글이 없습니다.</p>`; return; } let ds = snap.docs.map(d => ({id: d.id, ...d.data()})); ds.sort((a,b) => (b.likes||0)-(a.likes||0) || (b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)); list.innerHTML = ds.map(data => { const isMe = data.userPin === currentUser.pin; const liked = data.likedUsers?.includes(currentUser.pin); const dName = data.isAnonymous ? (isMe ? "익명(나)" : "익명") : data.userName; return `<div class="p-3 rounded-2xl ${isMe ? 'bg-blue-600/20 ml-8 border-blue-500/20' : 'bg-white/5 mr-8 border-white/5'} mb-3 border transition-all shadow-lg"><div class="flex justify-between items-center mb-1"><span class="text-[10px] font-bold ${isMe?'text-blue-300':'text-gray-400'}">${dName}</span><div class="flex items-center gap-2"><button onclick="likeComment('${data.id}')" class="text-[10px] font-bold ${liked?'text-yellow-400':'text-gray-500'}">🍕 ${data.likes||0}</button>${isMe?`<button onclick="delComment('${data.id}')" class="text-[9px] text-red-500 opacity-50 font-bold hover:opacity-100">삭제</button>`:''}</div></div><p class="text-sm leading-relaxed">${data.text}</p></div>`; }).join(''); }
+    async function loadComments() { const list = document.getElementById('comment-list'); list.innerHTML = `<p class="p-5 italic opacity-50">데이터 로드 중...</p>`; const q = query(collection(db, "comments"), where("gameId", "==", activeGameId)); const snap = await getDocs(q); if(snap.empty) { list.innerHTML = `<p class="p-5 opacity-30 italic">댓글 없음</p>`; return; } let ds = snap.docs.map(d => ({id: d.id, ...d.data()})); ds.sort((a,b) => (b.likes||0)-(a.likes||0) || (b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)); list.innerHTML = ds.map(data => { const isMe = data.userPin === currentUser.pin; const liked = data.likedUsers?.includes(currentUser.pin); const dName = data.isAnonymous ? (isMe ? "익명(나)" : "익명") : data.userName; return `<div class="p-3 rounded-2xl ${isMe ? 'bg-blue-600/20 ml-8 border-blue-500/20' : 'bg-white/5 mr-8 border-white/5'} mb-3 border transition-all shadow-lg"><div class="flex justify-between items-center mb-1"><span class="text-[10px] font-bold ${isMe?'text-blue-300':'text-gray-400'}">${dName}</span><div class="flex items-center gap-2"><button onclick="likeComment('${data.id}')" class="text-[10px] font-bold ${liked?'text-yellow-400':'text-gray-500'}">🍕 ${data.likes||0}</button>${isMe?`<button onclick="delComment('${data.id}')" class="text-[9px] text-red-500 opacity-50 font-bold hover:opacity-100">삭제</button>`:''}</div></div><p class="text-sm leading-relaxed">${data.text}</p></div>`; }).join(''); }
     window.addComment = async () => { const i = document.getElementById('comment-input'); const a = document.getElementById('anon-check').checked; if(!i.value.trim()) return; await addDoc(collection(db, "comments"), { gameId: activeGameId, userPin: currentUser.pin, userName: a?"익명":currentUser.name, isAnonymous: a, text: i.value.trim(), likes: 0, likedUsers: [], createdAt: serverTimestamp() }); i.value = ""; document.getElementById('anon-check').checked = false; loadComments(); };
     window.likeComment = async (id) => { const ref = doc(db, "comments", id); const snap = await getDoc(ref); const d = snap.data(); const liked = d.likedUsers?.includes(currentUser.pin); await updateDoc(ref, { likes: increment(liked?-1:1), likedUsers: liked?arrayRemove(currentUser.pin):arrayUnion(currentUser.pin) }); loadComments(); };
     window.delComment = async (id) => { if(confirm("삭제?")) { await deleteDoc(doc(db, "comments", id)); loadComments(); } };
-    window.togglePinModal = async (show) => { const m = document.getElementById('pin-modal'); if(show) { document.getElementById('pin-list-content').innerHTML = `불러오는 중...`; m.classList.add('active'); const snap = await getDocs(collection(db, "users")); let us = snap.docs.map(d => ({pin: d.id, name: d.data().name})); us.sort((a,b) => parseInt(a.pin)-parseInt(b.pin)); document.getElementById('pin-list-content').innerHTML = us.map(u => `<div class="flex justify-between p-3 border-b border-white/5"><span>${u.pin}</span><b>${u.name}</b></div>`).join(''); } else m.classList.remove('active'); };
+    window.togglePinModal = async (show) => { const m = document.getElementById('pin-modal'); if(show) { document.getElementById('pin-list-content').innerHTML = `로딩 중...`; m.classList.add('active'); const snap = await getDocs(collection(db, "users")); let us = snap.docs.map(d => ({pin: d.id, name: d.data().name})); us.sort((a,b) => parseInt(a.pin)-parseInt(b.pin)); document.getElementById('pin-list-content').innerHTML = us.map(u => `<div class="flex justify-between p-3 border-b border-white/5"><span>${u.pin}</span><b>${u.name}</b></div>`).join(''); } else m.classList.remove('active'); };
 </script>
 </body>
 </html>
