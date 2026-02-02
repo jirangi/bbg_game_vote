@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Game Archive v4.2.0</title>
+    <title>Game Archive v4.3.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -13,7 +13,8 @@
         .page.active { display: block; opacity: 1; transform: translateY(0); }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9000; align-items: center; justify-content: center; padding: 20px; pointer-events: auto; }
         .modal.active { display: flex; }
-        #global-back-btn { position: fixed; top: 24px; left: 20px; z-index: 8000; background: #1e293b; color: #60a5fa; padding: 10px 18px; border-radius: 14px; border: 1px solid rgba(96, 165, 250, 0.3); font-weight: 900; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: none; cursor: pointer; }
+        /* 뒤로가기 버튼 영역 최소화하여 클릭 간섭 방지 */
+        #global-back-btn { position: fixed; top: 24px; left: 20px; z-index: 8000; background: #1e293b; color: #60a5fa; padding: 10px 18px; border-radius: 14px; border: 1px solid rgba(96, 165, 250, 0.3); font-weight: 900; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: none; cursor: pointer; width: auto; }
         .user-icon { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: #334155; flex-shrink: 0; }
         .category-tag { font-size: 8px; padding: 2px 6px; border-radius: 4px; background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); font-weight: 800; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
@@ -26,29 +27,29 @@
 
     <div id="page-home" class="page active pt-10 font-bold text-center">
         <div class="flex justify-between items-center mb-10 px-4">
-            <div class="flex items-center gap-3 cursor-pointer p-1" onclick="toggleProfileModal(true)">
+            <div class="flex items-center gap-3 cursor-pointer p-1 relative z-[10]" onclick="toggleProfileModal(true)">
                 <img id="my-profile-icon" src="" class="user-icon border-2 border-blue-500/50 w-10 h-10 shadow-lg">
                 <span id="user-welcome" class="text-blue-300 text-sm font-extrabold"></span>
             </div>
-            <button onclick="logout()" class="text-gray-500 text-xs border border-white/10 px-3 py-1.5 rounded-lg transition hover:text-red-400">로그아웃</button>
+            <button onclick="logout()" class="text-gray-500 text-xs border border-white/10 px-3 py-1.5 rounded-lg transition hover:text-red-400 relative z-[10]">로그아웃</button>
         </div>
         <h1 class="text-4xl font-extrabold mb-12 italic text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 uppercase tracking-tighter">Game Archive</h1>
         <div class="flex flex-wrap justify-center gap-3 mb-10 px-4 font-bold">
-            <button onclick="navToStats()" class="bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-6 py-4 rounded-2xl font-extrabold hover:bg-yellow-500 transition shadow-lg">🏆 명예전당</button>
-            <button onclick="showPage('page-chat-info')" class="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-6 py-4 rounded-2xl font-extrabold hover:bg-blue-500 transition shadow-lg">📢 단톡방 정보</button>
+            <button onclick="navToStats()" class="bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-6 py-4 rounded-2xl font-extrabold hover:bg-yellow-500 transition shadow-lg relative z-[10]">🏆 명예전당</button>
+            <button onclick="showPage('page-chat-info')" class="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-6 py-4 rounded-2xl font-extrabold hover:bg-blue-500 transition shadow-lg relative z-[10]">📢 단톡방 정보</button>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4 font-bold">
-            <button onclick="navTo('보드게임')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition shadow-xl">🎲 보드게임</button>
-            <button onclick="navTo('지니어스')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition shadow-xl">🧠 지니어스</button>
-            <button onclick="navTo('방탈출')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition shadow-xl">🔑 방탈출</button>
-            <button onclick="navTo('머더 미스테리')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition shadow-xl">🕵️ 머더 미스테리</button>
+            <button onclick="navTo('보드게임')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition shadow-xl relative z-[10]">🎲 보드게임</button>
+            <button onclick="navTo('지니어스')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition shadow-xl relative z-[10]">🧠 지니어스</button>
+            <button onclick="navTo('방탈출')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition shadow-xl relative z-[10]">🔑 방탈출</button>
+            <button onclick="navTo('머더 미스테리')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition shadow-xl relative z-[10]">🕵️ 머더 미스테리</button>
         </div>
     </div>
 
     <div id="page-rank" class="page pt-24 font-bold">
         <div class="flex justify-between items-end mb-8 px-4 font-bold">
             <h2 id="rank-title" class="text-4xl font-black italic text-blue-400"></h2>
-            <button onclick="addGame()" class="bg-blue-600/20 text-blue-400 border border-blue-500/30 px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg">+ 새 게임</button>
+            <button onclick="addGame()" class="bg-blue-600/20 text-blue-400 border border-blue-500/30 px-5 py-2.5 rounded-xl text-sm font-bold">+ 새 게임</button>
         </div>
         <div class="glass rounded-[40px] overflow-hidden overflow-x-auto custom-scrollbar mx-4 shadow-2xl border border-white/5">
             <table class="w-full text-center min-w-[500px] font-bold">
@@ -62,17 +63,18 @@
 
     <div id="profile-modal" class="modal" onclick="closeOnBackdrop(event, 'profile-modal')">
         <div class="glass w-full max-w-md p-8 rounded-[40px] flex flex-col font-bold text-center" onclick="event.stopPropagation()">
-            <h3 class="text-3xl font-black text-blue-400 mb-8 uppercase italic font-bold">My Profile</h3>
-            <div class="flex flex-col items-center gap-6 mb-8 pb-8 border-b border-white/10">
+            <h3 class="text-3xl font-black text-blue-400 mb-8 uppercase italic">My Profile</h3>
+            <div class="flex flex-col items-center gap-6 mb-8 border-b border-white/10 pb-8">
                 <img id="profile-preview" src="" class="w-24 h-24 rounded-full border-4 border-blue-600 shadow-2xl object-cover bg-slate-800">
-                <input type="text" id="edit-nickname" class="w-full bg-white/5 p-4 rounded-2xl border border-white/10 outline-none font-black text-center font-bold" placeholder="닉네임">
+                <input type="text" id="edit-nickname" class="w-full bg-white/5 p-4 rounded-2xl border border-white/10 outline-none font-black text-center" placeholder="닉네임">
                 <button onclick="updateProfile()" class="w-full bg-blue-600 py-4 rounded-2xl font-black shadow-xl">저장</button>
             </div>
-            <h4 class="text-left text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-4">참석 히스토리</h4>
+            <h4 class="text-left text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-4 ml-1">참석 히스토리</h4>
             <div id="my-history-list" class="flex-grow overflow-y-auto max-h-[250px] space-y-3 custom-scrollbar text-left font-bold"></div>
         </div>
     </div>
 
+    <div id="page-login" class="page pt-24 max-w-sm text-center"><div class="glass p-8 rounded-3xl shadow-2xl"><h2 class="text-2xl font-extrabold mb-8 text-blue-400 uppercase italic">Login</h2><div class="space-y-4"><input type="text" id="pin" placeholder="PIN" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none text-white font-bold"><input type="password" id="pw" placeholder="비밀번호" maxlength="4" oninput="if(this.value.length===4) login()" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none text-white font-bold"><button onclick="login()" class="w-full bg-blue-600 py-4 rounded-xl font-extrabold shadow-lg mt-4">접속</button></div></div></div>
     <div id="page-stats" class="page pt-24 font-bold text-center"><h2 class="text-3xl font-black text-yellow-400 mb-10 italic uppercase font-bold">명예전당 🏆</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-6 px-4 font-bold"><div class="space-y-4"><h3 class="text-blue-400 font-black italic">🗳️ Voting King</h3><div id="vote-king" class="space-y-3"></div></div><div class="space-y-4"><h3 class="text-green-400 font-black italic">🆕 Creator King</h3><div id="game-add-king" class="space-y-3"></div></div></div></div>
     <div id="page-chat-info" class="page pt-24 font-bold px-4"><h2 class="text-3xl font-black text-blue-400 mb-10 italic uppercase">Group Info 📢</h2><div id="chat-info-list" class="space-y-4"></div></div>
 
@@ -86,33 +88,26 @@
 
         let currentUser = null; let selectedCategory = "";
 
-        // [v4.2.0 내비게이션 & 브라우저 뒤로가기 완벽 연동]
-        window.handleBack = () => {
-            if(document.querySelector('.modal.active')) { closeAllModals(); return; }
-            showPage('page-home');
-        };
-
-        window.onpopstate = (e) => {
+        // [v4.3.0 내비게이션 & 브라우저 동기화]
+        window.handleBack = () => { if(document.querySelector('.modal.active')) closeAllModals(); else showPage('page-home'); };
+        window.onpopstate = (e) => { 
             if(document.querySelector('.modal.active')) { closeAllModals(); return; }
             const pid = e.state?.page || 'page-home';
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            const target = document.getElementById(pid);
-            if(target) {
-                target.classList.add('active');
-                document.getElementById('global-back-btn').style.display = (pid === 'page-home') ? 'none' : 'block';
-            }
+            document.getElementById(pid)?.classList.add('active');
+            updateBackBtn(pid);
         };
-
-        window.showPage = (id) => {
+        window.showPage = (id, push=true) => {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            document.getElementById('global-back-btn').style.display = (id === 'page-home') ? 'none' : 'block';
-            history.pushState({ page: id }, '', '');
-            if(id === 'page-chat-info') loadChatInfo();
+            updateBackBtn(id);
+            if(push) history.pushState({page: id}, '', '');
             if(id === 'page-stats') navToStats();
+            if(id === 'page-chat-info') loadChatInfo();
         };
+        function updateBackBtn(id) { document.getElementById('global-back-btn').style.display = (id==='page-home'||id==='page-login')?'none':'block'; }
 
-        // [v4.2.0 마이페이지 히스토리 상세 로직 복구]
+        // [마이페이지 히스토리 상세 로직]
         async function loadMyHistory() {
             const listDiv = document.getElementById('my-history-list');
             listDiv.innerHTML = `<p class="opacity-30 italic">기록 로딩중...</p>`;
@@ -126,40 +121,54 @@
                     <div class="bg-white/5 p-4 rounded-2xl border border-white/5 flex justify-between items-center mb-1 font-bold">
                         <div class="text-left font-bold">
                             <div class="flex items-center gap-2 mb-1">
-                                <span class="category-tag font-bold font-bold">${s.gameCategory||'보드게임'}</span>
+                                <span class="category-tag">${s.gameCategory||'보드게임'}</span>
                                 <span class="text-[9px] text-blue-500 font-bold">${s.gameName||'Unknown'}</span>
                             </div>
-                            <div class="text-sm font-bold font-bold font-bold">${s.name}</div>
+                            <div class="text-sm font-bold">${s.name}</div>
                         </div>
-                        <div class="text-yellow-400 text-xs font-black font-bold">${rankTag}</div>
+                        <div class="text-yellow-400 text-xs font-black">${rankTag}</div>
                     </div>`;
                 }).join('') || "참석 기록이 없습니다.";
-            } catch(e) { listDiv.innerHTML = "로딩 실패"; }
+            } catch(e) { listDiv.innerHTML = "실패"; }
         }
 
-        // [인증 및 렌더링 유지]
-        window.addEventListener('DOMContentLoaded', async () => {
-            const auth = localStorage.getItem('game_archive_auth');
-            if (auth) {
-                const d = JSON.parse(auth);
-                const snap = await getDoc(doc(db, "users", d.pin));
-                if (snap.exists()) {
-                    currentUser = { pin: d.pin, ...snap.data() };
-                    document.getElementById('user-welcome').innerText = `${currentUser.name}님`;
-                    document.getElementById('my-profile-icon').src = currentUser.iconUrl || DEFAULT_ICON;
-                    showPage('page-home');
-                }
-            }
-        });
+        // [데이터 렌더링 엔진]
+        window.renderList = async () => {
+            const list = document.getElementById('rank-list'); list.innerHTML = `<tr><td colspan="4" class="p-10 opacity-30 font-bold italic">Loading...</td></tr>`;
+            try {
+                const [gS, rS] = await Promise.all([getDocs(query(collection(db, "games"), where("category", "==", selectedCategory))), getDocs(collection(db, "ratings"))]);
+                const rt = rS.docs.map(d => d.data());
+                let gms = gS.docs.map(d => {
+                    const r = rt.filter(v => v.gameId === d.id); const sc = r.map(v => v.score || 0).sort((a,b)=>a-b);
+                    let avgS = (r.length >= 5) ? sc.slice(1, -1).reduce((a,c)=>a+c,0)/(sc.length-2) : (r.length > 0 ? sc.reduce((a,c)=>a+c,0)/r.length : 0);
+                    return { id: d.id, ...d.data(), avgScore: avgS, voteCount: r.length };
+                }).sort((a,b) => b.avgScore - a.avgScore);
+                list.innerHTML = gms.map((g, i) => `<tr class="hover:bg-white/5 border-b border-white/5 font-bold transition"><td class="p-5 text-blue-400 font-bold">${i < 3 && g.voteCount >= 3 ? ['🥇','🥈','🥉'][i] : '#'+(i+1)}</td><td class="p-5 text-left font-black"><div class="text-sm">${g.name}</div><div class="text-[9px] opacity-40">Votes: ${g.voteCount}</div></td><td class="p-5 font-bold text-yellow-400">${g.avgScore.toFixed(1)}</td><td class="p-5"><button onclick="openSchedules('${g.id}','${g.name}')" class="bg-green-600/20 text-green-400 border border-green-500/20 px-3 py-1.5 rounded-lg text-[10px] font-black">기록</button></td></tr>`).join('');
+            } catch (e) { list.innerHTML = "Error"; }
+        };
 
+        // [명예전당]
+        async function navToStats() {
+            showPage('page-stats');
+            const [rS, gS, uS] = await Promise.all([getDocs(collection(db,"ratings")), getDocs(collection(db,"games")), getDocs(collection(db,"users"))]);
+            const uM = uS.docs.reduce((acc, d) => ({...acc, [d.id]: d.data()}), {});
+            const vC = rS.docs.map(d=>d.data()).reduce((acc, r) => { acc[r.userPin] = (acc[r.userPin]||0)+1; return acc; }, {});
+            document.getElementById('vote-king').innerHTML = Object.entries(vC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(v => `<div class='p-3 glass rounded-xl flex justify-between items-center'><div class='flex items-center gap-3'><img src='${uM[v[0]]?.iconUrl || DEFAULT_ICON}' class='user-icon w-8 h-8'><span class='text-xs font-bold'>${uM[v[0]]?.name || '?'}</span></div><b class='text-blue-400 text-xs'>${v[1]}회</b></div>`).join('');
+            const gC = gS.docs.map(d=>d.data()).reduce((acc, g) => { if(g.creatorPin) acc[g.creatorPin] = (acc[g.creatorPin]||0)+1; return acc; }, {});
+            document.getElementById('game-add-king').innerHTML = Object.entries(gC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(v => `<div class='p-3 glass rounded-xl flex justify-between items-center'><div class='flex items-center gap-3'><img src='${uM[v[0]]?.iconUrl || DEFAULT_ICON}' class='user-icon w-8 h-8 font-bold'><span class='text-xs font-bold'>${uM[v[0]]?.name || '?'}</span></div><b class='text-green-400 text-xs'>${v[1]}개</b></div>`).join('');
+        }
+
+        // [인증 및 공통 로직]
+        window.addEventListener('DOMContentLoaded', async () => { const auth = localStorage.getItem('game_archive_auth'); if (auth) { const d = JSON.parse(auth); const snap = await getDoc(doc(db, "users", d.pin)); if (snap.exists()) { currentUser = { pin: d.pin, ...snap.data() }; updateUI(); showPage('page-home', false); return; } } showPage('page-login', false); });
+        window.login = async () => { const pin = document.getElementById('pin').value, pw = document.getElementById('pw').value; const snap = await getDoc(doc(db, "users", pin)); if (snap.exists() && snap.data().password === pw) { currentUser = { pin, ...snap.data() }; localStorage.setItem('game_archive_auth', JSON.stringify({ pin, pw })); location.reload(); } };
+        window.logout = () => { localStorage.removeItem('game_archive_auth'); location.reload(); };
+        function updateUI() { document.getElementById('user-welcome').innerText = `${currentUser.name}님`; document.getElementById('my-profile-icon').src = currentUser.iconUrl || DEFAULT_ICON; if(currentUser.pin==="100") document.getElementById('admin-user-manage-btn')?.classList.remove('hidden'); }
         window.toggleProfileModal = (s) => { if(s && currentUser) { document.getElementById('edit-nickname').value = currentUser.name; document.getElementById('profile-preview').src = currentUser.iconUrl || DEFAULT_ICON; loadMyHistory(); } toggleModal('profile-modal', s); };
+        window.navTo = (cat) => { selectedCategory = cat; document.getElementById('rank-title').innerText = cat; renderList(); showPage('page-rank'); };
         window.toggleModal = (id, s) => document.getElementById(id).classList.toggle('active', s);
         window.closeAllModals = () => document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
         window.closeOnBackdrop = (e, id) => { if (e.target.id === id) toggleModal(id, false); };
-        window.navTo = (cat) => { selectedCategory = cat; document.getElementById('rank-title').innerText = cat; renderList(); showPage('page-rank'); };
-        
-        // (renderList, logout, navToStats 등 기존 성공 함수는 유지됩니다)
-        window.logout = () => { localStorage.removeItem('game_archive_auth'); location.reload(); };
+        window.updateProfile = async () => { await updateDoc(doc(db, "users", currentUser.pin), { name: document.getElementById('edit-nickname').value.trim() }); location.reload(); };
     </script>
 </body>
 </html>
