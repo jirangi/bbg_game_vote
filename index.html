@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Game Archive v5.9.1</title>
+    <title>Game Archive v5.9.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -12,18 +12,21 @@
         .page { display: none; opacity: 0; transform: translateY(10px); transition: all 0.3s ease; width: 100%; max-width: 800px; margin: 0 auto; pointer-events: auto; }
         .page.active { display: block; opacity: 1; transform: translateY(0); }
         
+        /* 모달 및 레이어 우선순위 */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; align-items: center; justify-content: center; padding: 20px; pointer-events: auto; }
         .modal.active { display: flex; }
         #detail-modal { z-index: 10005; } 
-        #schedule-modal { z-index: 10010; } 
         #add-schedule-modal { z-index: 10020; } 
         #admin-modal, #find-pin-modal { z-index: 10030; } 
         
-        #global-back-btn { position: fixed; top: 24px; left: 20px; z-index: 9500; background: #1e293b; color: #60a5fa; padding: 10px 18px; border-radius: 14px; border: 1px solid rgba(96, 165, 250, 0.3); font-weight: 900; display: none; cursor: pointer; }
+        #global-back-btn { position: fixed; top: 24px; left: 20px; z-index: 9000; background: #1e293b; color: #60a5fa; padding: 10px 18px; border-radius: 14px; border: 1px solid rgba(96, 165, 250, 0.3); font-weight: 900; display: none; cursor: pointer; }
         .game-name-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px; font-weight: 800; display: block; cursor: pointer; }
         .expanded .game-name-text { white-space: normal; overflow: visible; color: #60a5fa; }
         
-        .btn-priority { position: relative; z-index: 500; cursor: pointer; pointer-events: auto; }
+        /* 홈 화면 및 리스트 핵심 버튼 클릭권 확보 */
+        .btn-core { position: relative; z-index: 5000 !important; cursor: pointer !important; pointer-events: auto !important; }
+        .clickable-cell { position: relative; z-index: 500; cursor: pointer; pointer-events: auto; }
+        
         .member-chip { cursor: pointer; border: 1px solid rgba(255,255,255,0.1); padding: 10px 4px; border-radius: 12px; text-align: center; font-size: 10px; font-weight: 800; background: rgba(255,255,255,0.05); }
         .member-chip.selected { background: #3b82f6 !important; border-color: #60a5fa !important; color: white !important; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
@@ -38,7 +41,7 @@
         <div class="glass p-8 rounded-3xl shadow-2xl">
             <h2 class="text-2xl font-extrabold mb-8 text-blue-400 italic">Game Archive</h2>
             <div class="space-y-4">
-                <input type="text" id="pin" placeholder="PIN 번호 입력" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none text-white font-bold">
+                <input type="text" id="pin" placeholder="PIN" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none text-white font-bold">
                 <input type="password" id="pw" placeholder="비밀번호" maxlength="4" oninput="if(this.value.length===4) login()" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none text-white font-bold">
                 <button onclick="login()" class="w-full bg-blue-600 py-4 rounded-xl font-extrabold shadow-lg mt-2 font-bold">접속</button>
                 <div class="pt-4 space-y-2">
@@ -51,33 +54,33 @@
 
     <div id="page-home" class="page active pt-10 text-center font-bold">
         <div class="flex justify-between items-center mb-6 px-4">
-            <div class="flex items-center gap-3 p-2 btn-priority" style="z-index: 2000 !important;" onclick="toggleProfileModal(true)">
+            <div class="flex items-center gap-3 p-2 btn-core" onclick="toggleProfileModal(true)">
                 <img id="my-profile-icon" src="" class="w-12 h-12 rounded-full border-2 border-blue-500 shadow-xl object-cover bg-slate-800">
                 <span id="user-welcome" class="text-blue-300 text-sm font-black font-bold"></span>
             </div>
-            <button onclick="logout()" class="text-gray-500 text-xs border border-white/10 px-3 py-1.5 rounded-lg btn-priority" style="z-index: 2000 !important;">로그아웃</button>
+            <button onclick="logout()" class="text-gray-500 text-xs border border-white/10 px-3 py-1.5 rounded-lg transition btn-core">로그아웃</button>
         </div>
-        <div id="admin-entry" class="hidden px-4 mb-6 text-right"><button onclick="openAdmin()" class="text-[10px] bg-red-500/20 text-red-400 border border-red-500/30 px-4 py-2 rounded-xl font-black btn-priority" style="z-index: 2000 !important;">⚙️ 관리자 설정</button></div>
+        <div id="admin-entry" class="hidden px-4 mb-6 text-right"><button onclick="openAdmin()" class="text-[10px] bg-red-500/20 text-red-400 border border-red-500/30 px-4 py-2 rounded-xl font-black btn-core">⚙️ 관리자 설정</button></div>
         <h1 class="text-4xl font-extrabold mb-12 italic text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 uppercase tracking-tighter">Game Archive</h1>
-        <div class="flex flex-wrap justify-center gap-3 mb-10 px-4 font-bold">
-            <button onclick="navToStats()" class="bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-6 py-4 rounded-2xl font-extrabold hover:bg-yellow-500 hover:text-black transition shadow-lg btn-priority" style="z-index: 2000 !important;">🏆 명예전당</button>
-            <button onclick="showPage('page-chat-info')" class="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-6 py-4 rounded-2xl font-extrabold hover:bg-blue-500 transition shadow-lg btn-priority" style="z-index: 2000 !important;">📢 단톡방 정보</button>
+        <div class="flex flex-wrap justify-center gap-3 mb-10 px-4">
+            <button onclick="navToStats()" class="bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-6 py-4 rounded-2xl font-extrabold hover:bg-yellow-500 hover:text-black transition shadow-lg btn-core font-bold">🏆 명예전당</button>
+            <button onclick="showPage('page-chat-info')" class="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-6 py-4 rounded-2xl font-extrabold hover:bg-blue-500 transition shadow-lg btn-core font-bold">📢 단톡방 정보</button>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4 font-bold">
-            <button onclick="navTo('보드게임')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition btn-priority" style="z-index: 2000 !important;">🎲 보드게임</button>
-            <button onclick="navTo('지니어스')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition btn-priority" style="z-index: 2000 !important;">🧠 지니어스</button>
-            <button onclick="navTo('방탈출')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition btn-priority" style="z-index: 2000 !important;">🔑 방탈출</button>
-            <button onclick="navTo('머더 미스테리')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition btn-priority" style="z-index: 2000 !important;">🕵️ 머더 미스테리</button>
+            <button onclick="navTo('보드게임')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition btn-core">🎲 보드게임</button>
+            <button onclick="navTo('지니어스')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition btn-core">🧠 지니어스</button>
+            <button onclick="navTo('방탈출')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition btn-core">🔑 방탈출</button>
+            <button onclick="navTo('머더 미스테리')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition btn-core">🕵️ 머더 미스테리</button>
         </div>
     </div>
 
-    <div id="page-rank" class="page pt-24 font-bold"><div class="px-4 mb-4"><input type="text" id="game-search" oninput="renderList()" placeholder="🔍 검색..." class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none text-sm font-bold shadow-inner font-bold"></div><div class="px-4 mb-4 flex justify-between items-center font-bold font-bold"><h2 id="rank-title" class="text-2xl font-black italic text-blue-400 uppercase font-bold font-bold"></h2><select id="sort-selector" class="bg-slate-800 text-[10px] p-2 rounded-lg border border-white/10 font-bold" onchange="renderList()"><option value="default">기본</option><option value="score_desc">점수순</option><option value="diff_desc">난이도순</option></select></div><div class="glass rounded-[40px] overflow-hidden overflow-x-auto custom-scrollbar mx-4 shadow-2xl border border-white/5 font-bold"><table class="w-full text-center min-w-[340px] table-fixed border-collapse"><thead><tr class="bg-white/5 text-gray-500 text-[10px] border-b border-white/10 font-black"><th class="p-4 w-12 text-center font-bold">#</th><th class="p-4 text-left font-bold">정보</th><th class="w-24 text-center font-bold">평가</th><th class="w-20 font-bold">기록</th></tr></thead><tbody id="rank-list" class="divide-y divide-white/5 font-bold"></tbody></table></div><div class="px-4 mt-6 text-center font-bold"><button onclick="addGame()" class="bg-blue-600/20 text-blue-400 border border-blue-500/30 px-8 py-3 rounded-2xl text-xs font-bold font-bold">+ 새 게임 추가</button></div></div>
+    <div id="page-rank" class="page pt-24 font-bold"><div class="px-4 mb-4"><input type="text" id="game-search" oninput="renderList()" placeholder="🔍 검색..." class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none text-sm font-bold shadow-inner font-bold"></div><div class="px-4 mb-4 flex justify-between items-center font-bold"><h2 id="rank-title" class="text-2xl font-black italic text-blue-400 uppercase font-bold"></h2><select id="sort-selector" class="bg-slate-800 text-[10px] p-2 rounded-lg border border-white/10 font-bold" onchange="renderList()"><option value="default">기본</option><option value="score_desc">점수순</option><option value="diff_desc">난이도순</option></select></div><div class="glass rounded-[40px] overflow-hidden overflow-x-auto custom-scrollbar mx-4 shadow-2xl border border-white/5 font-bold"><table class="w-full text-center min-w-[340px] table-fixed border-collapse"><thead><tr class="bg-white/5 text-gray-500 text-[10px] border-b border-white/10 font-black"><th class="p-4 w-12 text-center font-bold">#</th><th class="p-4 text-left font-bold">정보</th><th class="w-24 text-center font-bold">평가</th><th class="w-20 font-bold">기록</th></tr></thead><tbody id="rank-list" class="divide-y divide-white/5 font-bold"></tbody></table></div><div class="px-4 mt-6 text-center font-bold"><button onclick="addGame()" class="bg-blue-600/20 text-blue-400 border border-blue-500/30 px-8 py-3 rounded-2xl text-xs font-bold">+ 새 게임 추가</button></div></div>
 
-    <div id="schedule-modal" class="modal" onclick="toggleModal('schedule-modal', false)"><div class="glass w-full max-w-md p-8 rounded-[40px] max-h-[85vh] flex flex-col font-bold" onclick="event.stopPropagation()"><div class="flex justify-between items-center mb-6 font-bold"><h3 id="schedule-game-title" class="text-xl font-black text-green-400 truncate"></h3><button onclick="toggleModal('schedule-modal', false)" class="text-gray-500 text-3xl font-bold">✕</button></div><div id="schedule-list" class="flex-grow overflow-y-auto custom-scrollbar space-y-3 mb-6 font-bold"></div><button onclick="openAddSchedule()" class="w-full bg-green-600 py-4 rounded-2xl font-black text-white font-bold shadow-xl font-bold">+ 새로운 기록 추가</button></div></div>
-    <div id="add-schedule-modal" class="modal" onclick="toggleModal('add-schedule-modal', false)"><div class="glass w-full max-w-md p-8 rounded-[40px] flex flex-col font-bold" onclick="event.stopPropagation()"><h3 class="text-xl font-black mb-6 text-green-400 font-bold font-bold">기록 정보 입력</h3><input type="text" id="new-schedule-name" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl mb-4 outline-none font-bold" placeholder="기록 제목 (필수)"><p class="text-[10px] text-gray-500 mb-2 ml-1 font-bold">참석자 선택:</p><div id="member-selector" class="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto p-2 bg-white/10 rounded-2xl mb-6 custom-scrollbar font-bold"></div><button onclick="submitSchedule()" class="w-full bg-green-600 py-4 rounded-2xl font-black text-white font-bold shadow-xl font-bold">기록 생성</button></div></div>
-    <div id="page-chat-info" class="page pt-24 px-4 font-bold"><h2 class="text-3xl font-black text-blue-400 mb-10 italic uppercase font-bold">Group Info 📢</h2><div id="chat-info-list" class="space-y-4 font-bold font-bold"></div></div>
-    <div id="profile-modal" class="modal" onclick="toggleModal('profile-modal', false)"><div class="glass w-full max-w-md p-8 rounded-[40px] flex flex-col font-bold text-center font-bold" onclick="event.stopPropagation()"><h3 class="text-3xl font-black text-blue-400 mb-8 uppercase italic font-bold">My Profile</h3><div class="flex flex-col items-center gap-6 mb-8 border-b border-white/10 pb-8"><img id="profile-preview" src="" class="w-24 h-24 rounded-full border-4 border-blue-600 shadow-2xl object-cover bg-slate-800"><input type="text" id="edit-nickname" class="w-full bg-white/5 p-4 rounded-2xl border border-white/10 outline-none font-black text-center" placeholder="닉네임"></div><h4 class="text-left text-[10px] text-gray-500 uppercase tracking-widest mb-4 ml-1">Attend History</h4><div id="my-history-list" class="flex-grow overflow-y-auto max-h-[300px] space-y-3 custom-scrollbar text-left font-bold font-bold"></div><button onclick="toggleModal('profile-modal', false)" class="mt-6 text-gray-500 text-xs font-bold uppercase">닫기</button></div></div>
-    <div id="page-stats" class="page pt-24 text-center font-bold"><h2 class="text-3xl font-black text-yellow-400 mb-10 italic uppercase font-bold">명예전당 🏆</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-6 px-4 font-bold"><div class="space-y-4 font-bold font-bold"><h3 class="text-blue-400 font-black italic">🗳️ Voting King</h3><div id="vote-king" class="space-y-3 font-bold"></div></div><div class="space-y-4 font-bold font-bold"><h3 class="text-green-400 font-black italic">🆕 Creator King</h3><div id="game-add-king" class="space-y-3 font-bold font-bold"></div></div></div></div>
+    <div id="page-stats" class="page pt-24 text-center font-bold"><h2 class="text-3xl font-black text-yellow-400 mb-10 italic uppercase font-bold">명예전당 🏆</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-6 px-4 font-bold font-bold"><div class="space-y-4 font-bold"><h3 class="text-blue-400 font-black italic">🗳️ Voting King</h3><div id="vote-king" class="space-y-3"></div></div><div class="space-y-4 font-bold"><h3 class="text-green-400 font-black italic">🆕 Creator King</h3><div id="game-add-king" class="space-y-3"></div></div></div></div>
+
+    <div id="admin-modal" class="modal" onclick="toggleModal('admin-modal', false)"><div class="glass w-full max-w-md p-8 rounded-[40px] flex flex-col font-bold" onclick="event.stopPropagation()"><div class="flex justify-between items-center mb-6 font-bold"><h3 class="text-xl font-black text-red-400 uppercase font-bold">User Manager ⚙️</h3><button onclick="toggleModal('admin-modal', false)" class="text-gray-500 text-3xl font-bold font-bold">✕</button></div><div class="flex gap-2 mb-6"><input type="text" id="new-user-name" placeholder="이름" class="flex-1 bg-white/5 p-4 rounded-xl border border-white/10 text-xs font-bold outline-none font-bold"><button onclick="addUser()" class="bg-blue-600 px-6 rounded-xl text-xs font-black font-bold">추가</button></div><div id="admin-user-list" class="flex-grow overflow-y-auto custom-scrollbar space-y-2 pr-2"></div></div></div>
+    <div id="profile-modal" class="modal" onclick="toggleModal('profile-modal', false)"><div class="glass w-full max-w-md p-8 rounded-[40px] flex flex-col font-bold text-center" onclick="event.stopPropagation()"><h3 class="text-3xl font-black text-blue-400 mb-8 uppercase italic font-bold">My Profile</h3><div class="flex flex-col items-center gap-6 mb-8 border-b border-white/10 pb-8"><img id="profile-preview" src="" class="w-24 h-24 rounded-full border-4 border-blue-600 shadow-2xl object-cover bg-slate-800"><input type="text" id="edit-nickname" class="w-full bg-white/5 p-4 rounded-2xl border border-white/10 outline-none font-black text-center" placeholder="닉네임"></div><h4 class="text-left text-[10px] text-gray-500 uppercase tracking-widest mb-4 ml-1">Attend History</h4><div id="my-history-list" class="flex-grow overflow-y-auto max-h-[300px] space-y-3 custom-scrollbar text-left font-bold"></div><button onclick="toggleModal('profile-modal', false)" class="mt-6 text-gray-500 text-xs font-black uppercase">닫기</button></div></div>
+    <div id="rate-modal" class="modal" onclick="toggleModal('rate-modal', false)"><div class="glass w-full max-w-xs p-8 rounded-[40px] flex flex-col font-bold" onclick="event.stopPropagation()"><h3 id="rate-modal-title" class="text-xl font-black text-yellow-400 mb-6 text-center"></h3><div id="rate-score-section" class="space-y-4 font-bold"><label class="text-[10px] text-gray-500 block text-center">재미 점수 (0 ~ 100)</label><input type="number" id="rate-score-input" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none font-black text-center text-2xl font-bold" placeholder="0"><button onclick="submitRating('score')" class="w-full bg-yellow-500 py-4 rounded-2xl font-black text-black font-bold font-bold font-bold">저장</button></div><div id="rate-diff-section" class="space-y-4 hidden font-bold"><label class="text-[10px] text-gray-500 block text-center">난이도 (1 ~ 5)</label><input type="range" id="rate-diff-range" min="1" max="5" step="1" class="w-full accent-blue-500 font-bold" oninput="document.getElementById('diff-val').innerText = this.value"><div id="diff-val" class="text-center text-3xl font-black text-blue-400">3</div><button onclick="submitRating('diff')" class="w-full bg-blue-600 py-4 rounded-2xl font-black text-white font-bold font-bold font-bold">저장</button></div></div></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -90,7 +93,7 @@
         let currentUser = null; let selectedCategory = ""; let activeGameId = null; let recordingRanks = []; let selectedMembers = [];
         const getTodayStr = () => new Date().toISOString().split('T')[0];
 
-        // [v5.9.1 내비게이션 엔진 - 크롬 뒤로가기 완벽 해결 핵심]
+        // [v5.9.2 내비게이션 시스템 - v4.8.1 안정 구조 복원]
         window.showPage = (id, push=true) => {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             const target = document.getElementById(id);
@@ -98,30 +101,48 @@
                 target.classList.add('active');
                 document.getElementById('global-back-btn').style.display = (id === 'page-home' || id === 'page-login') ? 'none' : 'block';
                 if(push) history.pushState({page: id}, '', '');
-                // 페이지별 데이터 로딩 보장
                 if(id === 'page-stats') navToStats();
                 if(id === 'page-chat-info') loadChatInfo();
             }
         };
 
-        // 35번 해결: 크롬 뒤로가기 버튼 감지 로직
-        window.onpopstate = (event) => {
-            // 모달이 열려 있다면 모두 닫기
-            const activeModal = document.querySelector('.modal.active');
-            if(activeModal) {
-                closeAllModals();
-                history.pushState({page: 'page-home'}, '', ''); // 홈 상태 강제 복구
-                return;
-            }
-            // 모달이 없다면 홈 페이지로 이동
-            showPage('page-home', false);
-        };
-
+        // 35번: 브라우저 뒤로가기 제어
+        window.onpopstate = () => { if(document.querySelector('.modal.active')) { closeAllModals(); history.pushState({page: 'page-home'}, '', ''); } else { showPage('page-home', false); } };
         window.handleBack = () => { if(document.querySelector('.modal.active')) closeAllModals(); else showPage('page-home'); };
 
-        // [v5.9.1 렌더링 엔진 - 점수/기록 클릭권 고정]
+        // [인증 엔진 - v5.7.4 타입 고정]
+        window.login = async () => { 
+            const pinIn = document.getElementById('pin').value.trim(); 
+            const pwIn = document.getElementById('pw').value.trim();
+            if(!pinIn || !pwIn) return;
+            try {
+                const snap = await getDoc(doc(db, "users", String(pinIn))); 
+                if (snap.exists() && String(snap.data().password) === String(pwIn)) { 
+                    currentUser = { pin: String(pinIn), ...snap.data() }; 
+                    localStorage.setItem('game_archive_auth', JSON.stringify({ pin: String(pinIn), pw: String(pwIn) })); 
+                    location.reload(); 
+                } else { alert("정보 불일치"); }
+            } catch(e) { alert("로그인 오류"); }
+        };
+
+        // [명예의 전당 로딩 복구 - 32번]
+        window.navToStats = async () => {
+            showPage('page-stats');
+            const vL = document.getElementById('vote-king'); const gL = document.getElementById('game-add-king');
+            vL.innerHTML = gL.innerHTML = `<p class="opacity-30 italic text-sm font-bold">로딩 중...</p>`;
+            try {
+                const [rSnap, gSnap, uSnap] = await Promise.all([getDocs(collection(db, "ratings")), getDocs(collection(db, "games")), getDocs(collection(db, "users"))]);
+                const uMap = uSnap.docs.reduce((acc, d) => ({...acc, [d.id]: d.data()}), {});
+                const vC = rSnap.docs.map(d=>d.data()).reduce((acc, r) => { if(r.userPin) acc[r.userPin] = (acc[r.userPin]||0)+1; return acc; }, {});
+                vL.innerHTML = Object.entries(vC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(v => `<div class='p-3 glass rounded-xl flex justify-between items-center mb-1 font-bold'><span>${uMap[v[0]]?.name || '?'}</span><b class='text-blue-400'>${v[1]}회</b></div>`).join('');
+                const gC = gSnap.docs.map(d=>d.data()).reduce((acc, g) => { if(g.creatorPin) acc[g.creatorPin] = (acc[g.creatorPin]||0)+1; return acc; }, {});
+                gL.innerHTML = Object.entries(gC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(v => `<div class='p-3 glass rounded-xl flex justify-between items-center mb-1 font-bold'><span>${uMap[v[0]]?.name || '?'}</span><b class='text-green-400'>${v[1]}개</b></div>`).join('');
+            } catch(e) { vL.innerHTML = "실패"; }
+        };
+
+        // [v5.9.2 리스트 렌더링 - 33, 34번 해결 핵심]
         window.renderList = async () => {
-            const list = document.getElementById('rank-list'); list.innerHTML = `<tr><td colspan="4" class="p-10 opacity-30 font-bold text-center">로딩 중...</td></tr>`;
+            const list = document.getElementById('rank-list'); list.innerHTML = `<tr><td colspan="4" class="p-10 opacity-30 font-bold">로딩 중...</td></tr>`;
             const [gS, rS, uS] = await Promise.all([getDocs(query(collection(db, "games"), where("category", "==", selectedCategory))), getDocs(collection(db, "ratings")), getDocs(collection(db, "users"))]);
             const uMap = uS.docs.reduce((acc, d) => ({...acc,[d.id]:d.data()}), {});
             let gms = gS.docs.map(d => {
@@ -135,10 +156,10 @@
                 <tr class="hover:bg-white/5 border-b border-white/5 transition font-bold" id="row-${g.id}">
                     <td class="p-4 text-blue-400 font-black text-center w-12 font-bold">${i < 3 && g.voteCount >= 3 ? ['🥇','🥈','🥉'][i] : '#'+(i+1)}</td>
                     <td class="p-4 text-left font-bold" onclick="toggleGameRow('${g.id}')">
-                        <span class="game-name-text text-sm font-black font-bold">${g.name}</span>
-                        <span class="text-[9px] opacity-40 font-bold">Votes: ${g.voteCount}</span>
+                        <span class="game-name-text text-sm font-black">${g.name}</span>
+                        <span class="text-[9px] opacity-40">Votes: ${g.voteCount}</span>
                     </td>
-                    <td class="p-2 text-center w-24 relative z-[1000]" onclick="event.stopPropagation();">
+                    <td class="p-2 text-center w-24 clickable-cell" onclick="event.stopPropagation();">
                         <div class="flex flex-col items-center pointer-events-auto">
                             <span onclick="event.stopPropagation(); openRate('score','${g.id}','${g.name}')" class="text-yellow-400 text-base font-black cursor-pointer">${g.avgScore.toFixed(1)}</span>
                             <div onclick="event.stopPropagation(); openRate('diff','${g.id}','${g.name}')" class="flex text-[8px] cursor-pointer">
@@ -146,11 +167,13 @@
                             </div>
                         </div>
                     </td>
-                    <td class="p-4 w-20 text-center font-bold relative z-[1000]"><button onclick="event.stopPropagation(); openSchedules('${g.id}','${g.name}');" class="bg-green-600/20 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-lg text-[10px] font-black hover:bg-green-600 transition">기록</button></td>
+                    <td class="p-4 w-20 text-center font-bold clickable-cell"><button onclick="event.stopPropagation(); openSchedules('${g.id}','${g.name}');" class="bg-green-600/20 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-lg text-[10px] font-black hover:bg-green-600 transition font-bold font-bold font-bold font-bold font-bold">기록</button></td>
                 </tr>`).join('');
         };
 
-        // [사용자 추가 엔진 - v5.9.1 강제 규격화]
+        window.toggleGameRow = (id) => { const dr = document.getElementById(`comment-row-${id}`); if(dr) dr.style.display = (dr.style.display === 'none') ? 'table-row' : 'none'; };
+        
+        // [v5.9.2 사용자 추가 엔진]
         window.addUser = async () => {
             const n = document.getElementById('new-user-name'); if(!n.value.trim()) return;
             const uS = await getDocs(collection(db, "users"));
@@ -161,35 +184,19 @@
             const listDiv = document.getElementById('admin-user-list'); listDiv.scrollTo({ top: listDiv.scrollHeight, behavior: 'smooth' });
         };
 
-        // [마이프로필 기록 연동 안정화]
-        window.navToDetailFromHistory = async (cat, gid, gname, sid) => { 
-            closeAllModals(); selectedCategory = cat; document.getElementById('rank-title').innerText = cat; 
-            showPage('page-rank'); await renderList(); 
-            setTimeout(() => openSchedules(gid, gname), 300); 
-        };
-
-        // [기초 기능 및 인증 동기화 유지]
-        window.login = async () => { 
-            const pinIn = document.getElementById('pin').value.trim(); const pwIn = document.getElementById('pw').value.trim(); if(!pinIn || !pwIn) return;
-            const snap = await getDoc(doc(db, "users", String(pinIn))); 
-            if (snap.exists() && String(snap.data().password) === String(pwIn)) { currentUser = { pin: String(pinIn), ...snap.data() }; localStorage.setItem('game_archive_auth', JSON.stringify({ pin: String(pinIn), pw: String(pwIn) })); location.reload(); } else { alert("정보 불일치"); }
-        };
+        // [기초 동기화 및 초기화]
         window.logout = () => { if(confirm("로그아웃?")) { localStorage.removeItem('game_archive_auth'); location.reload(); } };
         window.addEventListener('DOMContentLoaded', async () => { const auth = localStorage.getItem('game_archive_auth'); if (auth) { const d = JSON.parse(auth); const snap = await getDoc(doc(db, "users", String(d.pin))); if (snap.exists()) { currentUser = { pin: String(d.pin), ...snap.data() }; updateUI(); showPage('page-home', false); return; } } showPage('page-login', false); });
         function updateUI() { document.getElementById('user-welcome').innerText = `${currentUser.name}님`; document.getElementById('my-profile-icon').src = currentUser.iconUrl || DEFAULT_ICON; if(currentUser.pin === "100") document.getElementById('admin-entry').classList.remove('hidden'); }
         window.toggleModal = (id, s) => document.getElementById(id).classList.toggle('active', s);
         window.closeAllModals = () => document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
         window.navTo = (cat) => { selectedCategory = cat; document.getElementById('rank-title').innerText = cat; renderList(); showPage('page-rank'); };
+        window.openAdmin = async () => { toggleModal('admin-modal', true); const uS = await getDocs(collection(db, "users")); const users = uS.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => parseInt(a.id) - parseInt(b.id)); document.getElementById('admin-user-list').innerHTML = users.map(u => `<div class="flex justify-between items-center p-4 glass rounded-2xl border border-white/5 mb-2 font-bold font-bold font-bold font-bold"><div><span>${u.name}</span><span class="text-[9px] text-gray-500 block">PIN: ${u.id}</span></div>${u.id !== "100" ? `<button onclick="deleteUser('${u.id}')" class="bg-red-500/10 text-red-500 px-3 py-1.5 rounded-lg text-[10px] font-black">삭제</button>` : ''}</div>`).join(''); };
+        window.openFindPin = async () => { toggleModal('find-pin-modal', true); const uS = await getDocs(collection(db, "users")); const users = uS.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => a.name.localeCompare(b.name)); document.getElementById('pin-list-content').innerHTML = users.map(u => `<div class="flex justify-between items-center p-3 bg-white/5 rounded-xl border border-white/5 mb-1 font-bold"><span class="text-blue-200">${u.name}</span><span class="text-yellow-400 font-black">PIN: ${u.id}</span></div>`).join(''); };
         window.openSchedules = async (id, n) => { activeGameId = id; toggleModal('schedule-modal', true); document.getElementById('schedule-game-title').innerText = n; const sSnap = await getDocs(query(collection(db, "schedules"), where("gameId", "==", id))); document.getElementById('schedule-list').innerHTML = sSnap.docs.map(d => `<div onclick="openScheduleDetail('${d.id}')" class="bg-white/5 p-4 rounded-2xl border border-white/5 flex justify-between items-center cursor-pointer hover:bg-white/10 font-bold"><div><div class="text-sm text-green-300 font-bold">${d.data().name}</div><div class="text-[9px] text-gray-500 uppercase">${d.data().date || ''}</div></div><span class="text-blue-400 text-xs font-bold">▶</span></div>`).join(''); };
-        window.openAddSchedule = async () => { selectedMembers = [currentUser.pin]; const uS = await getDocs(collection(db, "users")); document.getElementById('member-selector').innerHTML = uS.docs.map(d => `<div id="sel-${d.id}" onclick="toggleMemberSelect('${d.id}')" class="member-chip font-bold ${d.id === currentUser.pin ? 'selected' : ''}">${d.data().name}</div>`).join(''); toggleModal('add-schedule-modal', true); };
-        window.toggleMemberSelect = (pin) => { if(pin === currentUser.pin) return; const el = document.getElementById(`sel-${pin}`); if(selectedMembers.includes(pin)) { selectedMembers = selectedMembers.filter(p => p !== pin); el.classList.remove('selected'); } else { selectedMembers.push(pin); el.classList.add('selected'); } };
-        window.submitSchedule = async () => { const name = document.getElementById('new-schedule-name').value.trim(); if(!name) return alert("제목 필수"); await addDoc(collection(db,"schedules"), { gameId: activeGameId, gameName: document.getElementById('schedule-game-title').innerText, gameCategory: selectedCategory, name, members: selectedMembers, ranks: [], feed: [], date: getTodayStr(), createdAt: serverTimestamp() }); toggleModal('add-schedule-modal', false); openSchedules(activeGameId, document.getElementById('schedule-game-title').innerText); };
         window.openRate = (t,id,n) => { activeGameId=id; document.getElementById('rate-modal-title').innerText=n; document.getElementById('rate-score-section').classList.toggle('hidden',t!=='score'); document.getElementById('rate-diff-section').classList.toggle('hidden',t!=='diff'); toggleModal('rate-modal',true); };
         window.submitRating = async (t) => { const v = (t==='score') ? parseFloat(document.getElementById('rate-score-input').value) : parseInt(document.getElementById('rate-diff-range').value); const snap = await getDocs(query(collection(db,"ratings"), where("gameId","==",activeGameId), where("userPin","==",currentUser.pin))); if(!snap.empty) await updateDoc(doc(db,"ratings",snap.docs[0].id), {[t==='score'?'score':'difficulty']:v}); else await addDoc(collection(db,"ratings"), {gameId:activeGameId, userPin:currentUser.pin, [t==='score'?'score':'difficulty']:v}); toggleModal('rate-modal', false); renderList(); };
-        window.openAdmin = async () => { toggleModal('admin-modal', true); const uS = await getDocs(collection(db, "users")); const users = uS.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => parseInt(a.id) - parseInt(b.id)); document.getElementById('admin-user-list').innerHTML = users.map(u => `<div class="flex justify-between items-center p-4 glass rounded-2xl border border-white/5 mb-2 font-bold"><div><span class="font-black">${u.name}</span><span class="text-[9px] text-gray-500 block font-bold">PIN: ${u.id}</span></div>${u.id !== "100" ? `<button onclick="deleteUser('${u.id}')" class="bg-red-500/10 text-red-500 px-3 py-1.5 rounded-lg text-[10px] font-black">삭제</button>` : ''}</div>`).join(''); };
-        window.openFindPin = async () => { toggleModal('find-pin-modal', true); const uS = await getDocs(collection(db, "users")); const users = uS.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => a.name.localeCompare(b.name)); document.getElementById('pin-list-content').innerHTML = users.map(u => `<div class="flex justify-between items-center p-3 bg-white/5 rounded-xl border border-white/5 mb-1 font-bold"><span class="text-blue-200">${u.name}</span><span class="text-yellow-400 font-black">PIN: ${u.id}</span></div>`).join(''); };
-        window.loadChatInfo = async () => { const s = await getDocs(query(collection(db, "chatInfo"), orderBy("createdAt", "desc"))); document.getElementById('chat-info-list').innerHTML = s.docs.map(d => `<div class='glass p-6 rounded-3xl text-left border border-white/10 shadow-xl font-bold'><h4 class='text-blue-300 mb-2 font-black'>${d.data().title}</h4><p class='text-sm opacity-80 whitespace-pre-wrap font-bold'>${d.data().content}</p></div>`).join(''); };
-        window.addGame = async () => { const n = prompt("이름:"); if(!n) return; await addDoc(collection(db, "games"), { name: n, category: selectedCategory, creatorPin: currentUser.pin, createdAt: serverTimestamp(), comments: [] }); renderList(); };
+        window.toggleProfileModal = async (s) => { if(s && currentUser) { document.getElementById('edit-nickname').value = currentUser.name; document.getElementById('profile-preview').src = currentUser.iconUrl || DEFAULT_ICON; toggleModal('profile-modal', true); const q = query(collection(db, "schedules"), where("members", "array-contains", currentUser.pin)); const sSnap = await getDocs(q); document.getElementById('my-history-list').innerHTML = sSnap.docs.map(d => { const s = d.data(); return `<div class="bg-white/5 p-4 rounded-2xl border border-white/5 flex justify-between items-center mb-1 font-bold"><div><div class="text-sm font-bold font-bold font-bold">${s.gameName} - ${s.name}</div></div></div>`; }).join('') || "기록 없음"; } else toggleModal('profile-modal', false); };
     </script>
 </body>
 </html>
