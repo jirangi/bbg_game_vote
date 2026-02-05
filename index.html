@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Game Archive v6.0.8</title>
+    <title>Game Archive v6.0.9</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -25,28 +25,32 @@
 
     <div id="page-home" class="page active pt-10 text-center font-bold">
         <div class="flex justify-between items-center mb-6 px-4">
-            <div class="flex items-center gap-3 p-2 force-clickable" onclick="toggleProfileModal(true)">
+            <div class="flex items-center gap-3 p-2 btn-priority" onclick="toggleProfileModal(true)">
                 <img id="my-profile-icon" src="" class="w-12 h-12 rounded-full border-2 border-blue-500 shadow-xl object-cover bg-slate-800" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3241/3241724.png'">
-                <div class="text-left font-bold"><span id="user-welcome" class="text-blue-300 text-sm font-black block"></span><span class="text-[9px] text-gray-500 font-bold">My Profile ></span></div>
+                <div class="text-left font-bold">
+                    <span id="user-welcome" class="text-blue-300 text-sm font-black block"></span>
+                    <span class="text-[9px] text-gray-500 font-bold">My Profile ></span>
+                </div>
             </div>
-            <button onclick="logout()" class="text-gray-500 text-xs border border-white/10 px-3 py-1.5 rounded-lg force-clickable font-bold">로그아웃</button>
+            <button onclick="logout()" class="text-gray-500 text-xs border border-white/10 px-3 py-1.5 rounded-lg btn-priority font-bold">로그아웃</button>
         </div>
         <h1 class="text-4xl font-extrabold mb-12 italic text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 uppercase tracking-tighter">Game Archive</h1>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4 font-bold">
-            <button onclick="navTo('보드게임')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition force-clickable">🎲 보드게임</button>
-            <button onclick="navTo('지니어스')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition force-clickable font-bold">🧠 지니어스</button>
-            <button onclick="navTo('방탈출')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition force-clickable font-bold">🔑 방탈출</button>
-            <button onclick="navTo('머더 미스테리')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition force-clickable font-bold">🕵️ 머더 미스테리</button>
+            <button onclick="navTo('보드게임')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition btn-priority">🎲 보드게임</button>
+            <button onclick="navTo('지니어스')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition btn-priority">🧠 지니어스</button>
+            <button onclick="navTo('방탈출')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition btn-priority font-bold">🔑 방탈출</button>
+            <button onclick="navTo('머더 미스테리')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition btn-priority font-bold font-bold">🕵️ 머더 미스테리</button>
         </div>
     </div>
 
     <div id="page-rank" class="page pt-24 font-bold">
-        <div class="px-4 mb-4"><input type="text" id="game-search" oninput="renderList()" placeholder="🔍 게임 검색..." class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none text-sm font-bold shadow-inner"></div>
-        <div class="px-4 mb-4 flex justify-between items-center font-bold"><h2 id="rank-title" class="text-2xl font-black italic text-blue-400 uppercase"></h2></div>
+        <div class="px-4 mb-4 flex justify-between items-center">
+            <h2 id="rank-title" class="text-2xl font-black italic text-blue-400 uppercase"></h2>
+        </div>
         <div class="glass rounded-[40px] overflow-hidden mx-4 shadow-2xl border border-white/5 font-bold">
             <table class="w-full text-center table-fixed border-collapse">
-                <thead><tr class="bg-white/5 text-gray-500 text-[10px] border-b border-white/10 font-black font-bold"><th class="p-4 w-12 text-center">#</th><th class="p-4 text-left">정보</th><th class="w-24 text-center">평가</th><th class="w-20">기록</th></tr></thead>
-                <tbody id="rank-list" class="divide-y divide-white/5 font-bold"></tbody>
+                <thead><tr class="bg-white/5 text-gray-500 text-[10px] border-b border-white/10 font-black"><th class="p-4 w-12">#</th><th class="p-4 text-left">정보</th><th class="w-24 text-center">평가</th><th class="w-20">기록</th></tr></thead>
+                <tbody id="rank-list" class="divide-y divide-white/5"></tbody>
             </table>
         </div>
     </div>
@@ -55,17 +59,17 @@
         <div class="glass w-full max-w-xs p-8 rounded-[40px] flex flex-col font-bold" onclick="event.stopPropagation()">
             <h3 id="rate-modal-title" class="text-xl font-black text-yellow-400 mb-6 text-center italic"></h3>
             
-            <div id="rate-score-section" class="space-y-4 font-bold">
-                <label class="text-[10px] text-gray-500 block text-center font-bold uppercase">재미 점수 (0 ~ 100)</label>
+            <div id="rate-score-section" class="space-y-4">
+                <label class="text-[10px] text-gray-500 block text-center uppercase">재미 점수 (0 ~ 100)</label>
                 <input type="number" id="rate-score-input" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none font-black text-center text-2xl text-yellow-400" placeholder="0">
-                <button onclick="submitRating('score')" class="w-full bg-yellow-500 py-4 rounded-2xl font-black text-black shadow-lg">점수 저장</button>
+                <button onclick="submitRating('score')" class="w-full bg-yellow-500 py-4 rounded-2xl font-black text-black">점수 저장</button>
             </div>
 
-            <div id="rate-diff-section" class="space-y-4 hidden font-bold">
-                <label class="text-[10px] text-gray-500 block text-center font-bold uppercase">난이도 평가 (1 ~ 5)</label>
+            <div id="rate-diff-section" class="space-y-4 hidden">
+                <label class="text-[10px] text-gray-500 block text-center uppercase">난이도 평가 (1 ~ 5)</label>
                 <input type="range" id="rate-diff-range" min="1" max="5" step="1" class="w-full accent-blue-500" oninput="document.getElementById('diff-val').innerText = '★'.repeat(this.value)">
-                <div id="diff-val" class="text-center text-3xl text-blue-400 font-bold tracking-widest">★★★</div>
-                <button onclick="submitRating('diff')" class="w-full bg-blue-600 py-4 rounded-2xl font-black text-white shadow-lg">난이도 저장</button>
+                <div id="diff-val" class="text-center text-3xl text-blue-400">★★★</div>
+                <button onclick="submitRating('diff')" class="w-full bg-blue-600 py-4 rounded-2xl font-black text-white">난이도 저장</button>
             </div>
         </div>
     </div>
@@ -73,21 +77,25 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, query, where, serverTimestamp, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { firebaseConfig } from "./firebase-config.js";
 
+        const firebaseConfig = { apiKey: "AIzaSyBVp-GgD8Ts-tGw5itr9Av_MnZAt-U4teE", authDomain: "game-archive-afacf.firebaseapp.com", projectId: "game-archive-afacf", storageBucket: "game-archive-afacf.firebasestorage.app", messagingSenderId: "927042381268", appId: "1:927042381268:web:e41f4106cf9202e45ca241" };
         const app = initializeApp(firebaseConfig); const db = getFirestore(app);
         const DEFAULT_ICON = 'https://cdn-icons-png.flaticon.com/512/3241/3241724.png';
         let currentUser = null; let selectedCategory = ""; let activeGameId = null;
 
-        // [v6.0.8 2.2, 2.3 개별 평가 엔진]
+        // [v6.0.9 에러 방어 및 평가 엔진]
         window.openRate = (type, id, n) => { 
             activeGameId = id; 
             document.getElementById('rate-modal-title').innerText = n; 
             document.getElementById('rate-score-section').classList.toggle('hidden', type !== 'score');
             document.getElementById('rate-diff-section').classList.toggle('hidden', type !== 'diff');
-            if(type === 'diff') {
-                document.getElementById('rate-diff-range').value = 3;
-                document.getElementById('diff-val').innerText = '★★★';
+            
+            // 안전한 요소 참조 (에러 방지)
+            const range = document.getElementById('rate-diff-range');
+            const val = document.getElementById('diff-val');
+            if(range && val && type === 'diff') {
+                range.value = 3;
+                val.innerText = '★★★';
             }
             toggleModal('rate-modal', true); 
         };
@@ -95,25 +103,24 @@
         window.submitRating = async (type) => {
             try {
                 const snap = await getDocs(query(collection(db, "ratings"), where("gameId", "==", activeGameId), where("userPin", "==", currentUser.pin)));
-                const val = (type === 'score') ? parseFloat(document.getElementById('rate-score-input').value) : parseInt(document.getElementById('rate-diff-range').value);
+                const inputVal = (type === 'score') ? document.getElementById('rate-score-input').value : document.getElementById('rate-diff-range').value;
+                const val = parseFloat(inputVal);
                 
                 const data = { gameId: activeGameId, userPin: currentUser.pin, updatedAt: serverTimestamp() };
                 if (type === 'score') data.score = val;
-                else data.difficulty = val;
+                else data.difficulty = parseInt(val);
 
                 if (!snap.empty) await updateDoc(doc(db, "ratings", snap.docs[0].id), data);
                 else await addDoc(collection(db, "ratings"), data);
 
                 toggleModal('rate-modal', false);
-                renderList(); // 실시간 반영
-            } catch(e) { alert("평가 저장에 실패했습니다."); }
+                renderList();
+            } catch(e) { alert("평가 저장 실패"); }
         };
 
-        // [리스트 렌더링 - 6.0.7 기반 개별 클릭 연결]
         window.renderList = async () => {
             const list = document.getElementById('rank-list');
             list.innerHTML = `<tr><td colspan="4" class="p-10 opacity-30 text-center font-bold">로딩 중...</td></tr>`;
-            const search = document.getElementById('game-search').value.toLowerCase();
             const [gS, rS] = await Promise.all([getDocs(query(collection(db, "games"), where("category", "==", selectedCategory))), getDocs(collection(db, "ratings"))]);
             const rt = rS.docs.map(d => d.data());
             let gms = gS.docs.map(d => {
@@ -121,23 +128,23 @@
                 const sc = r.map(v => v.score || 0);
                 const df = r.map(v => v.difficulty || 0).filter(v => v > 0);
                 return { id: d.id, ...d.data(), avgScore: sc.length > 0 ? sc.reduce((a,c)=>a+c,0)/sc.length : 0, avgDiff: df.length > 0 ? df.reduce((a,c)=>a+c,0)/df.length : 0 };
-            }).filter(g => g.name.toLowerCase().includes(search));
+            });
             gms.sort((a, b) => b.avgScore - a.avgScore);
             list.innerHTML = gms.map((g, i) => `
                 <tr class="hover:bg-white/5 border-b border-white/5 transition font-bold">
                     <td class="p-4 text-blue-400 font-black text-center w-12 font-bold">${i < 3 ? '🥇' : '#'+(i+1)}</td>
-                    <td class="p-4 text-left font-bold font-bold"><span class="game-name-text text-sm font-black font-bold">${g.name}</span></td>
+                    <td class="p-4 text-left"><span class="game-name-text text-sm font-black font-bold">${g.name}</span></td>
                     <td class="p-2 text-center w-24 btn-priority" onclick="event.stopPropagation();">
                         <div class="flex flex-col items-center">
                             <span onclick="openRate('score','${g.id}','${g.name}')" class="text-yellow-400 text-base font-black cursor-pointer font-bold">${g.avgScore.toFixed(1)}</span>
                             <span onclick="openRate('diff','${g.id}','${g.name}')" class="text-[8px] text-blue-400 cursor-pointer font-bold">${'★'.repeat(Math.round(g.avgDiff))}</span>
                         </div>
                     </td>
-                    <td class="p-4 w-20 text-center font-bold btn-priority"><button onclick="alert('기록 리스트(준비중)')" class="bg-green-600/20 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-lg text-[10px] font-black font-bold font-bold">기록</button></td>
+                    <td class="p-4 w-20 text-center btn-priority font-bold"><button onclick="alert('기록 리스트(준비중)')" class="bg-green-600/20 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-lg text-[10px] font-black font-bold">기록</button></td>
                 </tr>`).join('');
         };
 
-        // 기타 기초 함수 (로그인 및 세션 유지) v6.0.7 동일
+        // 기초 인증 및 UI 제어 (기존 동일)
         window.login = async () => {
             const p = document.getElementById('pin').value.trim();
             const w = document.getElementById('pw').value.trim();
