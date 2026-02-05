@@ -13,13 +13,10 @@
         .page.active { display: block; opacity: 1; transform: translateY(0); }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; align-items: center; justify-content: center; padding: 20px; pointer-events: auto; }
         .modal.active { display: flex; }
-        #schedule-modal { z-index: 10010; } 
-        #detail-modal { z-index: 10020; } 
-        #rate-modal { z-index: 10030; } 
-        #admin-modal, #profile-modal { z-index: 11000; }
+        #detail-modal { z-index: 10005; } 
+        #profile-modal { z-index: 11000; }
         #global-back-btn { position: fixed; top: 24px; left: 20px; z-index: 9000; background: #1e293b; color: #60a5fa; padding: 10px 18px; border-radius: 14px; border: 1px solid rgba(96, 165, 250, 0.3); font-weight: 900; display: none; cursor: pointer; }
-        .btn-priority { position: relative; z-index: 2000 !important; cursor: pointer !important; pointer-events: auto !important; }
-        .game-name-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px; font-weight: 800; display: block; }
+        .force-clickable { position: relative; z-index: 1000 !important; cursor: pointer !important; pointer-events: auto !important; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
     </style>
@@ -29,156 +26,130 @@
 
     <div id="page-login" class="page pt-24 max-w-sm mx-auto text-center font-bold">
         <div class="glass p-8 rounded-3xl shadow-2xl">
-            <h2 class="text-2xl font-extrabold mb-8 text-blue-400 italic">GAME ARCHIVE</h2>
+            <h2 class="text-2xl font-extrabold mb-8 text-blue-400 italic">Game Archive</h2>
             <div class="space-y-4">
                 <input type="text" id="pin" placeholder="PIN" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none text-white font-bold">
                 <input type="password" id="pw" placeholder="비밀번호" maxlength="4" oninput="if(this.value.length===4) login()" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none text-white font-bold">
-                <button onclick="login()" class="w-full bg-blue-600 py-4 rounded-xl font-extrabold shadow-lg mt-2 font-bold">접속하기</button>
+                <button onclick="login()" class="w-full bg-blue-600 py-4 rounded-xl font-extrabold shadow-lg mt-2 font-bold">접속</button>
             </div>
         </div>
     </div>
 
     <div id="page-home" class="page pt-10 text-center font-bold">
         <div class="flex justify-between items-center mb-6 px-4">
-            <div class="flex items-center gap-3 p-2 btn-priority" onclick="toggleProfileModal(true)">
+            <div class="flex items-center gap-3 p-2 force-clickable" onclick="toggleProfileModal(true)">
                 <img id="my-profile-icon" src="" class="w-12 h-12 rounded-full border-2 border-blue-500 shadow-xl object-cover bg-slate-800" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3241/3241724.png'">
-                <span id="user-welcome" class="text-blue-300 text-sm font-black"></span>
+                <div class="text-left">
+                    <span id="user-welcome" class="text-blue-300 text-sm font-black block"></span>
+                    <span class="text-[9px] text-gray-500 font-bold">My Profile ></span>
+                </div>
             </div>
-            <button onclick="logout()" class="text-gray-500 text-xs border border-white/10 px-3 py-1.5 rounded-lg btn-priority font-bold">로그아웃</button>
+            <button onclick="logout()" class="text-gray-500 text-xs border border-white/10 px-3 py-1.5 rounded-lg force-clickable font-bold">로그아웃</button>
         </div>
-        <div id="admin-entry" class="hidden px-4 mb-6 text-right"><button onclick="openAdmin()" class="text-[10px] bg-red-500/20 text-red-400 border border-red-500/30 px-4 py-2 rounded-xl font-black btn-priority">⚙️ 관리자 설정</button></div>
+        <div id="admin-entry" class="hidden px-4 mb-6 text-right"><button onclick="openAdmin()" class="text-[10px] bg-red-500/20 text-red-400 border border-red-500/30 px-4 py-2 rounded-xl font-black force-clickable">⚙️ 관리자 설정</button></div>
         
         <h1 class="text-4xl font-extrabold mb-12 italic text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 uppercase tracking-tighter">Game Archive</h1>
         
         <div class="flex flex-wrap justify-center gap-3 mb-10 px-4">
-            <button onclick="showPage('page-stats')" class="bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-6 py-4 rounded-2xl font-extrabold hover:bg-yellow-500 transition shadow-lg btn-priority font-bold">🏆 명예전당</button>
-            <button onclick="showPage('page-chat-info')" class="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-6 py-4 rounded-2xl font-extrabold hover:bg-blue-500 transition shadow-lg btn-priority font-bold">📢 단톡방 정보</button>
+            <button onclick="navToStats()" class="bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-6 py-4 rounded-2xl font-extrabold hover:bg-yellow-500 hover:text-black transition shadow-lg force-clickable font-bold">🏆 명예전당</button>
+            <button onclick="showPage('page-chat-info')" class="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-6 py-4 rounded-2xl font-extrabold hover:bg-blue-500 transition shadow-lg force-clickable font-bold">📢 단톡방 정보</button>
         </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4 font-bold font-bold">
-            <button onclick="navTo('보드게임')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition btn-priority">🎲 보드게임</button>
-            <button onclick="navTo('지니어스')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition btn-priority font-bold">🧠 지니어스</button>
-            <button onclick="navTo('방탈출')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition btn-priority font-bold">🔑 방탈출</button>
-            <button onclick="navTo('머더 미스테리')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition btn-priority font-bold">🕵️ 머더 미스테리</button>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4 font-bold">
+            <button onclick="navTo('보드게임')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition force-clickable">🎲 보드게임</button>
+            <button onclick="navTo('지니어스')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition force-clickable font-bold">🧠 지니어스</button>
+            <button onclick="navTo('방탈출')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition force-clickable font-bold">🔑 방탈출</button>
+            <button onclick="navTo('머더 미스테리')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition force-clickable font-bold">🕵️ 머더 미스테리</button>
         </div>
     </div>
 
     <div id="profile-modal" class="modal" onclick="toggleModal('profile-modal', false)">
         <div class="glass w-full max-w-md p-8 rounded-[40px] flex flex-col text-center font-bold" onclick="event.stopPropagation()">
             <h3 class="text-3xl font-black text-blue-400 mb-8 uppercase italic">My Profile</h3>
-            <div class="flex flex-col items-center gap-6 mb-8 border-b border-white/10 pb-8">
-                <img id="profile-preview" src="" class="w-24 h-24 rounded-full border-4 border-blue-600 shadow-2xl object-cover bg-slate-800" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3241/3241724.png'">
+            <div class="flex flex-col items-center gap-4 mb-8">
+                <img id="profile-preview" src="" class="w-24 h-24 rounded-full border-4 border-blue-600 shadow-2xl object-cover bg-slate-800">
                 <div id="display-name" class="text-xl font-black font-bold"></div>
+                <div id="display-pin" class="text-[10px] text-gray-500 font-bold"></div>
             </div>
-            <h4 class="text-left text-[10px] text-gray-500 uppercase tracking-widest mb-4 ml-1">Attend History</h4>
+            <h4 class="text-left text-[10px] text-gray-500 uppercase tracking-widest mb-4 ml-1 font-bold">Attend History</h4>
             <div id="my-history-list" class="flex-grow overflow-y-auto max-h-[300px] space-y-3 custom-scrollbar text-left font-bold"></div>
-            <button onclick="toggleModal('profile-modal', false)" class="mt-6 text-gray-500 text-xs font-black uppercase">닫기</button>
-        </div>
-    </div>
-
-    <div id="detail-modal" class="modal" onclick="toggleModal('detail-modal', false)">
-        <div class="glass w-full max-w-md p-8 rounded-[40px] max-h-[90vh] flex flex-col font-bold" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center mb-6">
-                <div class="flex flex-col min-w-0 flex-1"><h3 id="detail-title" class="text-xl font-black text-blue-400 truncate"></h3><span id="detail-date" class="text-[10px] text-gray-500 font-bold font-bold"></span></div>
-                <button onclick="toggleModal('detail-modal', false)" class="text-gray-500 text-3xl font-bold font-bold">✕</button>
-            </div>
-            <div id="detail-rank-result" class="text-sm space-y-2 mb-6 border-b border-white/10 pb-6 font-bold"></div>
-            <div id="detail-comment-feed" class="flex-grow overflow-y-auto custom-scrollbar space-y-4 text-left font-bold mb-4"></div>
-            <div class="flex gap-2 font-bold"><input type="text" id="comment-input" class="flex-1 bg-white/5 border border-white/10 p-4 rounded-2xl outline-none text-xs font-bold" placeholder="코멘트 입력..."><button onclick="submitComment()" class="bg-blue-600 px-6 rounded-2xl font-black text-xs font-bold">등록</button></div>
+            <button onclick="toggleModal('profile-modal', false)" class="mt-6 text-gray-500 text-xs font-black uppercase font-bold">닫기</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, query, where, serverTimestamp, arrayUnion, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { firebaseConfig } from "./firebase-config.js";
 
         const app = initializeApp(firebaseConfig); const db = getFirestore(app);
         const DEFAULT_ICON = 'https://cdn-icons-png.flaticon.com/512/3241/3241724.png';
-        let currentUser = null; let selectedCategory = ""; let activeGameId = null; let activeScheduleId = null;
+        let currentUser = null; let selectedCategory = "";
 
-        // [v6.0.3 세션 유지 및 UI 동기화]
+        // [v6.0.3 1.1 마이프로필 데이터 바인딩]
+        window.toggleProfileModal = async (show) => {
+            if (show && currentUser) {
+                document.getElementById('display-name').innerText = currentUser.name;
+                document.getElementById('display-pin').innerText = `PIN: ${currentUser.pin}`;
+                document.getElementById('profile-preview').src = currentUser.iconUrl || DEFAULT_ICON;
+                
+                const listDiv = document.getElementById('my-history-list');
+                listDiv.innerHTML = `<p class="opacity-30 italic text-sm text-center py-10 font-bold">기록 불러오는 중...</p>`;
+                toggleModal('profile-modal', true);
+                
+                try {
+                    const q = query(collection(db, "schedules"), where("members", "array-contains", currentUser.pin));
+                    const snap = await getDocs(q);
+                    listDiv.innerHTML = snap.docs.map(d => {
+                        const s = d.data();
+                        return `<div class="bg-white/5 p-4 rounded-2xl border border-white/5 font-bold mb-1">
+                            <div class="text-[9px] text-blue-400 uppercase font-black">${s.gameCategory || '🎲'}</div>
+                            <div class="text-sm">${s.gameName} - ${s.name}</div>
+                        </div>`;
+                    }).join('') || "<p class='opacity-20 text-center py-10'>기록이 없습니다.</p>";
+                } catch(e) { listDiv.innerHTML = "데이터 조회 실패"; }
+            } else toggleModal('profile-modal', false);
+        };
+
+        // 기초 인증 및 UI 갱신 로직 (v5.8.8 유지)
+        window.login = async () => {
+            const p = document.getElementById('pin').value.trim();
+            const w = document.getElementById('pw').value.trim();
+            const snap = await getDoc(doc(db, "users", String(p)));
+            if (snap.exists() && String(snap.data().password) === String(w)) {
+                currentUser = { pin: String(p), ...snap.data() };
+                localStorage.setItem('game_archive_auth', JSON.stringify({ pin: String(p), pw: String(w) }));
+                updateUI(); showPage('page-home');
+            } else alert("로그인 정보가 틀립니다.");
+        };
+
         window.addEventListener('DOMContentLoaded', async () => {
-            const savedAuth = localStorage.getItem('bbg_auth');
-            if (savedAuth) {
-                const { pin, pw } = JSON.parse(savedAuth);
-                const snap = await getDoc(doc(db, "users", String(pin)));
-                if (snap.exists() && String(snap.data().password) === String(pw)) {
-                    currentUser = { pin: String(pin), ...snap.data() };
-                    updateUI(); showPage('page-home', false); return;
+            const auth = localStorage.getItem('game_archive_auth');
+            if (auth) {
+                const d = JSON.parse(auth);
+                const snap = await getDoc(doc(db, "users", String(d.pin)));
+                if (snap.exists()) {
+                    currentUser = { pin: String(d.pin), ...snap.data() };
+                    updateUI(); showPage('page-home', false);
+                    return;
                 }
             }
             showPage('page-login', false);
         });
 
-        // [1.1 마이프로필 & 4.2 히스토리 복구]
-        window.toggleProfileModal = async (s) => {
-            if (s && currentUser) {
-                document.getElementById('display-name').innerText = currentUser.name;
-                document.getElementById('profile-preview').src = currentUser.iconUrl || DEFAULT_ICON;
-                const listDiv = document.getElementById('my-history-list');
-                listDiv.innerHTML = `<p class="opacity-30 italic text-sm text-center py-10 font-bold">로딩 중...</p>`;
-                toggleModal('profile-modal', true);
-                const q = query(collection(db, "schedules"), where("members", "array-contains", currentUser.pin));
-                const snap = await getDocs(q);
-                listDiv.innerHTML = snap.docs.map(d => {
-                    const data = d.data();
-                    return `<div onclick="navToHistory('${data.gameCategory}','${data.gameId}','${data.gameName}','${d.id}')" class="bg-white/5 p-4 rounded-2xl border border-white/5 font-bold mb-1 cursor-pointer hover:bg-white/10 flex justify-between items-center font-bold">
-                        <div><div class="text-[9px] text-blue-400 uppercase font-black font-bold font-bold">${data.gameCategory || '🎲'}</div><div class="text-sm font-bold font-bold font-bold">${data.gameName} - ${data.name}</div></div>
-                        <span class="text-yellow-400 text-xs font-bold">▶</span>
-                    </div>`;
-                }).join('') || "참석 기록 없음";
-            } else toggleModal('profile-modal', false);
-        };
-
-        // [4.3 기록 연동 클릭 복구]
-        window.navToHistory = async (cat, gid, gname, sid) => {
-            closeAllModals(); selectedCategory = cat; document.getElementById('rank-title').innerText = cat;
-            showPage('page-rank'); await renderList();
-            await openSchedules(gid, gname);
-            setTimeout(() => openScheduleDetail(sid), 400);
-        };
-
-        // [3.4 날짜 및 3.5 코멘트 상세 매핑 복구]
-        window.openScheduleDetail = async (sid) => {
-            activeScheduleId = sid; 
-            const [sS, uS] = await Promise.all([getDoc(doc(db,"schedules",sid)), getDocs(collection(db,"users"))]);
-            if (!sS.exists()) return;
-            const data = sS.data(); const uMap = uS.docs.reduce((acc, d) => ({...acc, [d.id]: d.data().name}), {});
-            document.getElementById('detail-title').innerText = data.name; 
-            document.getElementById('detail-date').innerText = "📅 " + (data.date || "미기록");
-            document.getElementById('detail-rank-result').innerHTML = (data.ranks || []).map((p, i) => `<div class="flex justify-between font-bold"><span>${i+1}위</span><span>${uMap[p] || '?'}</span></div>`).join('') || "순위 미기록";
-            document.getElementById('detail-comment-feed').innerHTML = (data.feed || []).map(f => `<div class="bg-white/5 p-3 rounded-xl border border-white/5 font-bold"><b>${uMap[f.userPin] || '?'}:</b> ${f.text}</div>`).join('') || "<p class='opacity-20 text-center py-4 font-bold font-bold'>코멘트 없음</p>";
-            toggleModal('detail-modal', true);
-        };
-
-        // 기초 유틸리티 (인증, 페이지 제어)
-        window.login = async () => {
-            const pinIn = document.getElementById('pin').value.trim(); const pwIn = document.getElementById('pw').value.trim();
-            const snap = await getDoc(doc(db, "users", String(pinIn)));
-            if (snap.exists() && String(snap.data().password) === String(pwIn)) {
-                currentUser = { pin: String(pinIn), ...snap.data() }; 
-                localStorage.setItem('bbg_auth', JSON.stringify({ pin: pinIn, pw: pwIn }));
-                updateUI(); showPage('page-home');
-            } else alert("정보 불일치");
-        };
-
-        window.updateUI = () => {
+        function updateUI() {
             document.getElementById('user-welcome').innerText = `${currentUser.name}님`;
             document.getElementById('my-profile-icon').src = currentUser.iconUrl || DEFAULT_ICON;
             if(currentUser.pin === "100") document.getElementById('admin-entry').classList.remove('hidden');
-        };
+        }
 
         window.showPage = (id, push=true) => {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             const t = document.getElementById(id); if(t) { t.classList.add('active'); document.getElementById('global-back-btn').style.display = (id === 'page-home' || id === 'page-login') ? 'none' : 'block'; if(push) history.pushState({page: id}, '', ''); }
         };
-
+        window.navTo = (cat) => { selectedCategory = cat; document.getElementById('rank-title').innerText = cat; alert(cat + " 페이지 이동 (v6.0.4에서 보드 구현)"); };
         window.toggleModal = (id, s) => document.getElementById(id).classList.toggle('active', s);
-        window.closeAllModals = () => document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
-        window.handleBack = () => { if(document.querySelector('.modal.active')) closeAllModals(); else showPage('page-home'); };
-        window.logout = () => { localStorage.removeItem('bbg_auth'); location.reload(); };
-        window.navTo = (cat) => { selectedCategory = cat; document.getElementById('rank-title').innerText = cat; renderList(); showPage('page-rank'); };
+        window.handleBack = () => { if(document.querySelector('.modal.active')) document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); else showPage('page-home'); };
+        window.logout = () => { localStorage.removeItem('game_archive_auth'); location.reload(); };
     </script>
 </body>
 </html>
