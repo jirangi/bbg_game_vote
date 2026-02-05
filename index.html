@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Game Archive v6.0.6</title>
+    <title>Game Archive v6.0.7</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -15,6 +15,7 @@
         .modal.active { display: flex; }
         #global-back-btn { position: fixed; top: 24px; left: 20px; z-index: 9000; background: #1e293b; color: #60a5fa; padding: 10px 18px; border-radius: 14px; border: 1px solid rgba(96, 165, 250, 0.3); font-weight: 900; display: none; cursor: pointer; }
         .force-clickable { position: relative; z-index: 1000 !important; cursor: pointer !important; pointer-events: auto !important; }
+        .game-name-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px; font-weight: 800; display: block; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
     </style>
@@ -25,7 +26,7 @@
     <div id="page-login" class="page pt-24 max-w-sm mx-auto text-center font-bold">
         <div class="glass p-8 rounded-3xl shadow-2xl">
             <h2 class="text-2xl font-extrabold mb-8 text-blue-400 italic">Game Archive</h2>
-            <div class="space-y-4">
+            <div class="space-y-4 font-bold">
                 <input type="text" id="pin" placeholder="PIN" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none text-white font-bold">
                 <input type="password" id="pw" placeholder="비밀번호" maxlength="4" oninput="if(this.value.length===4) login()" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none text-white font-bold">
                 <button onclick="login()" class="w-full bg-blue-600 py-4 rounded-xl font-extrabold shadow-lg mt-2 font-bold">접속</button>
@@ -37,14 +38,11 @@
         <div class="flex justify-between items-center mb-6 px-4">
             <div class="flex items-center gap-3 p-2 force-clickable" onclick="toggleProfileModal(true)">
                 <img id="my-profile-icon" src="" class="w-12 h-12 rounded-full border-2 border-blue-500 shadow-xl object-cover bg-slate-800" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3241/3241724.png'">
-                <div class="text-left font-bold">
-                    <span id="user-welcome" class="text-blue-300 text-sm font-black block"></span>
-                    <span class="text-[9px] text-gray-500 font-bold">My Profile ></span>
-                </div>
+                <div class="text-left font-bold"><span id="user-welcome" class="text-blue-300 text-sm font-black block"></span><span class="text-[9px] text-gray-500 font-bold">My Profile ></span></div>
             </div>
             <button onclick="logout()" class="text-gray-500 text-xs border border-white/10 px-3 py-1.5 rounded-lg force-clickable font-bold">로그아웃</button>
         </div>
-        <div id="admin-entry" class="hidden px-4 mb-6 text-right"><button onclick="openAdmin()" class="text-[10px] bg-red-500/20 text-red-400 border border-red-500/30 px-4 py-2 rounded-xl font-black force-clickable">⚙️ 관리자 설정</button></div>
+        <div id="admin-entry" class="hidden px-4 mb-6 text-right font-bold"><button onclick="openAdmin()" class="text-[10px] bg-red-500/20 text-red-400 border border-red-500/30 px-4 py-2 rounded-xl font-black force-clickable font-bold">⚙️ 관리자 설정</button></div>
         <h1 class="text-4xl font-extrabold mb-12 italic text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 uppercase tracking-tighter">Game Archive</h1>
         <div class="flex flex-wrap justify-center gap-3 mb-10 px-4 font-bold">
             <button onclick="showPage('page-stats')" class="bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-6 py-4 rounded-2xl font-extrabold hover:bg-yellow-500 transition shadow-lg force-clickable font-bold">🏆 명예전당</button>
@@ -58,68 +56,93 @@
         </div>
     </div>
 
-    <div id="page-chat-info" class="page pt-24 text-center font-bold">
-        <h2 class="text-3xl font-black text-blue-400 mb-10 italic uppercase">단톡방 정보 📢</h2>
-        <div class="px-4 space-y-6">
-            <div class="glass p-8 rounded-[40px] text-left border border-blue-500/20 shadow-2xl">
-                <h3 class="text-blue-300 font-black mb-4">💬 공식 오픈채팅방</h3>
-                <p class="text-sm text-gray-400 leading-relaxed mb-6 font-bold">
-                    모임 공지 및 실시간 소통이 이루어지는 공간입니다. <br>
-                    참여 후 공지사항의 필독 사항을 반드시 확인해 주세요.
-                </p>
-                <a href="#" class="inline-block bg-blue-600 px-8 py-4 rounded-2xl font-black text-sm shadow-lg hover:bg-blue-500 transition">단톡방 입장하기</a>
-            </div>
-            
-            <div class="glass p-8 rounded-[40px] text-left border border-white/5">
-                <h3 class="text-purple-400 font-black mb-4">📡 디스코드 채널</h3>
-                <p class="text-sm text-gray-400 leading-relaxed font-bold">
-                    음성 채팅 및 게임 관련 자료 공유가 이루어집니다. <br>
-                    보드게임/지니어스 룰 설명 시 주로 사용됩니다.
-                </p>
-            </div>
+    <div id="page-rank" class="page pt-24 font-bold">
+        <div class="px-4 mb-4"><input type="text" id="game-search" oninput="renderList()" placeholder="🔍 게임 검색..." class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none text-sm font-bold shadow-inner"></div>
+        <div class="px-4 mb-4 flex justify-between items-center font-bold">
+            <h2 id="rank-title" class="text-2xl font-black italic text-blue-400 uppercase"></h2>
         </div>
-    </div>
-
-    <div id="page-stats" class="page pt-24 text-center font-bold">
-        <h2 class="text-3xl font-black text-yellow-400 mb-10 italic uppercase">명예전당 🏆</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 px-4">
-            <div class="space-y-4">
-                <h3 class="text-blue-400 font-black italic">🗳️ Voting King</h3>
-                <div id="vote-king" class="space-y-3 font-bold"></div>
-            </div>
-            <div class="space-y-4">
-                <h3 class="text-green-400 font-black italic">🆕 Creator King</h3>
-                <div id="game-add-king" class="space-y-3 font-bold"></div>
-            </div>
+        <div class="glass rounded-[40px] overflow-hidden mx-4 shadow-2xl border border-white/5 font-bold">
+            <table class="w-full text-center table-fixed border-collapse">
+                <thead><tr class="bg-white/5 text-gray-500 text-[10px] border-b border-white/10 font-black"><th class="p-4 w-12 text-center">#</th><th class="p-4 text-left">정보</th><th class="w-24 text-center">평가</th><th class="w-20">기록</th></tr></thead>
+                <tbody id="rank-list" class="divide-y divide-white/5 font-bold"></tbody>
+            </table>
         </div>
+        <div class="px-4 mt-6 text-center font-bold font-bold"><button onclick="addGame()" class="bg-blue-600/20 text-blue-400 border border-blue-500/30 px-8 py-3 rounded-2xl text-xs font-bold font-bold">+ 새 게임 추가</button></div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, getDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, query, where, serverTimestamp, arrayUnion, addDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyBVp-GgD8Ts-tGw5itr9Av_MnZAt-U4teE", authDomain: "game-archive-afacf.firebaseapp.com", projectId: "game-archive-afacf", storageBucket: "game-archive-afacf.firebasestorage.app", messagingSenderId: "927042381268", appId: "1:927042381268:web:e41f4106cf9202e45ca241" };
         const app = initializeApp(firebaseConfig); const db = getFirestore(app);
         const DEFAULT_ICON = 'https://cdn-icons-png.flaticon.com/512/3241/3241724.png';
-        let currentUser = null; 
+        let currentUser = null; let selectedCategory = "";
 
-        // [v6.0.6 단톡방 정보 로딩 엔진 (추후 Firestore 연동 가능)]
-        async function loadChatInfo() {
-            console.log("단톡방 정보를 불러옵니다.");
-            // 현재는 UI 고정 상태이나, 추후 Firestore 'notices' 컬렉션에서 불러오는 로직을 여기에 삽입합니다.
-        }
+        // [v6.0.7 게임 보드 렌더링 엔진]
+        window.renderList = async () => {
+            const list = document.getElementById('rank-list');
+            list.innerHTML = `<tr><td colspan="4" class="p-10 opacity-30 text-center font-bold">로딩 중...</td></tr>`;
+            
+            const search = document.getElementById('game-search').value.toLowerCase();
+            const [gS, rS] = await Promise.all([
+                getDocs(query(collection(db, "games"), where("category", "==", selectedCategory))),
+                getDocs(collection(db, "ratings"))
+            ]);
 
-        // 명예의 전당 로딩 (v6.0.5 유지)
-        async function loadStats() {
-            const [rS, gS, uS] = await Promise.all([getDocs(collection(db, "ratings")), getDocs(collection(db, "games")), getDocs(collection(db, "users"))]);
-            const uMap = uS.docs.reduce((acc, d) => ({...acc, [d.id]: d.data().name}), {});
-            const vC = rS.docs.map(d=>d.data()).reduce((acc, r) => { if(r.userPin) acc[r.userPin] = (acc[r.userPin]||0)+1; return acc; }, {});
-            document.getElementById('vote-king').innerHTML = Object.entries(vC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(v => `<div class='p-4 glass rounded-2xl flex justify-between items-center font-bold'><span>${uMap[v[0]] || '?'}</span><b class='text-blue-400'>${v[1]}회</b></div>`).join('') || "데이터 없음";
-            const gC = gS.docs.map(d=>d.data()).reduce((acc, g) => { if(g.creatorPin) acc[g.creatorPin] = (acc[g.creatorPin]||0)+1; return acc; }, {});
-            document.getElementById('game-add-king').innerHTML = Object.entries(gC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(g => `<div class='p-4 glass rounded-2xl flex justify-between items-center font-bold'><span>${uMap[g[0]] || '?'}</span><b class='text-green-400'>${g[1]}개</b></div>`).join('') || "데이터 없음";
-        }
+            const rt = rS.docs.map(d => d.data());
+            let gms = gS.docs.map(d => {
+                const r = rt.filter(v => v.gameId === d.id);
+                const sc = r.map(v => v.score || 0);
+                const df = r.map(v => v.difficulty || 0).filter(v => v > 0);
+                return { 
+                    id: d.id, 
+                    ...d.data(), 
+                    avgScore: sc.length > 0 ? sc.reduce((a,c)=>a+c,0)/sc.length : 0, 
+                    avgDiff: df.length > 0 ? df.reduce((a,c)=>a+c,0)/df.length : 0 
+                };
+            }).filter(g => g.name.toLowerCase().includes(search));
 
-        // 공통 페이지 제어 로직
+            gms.sort((a, b) => b.avgScore - a.avgScore);
+
+            list.innerHTML = gms.map((g, i) => `
+                <tr class="hover:bg-white/5 border-b border-white/5 transition font-bold">
+                    <td class="p-4 text-blue-400 font-black text-center w-12 font-bold">${i < 3 ? '🥇' : '#'+(i+1)}</td>
+                    <td class="p-4 text-left font-bold"><span class="game-name-text text-sm font-black font-bold font-bold">${g.name}</span></td>
+                    <td class="p-2 text-center w-24 btn-priority" onclick="event.stopPropagation();">
+                        <div class="flex flex-col items-center">
+                            <span onclick="alert('점수 투표(준비중)')" class="text-yellow-400 text-base font-black cursor-pointer font-bold">${g.avgScore.toFixed(1)}</span>
+                            <span onclick="alert('난이도 투표(준비중)')" class="text-[8px] text-blue-400 cursor-pointer font-bold">${'★'.repeat(Math.round(g.avgDiff))}</span>
+                        </div>
+                    </td>
+                    <td class="p-4 w-20 text-center font-bold btn-priority"><button onclick="alert('기록 리스트(준비중)')" class="bg-green-600/20 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-lg text-[10px] font-black font-bold">기록</button></td>
+                </tr>`).join('');
+        };
+
+        // [2.5 새 게임 추가 기능]
+        window.addGame = async () => {
+            const name = prompt("추가할 게임 이름을 입력하세요:");
+            if (!name) return;
+            try {
+                await addDoc(collection(db, "games"), {
+                    name: name,
+                    category: selectedCategory,
+                    creatorPin: currentUser.pin,
+                    createdAt: serverTimestamp()
+                });
+                renderList();
+            } catch(e) { alert("추가 실패"); }
+        };
+
+        // 내비게이션 및 기초 함수
+        window.navTo = (cat) => {
+            selectedCategory = cat;
+            document.getElementById('rank-title').innerText = cat;
+            document.getElementById('game-search').value = "";
+            renderList();
+            showPage('page-rank');
+        };
+
         window.showPage = (id, push=true) => {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             const t = document.getElementById(id); if(t) { 
@@ -127,11 +150,10 @@
                 document.getElementById('global-back-btn').style.display = (id === 'page-home' || id === 'page-login') ? 'none' : 'block'; 
                 if(push) history.pushState({page: id}, '', ''); 
                 if(id === 'page-stats') loadStats();
-                if(id === 'page-chat-info') loadChatInfo();
             }
         };
 
-        // 기타 기초 함수 생략 (로그인, 로그아웃 등 v6.0.5와 동일)
+        // 나머지 기초 로직 (로그인 등)은 v6.0.6 유지
         window.login = async () => {
             const p = document.getElementById('pin').value.trim();
             const w = document.getElementById('pw').value.trim();
@@ -164,7 +186,6 @@
 
         window.handleBack = () => { if(document.querySelector('.modal.active')) document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); else showPage('page-home'); };
         window.logout = () => { localStorage.removeItem('game_archive_auth'); location.reload(); };
-        window.navTo = (cat) => alert(cat + " 페이지 이동 (v6.0.7 구현 예정)");
         window.toggleModal = (id, s) => document.getElementById(id).classList.toggle('active', s);
     </script>
 </body>
