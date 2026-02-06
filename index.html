@@ -49,8 +49,8 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4 font-bold">
             <button onclick="navTo('보드게임')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition">🎲 보드게임</button>
             <button onclick="navTo('지니어스')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition">🧠 지니어스</button>
-            <button onclick="navTo('방탈출')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition font-bold">🔑 방탈출</button>
-            <button onclick="navTo('머더 미스테리')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition font-bold">🕵️ 머더 미스테리</button>
+            <button onclick="navTo('방탈출')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition">🔑 방탈출</button>
+            <button onclick="navTo('머더 미스테리')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition">🕵️ 머더 미스테리</button>
         </div>
     </div>
 
@@ -63,12 +63,14 @@
                 <a href="#" class="inline-block bg-blue-600 px-8 py-4 rounded-2xl font-black text-sm shadow-lg">단톡방 입장하기</a>
             </div>
             
-            <div id="admin-notice-write" class="hidden glass p-4 rounded-[30px] border border-green-500/20">
-                <textarea id="notice-input" class="w-full bg-transparent border-none outline-none text-sm p-2 text-white h-20 resize-none font-bold" placeholder="공지사항 작성..."></textarea>
+            <div id="admin-notice-write" class="hidden glass p-6 rounded-[30px] border border-green-500/20 text-left">
+                <div class="mb-2 text-xs text-green-400 font-black uppercase">New Notice</div>
+                <input id="notice-title" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none text-sm font-bold mb-2" placeholder="제목을 입력하세요">
+                <textarea id="notice-input" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none text-sm h-24 resize-none font-bold" placeholder="내용을 입력하세요..."></textarea>
                 <button id="notice-submit-btn" class="w-full bg-green-600 py-3 rounded-xl font-black text-xs mt-2 shadow-lg">공지 등록</button>
             </div>
 
-            <div id="notice-list" class="space-y-4 pb-10"></div>
+            <div id="notice-list" class="space-y-6 pb-10"></div>
         </div>
     </div>
 
@@ -92,14 +94,16 @@
         const DEFAULT_ICON = 'https://cdn-icons-png.flaticon.com/512/3241/3241724.png';
         let currentUser = null; let selectedCategory = ""; let activeGameId = null; let activeGameName = ""; let activeScheduleId = null; let activeScheduleData = null; let tempRanks = []; let selMembersGlobal = [];
 
-        // [v6.3.3 핵심 수리: 공지 등록 클릭 바인딩 및 정렬]
+        // [v6.3.3 공지사항 로직 수리 (등록, 수정, 삭제, 정렬)]
         document.getElementById('notice-submit-btn').addEventListener('click', async () => {
-            const txt = document.getElementById('notice-input').value.trim();
-            if(!txt) return alert("내용을 입력하세요.");
+            const title = document.getElementById('notice-title').value.trim();
+            const text = document.getElementById('notice-input').value.trim();
+            if(!title || !text) return alert("제목과 내용을 모두 입력하세요.");
             if(currentUser.pin !== '100') return alert("관리자만 작성 가능합니다.");
             
             try {
-                await addDoc(collection(db, "notices"), { text: txt, writerName: currentUser.name, createdAt: serverTimestamp() });
+                await addDoc(collection(db, "notices"), { title: title, text: text, writerName: currentUser.name, createdAt: serverTimestamp() });
+                document.getElementById('notice-title').value = "";
                 document.getElementById('notice-input').value = "";
                 alert("등록되었습니다.");
                 window.loadNotices();
@@ -110,36 +114,63 @@
             const list = document.getElementById('notice-list');
             list.innerHTML = `<p class="text-xs text-gray-500 font-bold">공지 로딩 중...</p>`;
             try {
-                // orderBy 없이 쿼리 -> 클라이언트 정렬로 인덱스 오류 방지
                 const q = query(collection(db, "notices"));
                 const snap = await getDocs(q);
-                
-                // 최신순 정렬 (timestamp 비교)
+                // 최신순 정렬 (Client-side)
                 const notices = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
                 
                 list.innerHTML = notices.length ? notices.map(n => {
                     const date = n.createdAt ? new Date(n.createdAt.seconds*1000).toLocaleDateString() : "-";
-                    return `<div class="glass p-6 rounded-3xl text-left border border-white/10 relative">
-                        <div class="text-[10px] text-blue-400 mb-2 font-bold">${date} • ${n.writerName}</div>
-                        <div class="text-sm font-bold whitespace-pre-wrap leading-relaxed">${n.text}</div>
-                        ${currentUser.pin === '100' ? `<button onclick="window.delNotice('${n.id}')" class="absolute top-4 right-4 text-red-500 hover:text-white border border-red-500/30 hover:bg-red-500 px-3 py-1 rounded-lg text-xs font-black transition">삭제</button>` : ''}
+                    // v6.3.3 디자인 통일: Chat Room Box 스타일 적용
+                    return `<div class="glass p-8 rounded-[40px] text-left border border-white/10 shadow-2xl relative group">
+                        <h3 class="text-blue-300 font-black mb-4">${n.title || '공지사항'}</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed mb-2 whitespace-pre-wrap">${n.text}</p>
+                        <div class="text-[10px] text-gray-600 font-bold">${date} • ${n.writerName}</div>
+                        ${currentUser.pin === '100' ? `
+                            <div class="absolute top-6 right-6 flex gap-2">
+                                <button onclick="editNotice('${n.id}', '${n.title}', \`${n.text}\`)" class="text-blue-500/50 hover:text-blue-500 text-xs font-black border border-blue-500/20 px-2 py-1 rounded">수정</button>
+                                <button onclick="deleteNotice('${n.id}')" class="text-red-500/50 hover:text-red-500 text-xs font-black border border-red-500/20 px-2 py-1 rounded">삭제</button>
+                            </div>` : ''}
                     </div>`;
                 }).join('') : `<p class="text-xs text-gray-500 font-bold">등록된 공지가 없습니다.</p>`;
             } catch(e) { console.error(e); list.innerHTML = `<p class="text-xs text-red-400">로드 실패</p>`; }
         };
 
-        window.delNotice = async (id) => {
-            if(confirm("이 공지를 삭제하시겠습니까?")) {
+        window.editNotice = async (id, oldTitle, oldText) => {
+            const newTitle = prompt("수정할 제목:", oldTitle);
+            if(newTitle === null) return;
+            const newText = prompt("수정할 내용:", oldText);
+            if(newText === null) return;
+            
+            try {
+                await setDoc(doc(db, "notices", id), { title: newTitle, text: newText }, { merge: true });
+                alert("수정되었습니다.");
+                window.loadNotices();
+            } catch(e) { alert("수정 실패"); }
+        };
+
+        window.deleteNotice = async (id) => {
+            if(confirm("정말 삭제하시겠습니까?")) {
                 await deleteDoc(doc(db, "notices", id));
                 window.loadNotices();
             }
         };
 
-        // ... [기타 기능: 로그인, 모달, 기록, 상세 등 v6.3.2 코드 유지]
+        // ... [기타 기능 유지]
+        window.showPage = (id) => { 
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
+            document.getElementById(id).classList.add('active'); 
+            document.getElementById('global-back-btn').style.display = (id === 'page-home' || id === 'page-login') ? 'none' : 'block'; 
+            if(id === 'page-chat-info') {
+                document.getElementById('admin-notice-write').classList.toggle('hidden', currentUser?.pin !== '100');
+                window.loadNotices();
+            }
+            if(id === 'page-stats') window.loadStats();
+        };
+        // ... (이하 동일)
         window.login = async () => { const p = document.getElementById('pin').value.trim(); const w = document.getElementById('pw').value.trim(); if(!p||!w)return; try { const snap = await getDoc(doc(db,"users",String(p))); if (snap.exists() && String(snap.data().password) === String(w)) { currentUser = { pin: String(p), ...snap.data() }; localStorage.setItem('game_archive_auth', JSON.stringify({ pin: String(p), pw: String(w) })); document.getElementById('admin-btn').classList.toggle('hidden', String(p) !== '100'); showPage('page-home'); } else alert("정보 불일치"); } catch(e) {} };
         window.logout = () => { localStorage.removeItem('game_archive_auth'); location.reload(); };
         window.addEventListener('DOMContentLoaded', async () => { const auth = localStorage.getItem('game_archive_auth'); if (auth) { const d = JSON.parse(auth); try { const snap = await getDoc(doc(db,"users",String(d.pin))); if (snap.exists()) { currentUser = { pin: String(d.pin), ...snap.data() }; document.getElementById('user-welcome').innerText = `${currentUser.name}님`; document.getElementById('my-profile-icon').src = currentUser.iconUrl || DEFAULT_ICON; document.getElementById('admin-btn').classList.toggle('hidden', String(d.pin) !== '100'); showPage('page-home'); return; } } catch(e) {} } showPage('page-login'); });
-        window.showPage = (id, p=true) => { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); const el = document.getElementById(id); if(el) { el.classList.add('active'); document.getElementById('global-back-btn').style.display = (id === 'page-home' || id === 'page-login') ? 'none' : 'block'; if(p) history.pushState({page: id}, '', ''); if(id==='page-chat-info') { document.getElementById('admin-notice-write').classList.toggle('hidden', currentUser?.pin!=='100'); window.loadNotices(); } if(id==='page-stats') window.loadStats(); } };
         window.navTo = (cat) => { selectedCategory = cat; document.getElementById('rank-title').innerText = cat; renderList(); showPage('page-rank'); };
         window.openModal = (id) => { const el = document.getElementById(id); if(el) { el.classList.add('active'); history.pushState({modal: id}, '', ''); } };
         window.closeModal = () => { if(document.querySelector('.modal.active')) history.back(); };
@@ -153,16 +184,15 @@
         window.openScheduleDetail = async (sid) => { activeScheduleId = sid; const [sS, uS] = await Promise.all([getDoc(doc(db,"schedules",sid)), getDocs(collection(db,"users"))]); activeScheduleData = sS.data(); const uMap = uS.docs.reduce((acc,doc)=>({...acc, [doc.id]:doc.data().name}), {}); document.getElementById('detail-title').innerText = activeScheduleData.gameName; document.getElementById('detail-date-display').innerText = "📅 " + (activeScheduleData.date || "미기록"); document.getElementById('murder-character-box').classList.toggle('hidden', activeScheduleData.gameCategory !== '머더 미스테리'); document.getElementById('rank-edit-trigger').style.display = 'block'; const res = activeScheduleData.ranks || []; const rankDiv = document.getElementById('detail-rank-result'); if(activeScheduleData.gameCategory === '보드게임') rankDiv.innerHTML = res.map((p,i)=>`<div class="flex justify-between py-1 border-b border-white/5 font-bold"><span>${i+1}등</span><span>${uMap[p]||'?'}</span></div>`).join('') || "순위 미기록"; else { const winT = activeScheduleData.gameCategory === '방탈출' ? '성공' : (activeScheduleData.gameCategory === '지니어스' ? '우승' : '승리'); const loseT = activeScheduleData.gameCategory === '방탈출' ? '실패' : (activeScheduleData.gameCategory === '지니어스' ? '참여' : '패배'); rankDiv.innerHTML = activeScheduleData.members.map(p => `<div class="flex justify-between py-1 border-b border-white/5"><span class="${res.includes(String(p))?'text-yellow-400':'text-gray-500'}">${res.includes(String(p))?winT:loseT}</span><span>${uMap[p]||'?'}${activeScheduleData.characters?.[p]?` (${activeScheduleData.characters[p]})`:''}</span></div>`).join(''); } document.getElementById('detail-comment-feed').innerHTML = (activeScheduleData.feed || []).map((f, i) => `<div class="bg-white/5 p-3 rounded-xl border border-white/5 flex justify-between items-start font-bold"><div class="flex-1"><b>${uMap[f.userPin] || '?'}:</b> ${f.text}</div>${f.userPin === currentUser.pin ? `<button onclick="deleteComment(${i})" class="text-red-400/30 text-[10px] font-black ml-2 px-1 hover:text-red-500">X</button>` : ''}</div>`).join('') || "코멘트 없음"; openModal('detail-modal'); };
         window.enableRankEdit = async () => { if(!activeScheduleId) return; const slots = document.getElementById('rank-edit-slots'); const chips = document.getElementById('rank-edit-chips'); const uS = await getDocs(collection(db,"users")); const uMap = uS.docs.reduce((acc,doc)=>({...acc, [doc.id]:doc.data().name}), {}); tempRanks = [...(activeScheduleData.ranks || [])]; document.getElementById('rank-edit-title').innerText = activeGameName + " 수정"; openModal('rank-edit-modal'); const rUI = () => { if(selectedCategory === '보드게임') { slots.innerHTML = Array.from({length: activeScheduleData.members.length}).map((_,i) => `<div class="rank-slot ${tempRanks[i]?'filled':''}" onclick="window.remR(${i})"><b>${i+1}등:</b> ${uMap[tempRanks[i]] || '선택 대기'}</div>`).join(''); document.getElementById('rank-complete-btn').style.display = 'none'; } else { const winTxt = selectedCategory === '방탈출' ? '성공' : (selectedCategory === '지니어스' ? '우승' : '승리'); slots.innerHTML = `<div class='p-3 bg-white/5 rounded-2xl text-xs mb-2 font-bold'>${winTxt}자 선택</div><div class='grid grid-cols-2 gap-2'>${tempRanks.map(p=>`<div class='p-3 bg-blue-600/20 rounded-xl flex justify-between'><span>${uMap[p]}</span><button onclick="window.remR(${tempRanks.indexOf(p)})">✕</button></div>`).join('')}</div>`; document.getElementById('rank-complete-btn').style.display = 'block'; } chips.innerHTML = activeScheduleData.members.map(p => `<button onclick="window.addR('${p}')" class="member-chip ${tempRanks.includes(p)?'opacity-20 pointer-events-none':''} font-bold">${uMap[p]}</button>`).join(''); }; window.remR = (i) => { tempRanks.splice(i, 1); rUI(); }; window.addR = (p) => { if(!tempRanks.includes(p)) tempRanks.push(p); rUI(); if(selectedCategory === '보드게임' && tempRanks.length === activeScheduleData.members.length) window.saveRankResult(); }; window.saveRankResult = async () => { await updateDoc(doc(db, "schedules", activeScheduleId), { ranks: tempRanks }); closeModal(); openScheduleDetail(activeScheduleId); }; rUI(); };
         window.navToD = async (cat, gid, gname, sid) => { closeModal(); selectedCategory = cat; navTo(cat); await openSchedules(gid, gname); openScheduleDetail(sid); };
-        window.confirmDelete = async () => { if(confirm("삭제하시겠습니까?")) { await deleteDoc(doc(db,"schedules",activeScheduleId)); closeModal(); openSchedules(activeGameId, activeGameName); } };
-        window.enableDateEdit = () => { const d = document.getElementById('detail-date-display'); const i = document.getElementById('detail-date-input'); d.classList.add('hidden'); i.classList.remove('hidden'); i.value = activeScheduleData.date || ""; i.focus(); };
-        window.updateDate = async (v) => { try { await updateDoc(doc(db,"schedules",activeScheduleId), {date:v}); activeScheduleData.date=v; document.getElementById('detail-date-display').innerText="📅 "+v; document.getElementById('detail-date-display').classList.remove('hidden'); document.getElementById('detail-date-input').classList.add('hidden'); } catch(e){} };
+        window.toggleProfileModal = async (s) => { if(s && currentUser) { document.getElementById('display-name').innerText = currentUser.name; document.getElementById('profile-preview').src = currentUser.iconUrl || DEFAULT_ICON; openModal('profile-modal'); const snap = await getDocs(query(collection(db, "schedules"), where("members", "array-contains", String(currentUser.pin)))); const getResTxt = (c, p, r) => { const w = (r||[]).includes(String(p)); if(c==='보드게임') return w?`${r.indexOf(String(p))+1}등`:'미기록'; if(c==='방탈출') return w?'성공':'실패'; if(c==='지니어스') return w?'우승':'참여'; if(c==='머더 미스테리') return w?'승리':'패배'; return '참석'; }; document.getElementById('my-history-list').innerHTML = snap.docs.map(d => `<div onclick="window.navToD('${d.data().gameCategory}','${d.data().gameId}','${d.data().gameName}','${d.id}')" class="bg-white/5 p-4 rounded-2xl border border-white/5 mb-1 cursor-pointer flex justify-between items-center font-bold"><div class="text-left font-bold"><div class="text-[9px] text-blue-400 font-black">${d.data().gameCategory} | <span class="text-yellow-400">${getResTxt(d.data().gameCategory, currentUser.pin, d.data().ranks)}</span></div><div class="text-sm font-black">${d.data().gameName}</div></div><span class="text-blue-400 text-xs font-bold">▶</span></div>`).join('') || "기록 없음"; } };
+        window.loadStats = async () => { try { const [rS, gS, uS] = await Promise.all([getDocs(collection(db, "ratings")), getDocs(collection(db, "games")), getDocs(collection(db, "users"))]); const uMap = uS.docs.reduce((acc, d) => ({...acc, [d.id]: d.data().name}), {}); const vC = rS.docs.map(d=>d.data()).reduce((acc, r) => { if(r.userPin) acc[r.userPin] = (acc[r.userPin]||0)+1; return acc; }, {}); document.getElementById('vote-king').innerHTML = Object.entries(vC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(v => `<div class='p-4 glass rounded-2xl flex justify-between items-center font-bold'><span>${uMap[v[0]] || '?'}</span><b class='text-blue-400'>${v[1]}회</b></div>`).join(''); const gC = gS.docs.map(d=>d.data()).reduce((acc, g) => { if(g.creatorPin) acc[g.creatorPin] = (acc[g.creatorPin]||0)+1; return acc; }, {}); document.getElementById('game-add-king').innerHTML = Object.entries(gC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(g => `<div class='p-4 glass rounded-2xl flex justify-between items-center font-bold'><span>${uMap[g[0]] || '?'}</span><b class='text-green-400'>${g[1]}개</b></div>`).join(''); } catch(e) {} };
+        window.saveCharacter = async () => { const c = document.getElementById('character-input').value.trim(); if(!c) return; const chars = activeScheduleData.characters || {}; chars[currentUser.pin] = c; await updateDoc(doc(db,"schedules",activeScheduleId), {characters: chars}); document.getElementById('character-input').value=""; openScheduleDetail(activeScheduleId); };
         window.submitComment = async () => { const i = document.getElementById('comment-input'); if(!i.value.trim()) return; await updateDoc(doc(db,"schedules",activeScheduleId), {feed: arrayUnion({userPin:String(currentUser.pin),text:i.value.trim(),createdAt:new Date().toISOString()})}); i.value=""; openScheduleDetail(activeScheduleId); };
         window.deleteComment = async (idx) => { if(!confirm("삭제?")) return; const nF = [...activeScheduleData.feed]; nF.splice(idx,1); await updateDoc(doc(db,"schedules",activeScheduleId), {feed:nF}); openScheduleDetail(activeScheduleId); };
-        window.saveCharacter = async () => { const c = document.getElementById('character-input').value.trim(); if(!c) return; const chars = activeScheduleData.characters || {}; chars[currentUser.pin] = c; await updateDoc(doc(db,"schedules",activeScheduleId), {characters: chars}); document.getElementById('character-input').value=""; openScheduleDetail(activeScheduleId); };
-        window.loadStats = async () => { try { const [rS, gS, uS] = await Promise.all([getDocs(collection(db, "ratings")), getDocs(collection(db, "games")), getDocs(collection(db, "users"))]); const uMap = uS.docs.reduce((acc, d) => ({...acc, [d.id]: d.data().name}), {}); const vC = rS.docs.map(d=>d.data()).reduce((acc, r) => { if(r.userPin) acc[r.userPin] = (acc[r.userPin]||0)+1; return acc; }, {}); document.getElementById('vote-king').innerHTML = Object.entries(vC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(v => `<div class='p-4 glass rounded-2xl flex justify-between items-center font-bold'><span>${uMap[v[0]] || '?'}</span><b class='text-blue-400'>${v[1]}회</b></div>`).join(''); const gC = gS.docs.map(d=>d.data()).reduce((acc, g) => { if(g.creatorPin) acc[g.creatorPin] = (acc[g.creatorPin]||0)+1; return acc; }, {}); document.getElementById('game-add-king').innerHTML = Object.entries(gC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(g => `<div class='p-4 glass rounded-2xl flex justify-between items-center font-bold'><span>${uMap[g[0]] || '?'}</span><b class='text-green-400'>${g[1]}개</b></div>`).join(''); } catch(e) {} };
+        window.confirmDelete = async () => { if(confirm("삭제하시겠습니까?")) { await deleteDoc(doc(db,"schedules",activeScheduleId)); closeModal(); openSchedules(activeGameId, activeGameName); } };
+        window.enableDateEdit = () => { document.getElementById('detail-date-display').classList.add('hidden'); document.getElementById('detail-date-input').classList.remove('hidden'); document.getElementById('detail-date-input').value=activeScheduleData.date||""; document.getElementById('detail-date-input').focus(); };
+        window.updateDate = async (v) => { try { await updateDoc(doc(db,"schedules",activeScheduleId), {date:v}); activeScheduleData.date=v; document.getElementById('detail-date-display').innerText="📅 "+v; document.getElementById('detail-date-display').classList.remove('hidden'); document.getElementById('detail-date-input').classList.add('hidden'); } catch(e){} };
         window.addGame = async () => { const n = prompt("게임 이름:"); if(n) { await addDoc(collection(db,"games"), {name:n, category:selectedCategory, creatorPin:currentUser.pin, createdAt:serverTimestamp()}); renderList(); } };
-        const getResTxt = (cat, pin, ranks) => { const isWin = (ranks||[]).includes(String(pin)); if(cat==='보드게임') return isWin?`${ranks.indexOf(String(pin))+1}등`:'미기록'; if(cat==='방탈출') return isWin?'성공':'실패'; if(cat==='지니어스') return isWin?'우승':'참여'; if(cat==='머더 미스테리') return isWin?'승리':'패배'; return '참석'; };
-        window.toggleProfileModal = async (s) => { if(s && currentUser) { document.getElementById('display-name').innerText = currentUser.name; document.getElementById('profile-preview').src = currentUser.iconUrl || DEFAULT_ICON; openModal('profile-modal'); const snap = await getDocs(query(collection(db, "schedules"), where("members", "array-contains", String(currentUser.pin)))); document.getElementById('my-history-list').innerHTML = snap.docs.map(d => `<div onclick="window.navToD('${d.data().gameCategory}','${d.data().gameId}','${d.data().gameName}','${d.id}')" class="bg-white/5 p-4 rounded-2xl border border-white/5 mb-1 cursor-pointer flex justify-between items-center font-bold"><div class="text-left font-bold"><div class="text-[9px] text-blue-400 font-black">${d.data().gameCategory} | <span class="text-yellow-400">${getResTxt(d.data().gameCategory, currentUser.pin, d.data().ranks)}</span></div><div class="text-sm font-black">${d.data().gameName}</div></div><span class="text-blue-400 text-xs font-bold">▶</span></div>`).join('') || "기록 없음"; } };
     </script>
 </body>
 </html>
