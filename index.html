@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Game Archive v6.3.4</title>
+    <title>Game Archive v6.4.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -58,26 +58,46 @@
     <div id="page-chat-info" class="page pt-24 text-center font-bold">
         <h2 class="text-3xl font-black text-blue-400 mb-10 italic uppercase">단톡방 정보 📢</h2>
         <div class="px-4 space-y-6">
-            
             <div id="admin-notice-write" class="hidden glass p-6 rounded-[30px] border border-green-500/20 text-left">
                 <div class="mb-3 text-xs text-green-400 font-black uppercase">✨ New Notice</div>
-                <input id="notice-title" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none text-sm font-bold mb-2 placeholder-gray-500" placeholder="제목 (예: 2월 정모 안내)">
-                <textarea id="notice-input" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none text-sm h-20 resize-none font-bold mb-2 placeholder-gray-500" placeholder="내용을 입력하세요..."></textarea>
-                
+                <input id="notice-title" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none text-sm font-bold mb-2 placeholder-gray-500" placeholder="제목">
+                <textarea id="notice-input" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none text-sm h-20 resize-none font-bold mb-2 placeholder-gray-500" placeholder="내용..."></textarea>
                 <div class="flex gap-2 mb-2">
-                    <input id="notice-link-text" class="w-1/3 bg-white/5 border border-white/10 p-3 rounded-xl outline-none text-xs font-bold placeholder-gray-500" placeholder="버튼명 (예: 입장)">
-                    <input id="notice-link-url" class="w-2/3 bg-white/5 border border-white/10 p-3 rounded-xl outline-none text-xs font-bold placeholder-gray-500" placeholder="URL (https://...)">
+                    <input id="notice-link-text" class="w-1/3 bg-white/5 border border-white/10 p-3 rounded-xl outline-none text-xs font-bold placeholder-gray-500" placeholder="버튼명">
+                    <input id="notice-link-url" class="w-2/3 bg-white/5 border border-white/10 p-3 rounded-xl outline-none text-xs font-bold placeholder-gray-500" placeholder="URL">
                 </div>
-
                 <button id="notice-submit-btn" class="w-full bg-green-600 py-3 rounded-xl font-black text-xs mt-2 shadow-lg">공지 등록</button>
             </div>
-
             <div id="notice-list" class="space-y-6 pb-10"></div>
         </div>
     </div>
 
-    <div id="page-stats" class="page pt-24 text-center font-bold"><h2 class="text-3xl font-black text-yellow-400 mb-10 italic uppercase">명예전당 🏆</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-6 px-4 font-bold"><div class="space-y-4"><h3 class="text-blue-400 font-black italic">🗳️ Voting King</h3><div id="vote-king" class="space-y-3"></div></div><div class="space-y-4 font-bold"><h3 class="text-green-400 font-black italic">🆕 Creator King</h3><div id="game-add-king" class="space-y-3 font-bold"></div></div></div></div>
-    <div id="page-rank" class="page pt-24 font-bold"><div class="px-4 mb-4"><h2 id="rank-title" class="text-2xl font-black italic text-blue-400 uppercase"></h2></div><div class="px-4 mb-4 flex flex-col gap-3 font-bold"><input type="text" id="game-search" oninput="renderList()" placeholder="🔍 게임 검색..." class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none text-sm font-bold shadow-inner font-bold"><button onclick="addGame()" class="w-full bg-blue-600/20 text-blue-400 border border-blue-500/30 py-3 rounded-2xl text-xs font-black font-bold">+ 새 게임 추가</button></div><div class="glass rounded-[40px] overflow-hidden mx-4 shadow-2xl border border-white/5 font-bold"><table class="w-full text-center table-fixed border-collapse"><thead><tr class="bg-white/5 text-gray-500 text-[10px] border-b border-white/10 font-black"><th class="p-4 w-10 text-center">#</th><th class="p-4 text-left">정보</th><th class="w-24 text-center">평가</th><th class="w-20">기록</th></tr></thead><tbody id="rank-list" class="divide-y divide-white/5 font-bold"></tbody></table></div></div>
+    <div id="page-stats" class="page pt-24 text-center font-bold">
+        <h2 class="text-3xl font-black text-yellow-400 mb-10 italic uppercase">명예전당 🏆</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 px-4 mb-6">
+            <div class="space-y-4"><h3 class="text-blue-400 font-black italic">🗳️ Voting King</h3><div id="vote-king" class="space-y-3"></div></div>
+            <div class="space-y-4"><h3 class="text-green-400 font-black italic">🆕 Creator King</h3><div id="game-add-king" class="space-y-3"></div></div>
+        </div>
+        <div class="px-4">
+            <h3 class="text-purple-400 font-black italic mb-4">💬 Best Reviews (Top 3)</h3>
+            <div id="best-reviews" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <div id="page-rank" class="page pt-24 font-bold">
+        <div class="px-4 mb-4"><h2 id="rank-title" class="text-2xl font-black italic text-blue-400 uppercase"></h2></div>
+        <div class="px-4 mb-4 flex flex-col gap-3 font-bold">
+            <input type="text" id="game-search" oninput="renderList()" placeholder="🔍 게임 검색..." class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none text-sm font-bold shadow-inner font-bold">
+            <button onclick="addGame()" class="w-full bg-blue-600/20 text-blue-400 border border-blue-500/30 py-3 rounded-2xl text-xs font-black font-bold">+ 새 게임 추가</button>
+        </div>
+        <div class="glass rounded-[40px] overflow-hidden mx-4 shadow-2xl border border-white/5 font-bold">
+            <table class="w-full text-center table-fixed border-collapse">
+                <thead><tr class="bg-white/5 text-gray-500 text-[10px] border-b border-white/10 font-black"><th class="p-4 w-10 text-center">#</th><th class="p-4 text-left">정보</th><th class="w-24 text-center">평가</th><th class="w-20">기록</th></tr></thead>
+                <tbody id="rank-list" class="divide-y divide-white/5 font-bold"></tbody>
+            </table>
+        </div>
+    </div>
+
     <div id="page-login" class="page pt-20 text-center font-bold active"><h1 class="text-4xl font-black mb-10 italic text-blue-500">GAME ARCHIVE</h1><div class="glass p-8 rounded-[40px] mx-4 space-y-4 font-bold"><input type="number" id="pin" placeholder="PIN 번호" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none text-center font-bold"><input type="password" id="pw" placeholder="PASSWORD (4자리)" maxlength="4" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none text-center font-bold" oninput="if(this.value.length===4) login()"><button onclick="login()" class="w-full bg-blue-600 py-4 rounded-2xl font-black text-white font-bold">입장하기</button></div></div>
 
     <div id="profile-modal" class="modal" onclick="if(event.target===this) closeModal()"><div class="glass w-full max-w-md p-8 rounded-[40px] flex flex-col text-center font-bold" onclick="event.stopPropagation()"><h3 class="text-3xl font-black text-blue-400 mb-8 uppercase italic">My Profile</h3><div class="flex flex-col items-center gap-4 mb-8 font-bold"><img id="profile-preview" src="" class="w-24 h-24 rounded-full border-4 border-blue-600 object-cover bg-slate-800"><div id="display-name" class="text-xl font-black"></div></div><h4 class="text-left text-[10px] text-gray-500 uppercase tracking-widest mb-4 ml-1">Attend History</h4><div id="my-history-list" class="flex-grow overflow-y-auto max-h-[300px] space-y-3 custom-scrollbar text-left font-bold"></div><button onclick="closeModal()" class="mt-6 text-gray-500 text-xs font-black uppercase">닫기</button></div></div>
@@ -89,128 +109,186 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, query, where, serverTimestamp, addDoc, arrayUnion, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, query, where, serverTimestamp, addDoc, arrayUnion, arrayRemove, deleteDoc, setDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyBVp-GgD8Ts-tGw5itr9Av_MnZAt-U4teE", authDomain: "game-archive-afacf.firebaseapp.com", projectId: "game-archive-afacf", storageBucket: "game-archive-afacf.firebasestorage.app", messagingSenderId: "927042381268", appId: "1:927042381268:web:e41f4106cf9202e45ca241" };
         const app = initializeApp(firebaseConfig); const db = getFirestore(app);
         const DEFAULT_ICON = 'https://cdn-icons-png.flaticon.com/512/3241/3241724.png';
         let currentUser = null; let selectedCategory = ""; let activeGameId = null; let activeGameName = ""; let activeScheduleId = null; let activeScheduleData = null; let tempRanks = []; let selMembersGlobal = [];
 
-        // [v6.3.4 핵심: 공지사항 인라인 수정 및 링크 버튼 엔진]
-        document.getElementById('notice-submit-btn').addEventListener('click', async () => {
-            const title = document.getElementById('notice-title').value.trim();
-            const text = document.getElementById('notice-input').value.trim();
-            const linkText = document.getElementById('notice-link-text').value.trim();
-            const linkUrl = document.getElementById('notice-link-url').value.trim();
+        // [v6.4.0 신규 기능: 뒤로가기 버튼 수리]
+        window.handleBack = () => {
+            if(document.querySelector('.modal.active')) {
+                history.back(); // 모달 닫기
+            } else if (document.getElementById('page-home').classList.contains('active')) {
+                // 홈에서는 아무 동작 안 함 (또는 브라우저 기본 뒤로가기)
+            } else {
+                showPage('page-home'); // 서브 페이지면 홈으로
+            }
+        };
 
-            if(!title || !text) return alert("제목과 내용을 입력하세요.");
-            if(currentUser.pin !== '100') return alert("관리자만 작성 가능합니다.");
-            
-            try {
-                await addDoc(collection(db, "notices"), { 
-                    title, text, writerName: currentUser.name, createdAt: serverTimestamp(),
-                    linkText, linkUrl 
-                });
-                // 입력폼 초기화
-                document.getElementById('notice-title').value = "";
-                document.getElementById('notice-input').value = "";
-                document.getElementById('notice-link-text').value = "";
-                document.getElementById('notice-link-url').value = "";
-                
-                window.loadNotices();
-            } catch(e) { console.error(e); alert("작성 실패"); }
-        });
+        // [v6.4.0 신규 기능: 게임 댓글(Review) 시스템]
+        window.toggleGameComments = async (gid) => {
+            const row = document.getElementById(`comment-row-${gid}`);
+            if (row.classList.contains('hidden')) {
+                row.classList.remove('hidden');
+                loadGameComments(gid);
+            } else {
+                row.classList.add('hidden');
+            }
+        };
 
-        window.loadNotices = async () => {
-            const list = document.getElementById('notice-list');
-            list.innerHTML = `<p class="text-xs text-gray-500 font-bold">공지 로딩 중...</p>`;
+        window.loadGameComments = async (gid) => {
+            const container = document.getElementById(`comments-container-${gid}`);
+            container.innerHTML = `<p class="text-xs text-gray-500">불러오는 중...</p>`;
             try {
-                const q = query(collection(db, "notices"));
+                const q = query(collection(db, "game_comments"), where("gameId", "==", gid));
                 const snap = await getDocs(q);
-                // 최신순 정렬
-                const notices = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
-                
-                list.innerHTML = notices.length ? notices.map(n => {
-                    const date = n.createdAt ? new Date(n.createdAt.seconds*1000).toLocaleDateString() : "-";
-                    // 렌더링 시 고유 ID 부여하여 인라인 수정 가능하게 함
-                    return `<div id="notice-card-${n.id}" class="glass p-8 rounded-[40px] text-left border border-white/10 shadow-2xl relative group">
-                        <div id="notice-view-${n.id}">
-                            <h3 class="text-blue-300 font-black mb-4 text-lg">${n.title || '공지사항'}</h3>
-                            <p class="text-sm text-gray-400 leading-relaxed mb-6 whitespace-pre-wrap">${n.text}</p>
-                            ${n.linkUrl ? `<a href="${n.linkUrl}" target="_blank" class="inline-block bg-blue-600 px-8 py-4 rounded-2xl font-black text-sm shadow-lg mb-4 hover:bg-blue-500 transition">${n.linkText || '바로가기'}</a>` : ''}
-                            <div class="text-[10px] text-gray-600 font-bold">${date} • ${n.writerName}</div>
-                            ${currentUser.pin === '100' ? `
-                                <div class="absolute top-6 right-6 flex gap-2">
-                                    <button onclick="enableEditNotice('${n.id}')" class="text-blue-500/50 hover:text-blue-500 text-xs font-black border border-blue-500/20 px-2 py-1 rounded">수정</button>
-                                    <button onclick="deleteNotice('${n.id}')" class="text-red-500/50 hover:text-red-500 text-xs font-black border border-red-500/20 px-2 py-1 rounded">삭제</button>
-                                </div>` : ''}
-                        </div>
-                        <div id="notice-edit-${n.id}" class="hidden space-y-2">
-                            <input id="edit-title-${n.id}" class="w-full bg-white/5 border border-white/10 p-2 rounded-xl text-sm font-bold" value="${n.title}">
-                            <textarea id="edit-text-${n.id}" class="w-full bg-white/5 border border-white/10 p-2 rounded-xl text-sm font-bold h-24">${n.text}</textarea>
-                            <div class="flex gap-2">
-                                <input id="edit-link-txt-${n.id}" class="w-1/3 bg-white/5 border border-white/10 p-2 rounded-xl text-xs font-bold" value="${n.linkText||''}" placeholder="버튼명">
-                                <input id="edit-link-url-${n.id}" class="w-2/3 bg-white/5 border border-white/10 p-2 rounded-xl text-xs font-bold" value="${n.linkUrl||''}" placeholder="URL">
+                const comments = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => (b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)); // 최신순
+
+                container.innerHTML = comments.map(c => `
+                    <div class="bg-white/5 p-3 rounded-xl mb-2 flex justify-between items-start text-left">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-xs font-black text-blue-300">${c.userName}</span>
+                                <span class="text-[9px] text-gray-500">${c.createdAt ? new Date(c.createdAt.seconds*1000).toLocaleDateString() : ''}</span>
                             </div>
-                            <div class="flex gap-2 justify-end">
-                                <button onclick="saveNotice('${n.id}')" class="bg-blue-600 px-4 py-2 rounded-xl text-xs font-bold">저장</button>
-                                <button onclick="cancelEditNotice('${n.id}')" class="bg-gray-600 px-4 py-2 rounded-xl text-xs font-bold">취소</button>
-                            </div>
+                            <p class="text-sm font-bold text-gray-300 whitespace-pre-wrap">${c.text}</p>
                         </div>
-                    </div>`;
-                }).join('') : `<p class="text-xs text-gray-500 font-bold">등록된 공지가 없습니다.</p>`;
-            } catch(e) { console.error(e); list.innerHTML = `<p class="text-xs text-red-400">로드 실패</p>`; }
+                        <div class="flex flex-col items-end gap-1">
+                            <button onclick="likeGameComment('${c.id}', '${gid}')" class="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg hover:bg-white/20 transition">
+                                <span class="text-xs">👍</span>
+                                <span class="text-[10px] font-bold text-yellow-400">${(c.likes || []).length}</span>
+                            </button>
+                            ${(c.userPin === currentUser.pin || currentUser.pin === '100') ? `<button onclick="deleteGameComment('${c.id}', '${gid}')" class="text-[10px] text-red-500 font-bold hover:underline">삭제</button>` : ''}
+                        </div>
+                    </div>
+                `).join('') || `<p class="text-xs text-gray-500">첫 번째 댓글을 남겨보세요!</p>`;
+            } catch(e) { container.innerHTML = "로드 실패"; }
         };
 
-        window.enableEditNotice = (id) => {
-            document.getElementById(`notice-view-${id}`).classList.add('hidden');
-            document.getElementById(`notice-edit-${id}`).classList.remove('hidden');
-        };
-
-        window.cancelEditNotice = (id) => {
-            document.getElementById(`notice-view-${id}`).classList.remove('hidden');
-            document.getElementById(`notice-edit-${id}`).classList.add('hidden');
-        };
-
-        window.saveNotice = async (id) => {
-            const title = document.getElementById(`edit-title-${id}`).value.trim();
-            const text = document.getElementById(`edit-text-${id}`).value.trim();
-            const linkText = document.getElementById(`edit-link-txt-${id}`).value.trim();
-            const linkUrl = document.getElementById(`edit-link-url-${id}`).value.trim();
-
+        window.addGameComment = async (gid) => {
+            const input = document.getElementById(`comment-input-${gid}`);
+            const text = input.value.trim();
+            if(!text) return;
             try {
-                await setDoc(doc(db, "notices", id), { title, text, linkText, linkUrl }, { merge: true });
-                window.loadNotices(); // 새로고침
-            } catch(e) { alert("수정 실패"); }
+                await addDoc(collection(db, "game_comments"), {
+                    gameId: gid,
+                    userPin: currentUser.pin,
+                    userName: currentUser.name,
+                    text: text,
+                    likes: [],
+                    createdAt: serverTimestamp()
+                });
+                input.value = "";
+                loadGameComments(gid);
+            } catch(e) { alert("작성 실패"); }
         };
 
-        window.deleteNotice = async (id) => {
-            if(confirm("이 공지를 삭제하시겠습니까?")) {
-                await deleteDoc(doc(db, "notices", id));
-                window.loadNotices();
+        window.deleteGameComment = async (cid, gid) => {
+            if(confirm("댓글을 삭제하시겠습니까?")) {
+                await deleteDoc(doc(db, "game_comments", cid));
+                loadGameComments(gid);
             }
         };
 
-        // ... [기타 기존 기능들 유지]
-        window.showPage = (id) => { 
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
-            document.getElementById(id).classList.add('active'); 
-            document.getElementById('global-back-btn').style.display = (id === 'page-home' || id === 'page-login') ? 'none' : 'block'; 
-            if(id === 'page-chat-info') {
-                document.getElementById('admin-notice-write').classList.toggle('hidden', currentUser?.pin !== '100');
-                window.loadNotices();
-            }
-            if(id === 'page-stats') window.loadStats();
+        window.likeGameComment = async (cid, gid) => {
+            try {
+                const ref = doc(db, "game_comments", cid);
+                const snap = await getDoc(ref);
+                if(snap.exists()) {
+                    const data = snap.data();
+                    const likes = data.likes || [];
+                    if(likes.includes(currentUser.pin)) {
+                        await updateDoc(ref, { likes: arrayRemove(currentUser.pin) });
+                    } else {
+                        await updateDoc(ref, { likes: arrayUnion(currentUser.pin) });
+                    }
+                    loadGameComments(gid);
+                }
+            } catch(e) {}
         };
-        // ... (나머지 로직은 v6.3.3과 동일)
-        window.login = async () => { const p = document.getElementById('pin').value.trim(); const w = document.getElementById('pw').value.trim(); if(!p||!w)return; try { const snap = await getDoc(doc(db,"users",String(p))); if (snap.exists() && String(snap.data().password) === String(w)) { currentUser = { pin: String(p), ...snap.data() }; localStorage.setItem('game_archive_auth', JSON.stringify({ pin: String(p), pw: String(w) })); document.getElementById('admin-btn').classList.toggle('hidden', String(p) !== '100'); showPage('page-home'); } else alert("정보 불일치"); } catch(e) {} };
+
+        // [v6.4.0 리스트 렌더링 수정: 이름 클릭 시 댓글창 토글]
+        window.renderList = async () => { 
+            const list = document.getElementById('rank-list'); const s = document.getElementById('game-search').value.toLowerCase(); 
+            try { 
+                const q = query(collection(db, "games"), where("category", "==", selectedCategory)); 
+                const [gS, rS] = await Promise.all([getDocs(q), getDocs(collection(db, "ratings"))]); 
+                const rt = rS.docs.map(d => d.data()); 
+                let gms = gS.docs.map(d => { 
+                    const r = rt.filter(v => v.gameId === d.id); 
+                    const scs = r.map(v => v.score).filter(v => v != null); 
+                    const lvs = r.map(v => v.level).filter(v => v != null); 
+                    return { id: d.id, ...d.data(), avgS: scs.length ? (scs.reduce((a,c)=>a+c,0)/scs.length).toFixed(1) : "0.0", avgL: lvs.length ? (lvs.reduce((a,c)=>a+c,0)/lvs.length).toFixed(1) : "0.0" }; 
+                }).filter(g => (document.getElementById('game-search').value||"").toLowerCase().split(" ").every(t => g.name.toLowerCase().includes(t))).sort((a,b)=>Number(b.avgS)-Number(a.avgS)); 
+                
+                list.innerHTML = gms.map((g, i) => `
+                    <tr class="border-b border-white/5 font-bold">
+                        <td class="p-4 text-blue-400 w-10 font-black">${i < 3 ? '🥇' : '#'+(i+1)}</td>
+                        <td class="p-4 text-left cursor-pointer hover:bg-white/5 transition" onclick="toggleGameComments('${g.id}')">
+                            <span class="text-sm font-black block">${g.name} <span class="text-[10px] text-gray-500">▼</span></span>
+                            <span class="text-[9px] text-gray-500 font-bold">SCORE: ${g.avgS} | LV: ${g.avgL}</span>
+                        </td>
+                        <td class="p-2 text-center w-24"><div class="flex flex-col gap-1"><button onclick="rateGame('${g.id}','score')" class="bg-yellow-500/10 text-yellow-400 text-[8px] py-1 rounded font-black border border-yellow-500/20">SCORE</button><button onclick="rateGame('${g.id}','level')" class="bg-red-500/10 text-red-400 text-[8px] py-1 rounded font-black border border-red-500/20">LEVEL</button></div></td>
+                        <td class="p-4 w-20 text-center"><button onclick="openSchedules('${g.id}','${g.name}')" class="bg-green-600/20 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-lg text-[10px] font-black">기록</button></td>
+                    </tr>
+                    <tr id="comment-row-${g.id}" class="hidden bg-black/20">
+                        <td colspan="4" class="p-4">
+                            <div class="text-xs font-black text-gray-400 mb-2">COMMENTS & REVIEWS</div>
+                            <div id="comments-container-${g.id}" class="mb-4 max-h-40 overflow-y-auto custom-scrollbar"></div>
+                            <div class="flex gap-2">
+                                <input id="comment-input-${g.id}" class="flex-1 bg-white/5 border border-white/10 p-2 rounded-xl text-xs font-bold" placeholder="게임에 대한 의견을 남겨주세요...">
+                                <button onclick="addGameComment('${g.id}')" class="bg-blue-600 px-4 rounded-xl text-xs font-black">작성</button>
+                            </div>
+                        </td>
+                    </tr>`).join(''); 
+            } catch(e) {} 
+        };
+
+        // [v6.4.0 명예전당 Best Reviews 추가]
+        window.loadStats = async () => {
+            try {
+                const [rS, gS, uS, cS] = await Promise.all([getDocs(collection(db, "ratings")), getDocs(collection(db, "games")), getDocs(collection(db, "users")), getDocs(collection(db, "game_comments"))]);
+                const uMap = uS.docs.reduce((acc, d) => ({...acc, [d.id]: d.data().name}), {});
+                const gMap = gS.docs.reduce((acc, d) => ({...acc, [d.id]: d.data().name}), {});
+
+                // Voting King
+                const vC = rS.docs.map(d=>d.data()).reduce((acc, r) => { if(r.userPin) acc[r.userPin] = (acc[r.userPin]||0)+1; return acc; }, {});
+                document.getElementById('vote-king').innerHTML = Object.entries(vC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(v => `<div class='p-4 glass rounded-2xl flex justify-between items-center font-bold'><span>${uMap[v[0]] || '?'}</span><b class='text-blue-400'>${v[1]}회</b></div>`).join('');
+                
+                // Creator King
+                const gC = gS.docs.map(d=>d.data()).reduce((acc, g) => { if(g.creatorPin) acc[g.creatorPin] = (acc[g.creatorPin]||0)+1; return acc; }, {});
+                document.getElementById('game-add-king').innerHTML = Object.entries(gC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(g => `<div class='p-4 glass rounded-2xl flex justify-between items-center font-bold'><span>${uMap[g[0]] || '?'}</span><b class='text-green-400'>${g[1]}개</b></div>`).join('');
+
+                // Best Reviews (Likes 순 정렬)
+                const comments = cS.docs.map(d => ({...d.data(), id: d.id})).sort((a,b) => (b.likes?.length||0) - (a.likes?.length||0)).slice(0, 3);
+                document.getElementById('best-reviews').innerHTML = comments.map(c => `
+                    <div class="glass p-4 rounded-2xl text-left border border-purple-500/20">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[10px] text-gray-400 font-bold">${gMap[c.gameId] || '삭제된 게임'}</span>
+                            <span class="text-xs text-yellow-400 font-black">👍 ${(c.likes||[]).length}</span>
+                        </div>
+                        <div class="text-sm font-bold text-white mb-2 line-clamp-2">"${c.text}"</div>
+                        <div class="text-[10px] text-blue-300 text-right">- ${c.userName}</div>
+                    </div>
+                `).join('') || "<p class='text-xs text-gray-500'>아직 베스트 댓글이 없습니다.</p>";
+
+            } catch(e) { console.error(e); }
+        };
+
+        // ... [기존 로직 유지: 공지사항, 스케줄 등]
+        document.getElementById('notice-submit-btn').addEventListener('click', async () => { const title = document.getElementById('notice-title').value.trim(); const text = document.getElementById('notice-input').value.trim(); const linkText = document.getElementById('notice-link-text').value.trim(); const linkUrl = document.getElementById('notice-link-url').value.trim(); if(!title || !text) return alert("제목/내용 입력"); if(currentUser.pin!=='100')return alert("권한없음"); try{ await addDoc(collection(db,"notices"),{title,text,linkText,linkUrl,writerName:currentUser.name,createdAt:serverTimestamp()}); document.getElementById('notice-title').value=""; document.getElementById('notice-input').value=""; window.loadNotices(); }catch(e){alert("실패");}});
+        window.loadNotices = async () => { const l=document.getElementById('notice-list'); try{ const s=await getDocs(query(collection(db,"notices"))); const n=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)); l.innerHTML=n.map(x=>`<div id="notice-view-${x.id}" class="glass p-8 rounded-[40px] text-left border border-white/10 shadow-2xl relative group"><h3 class="text-blue-300 font-black mb-4 text-lg">${x.title}</h3><p class="text-sm text-gray-400 mb-6 whitespace-pre-wrap">${x.text}</p>${x.linkUrl?`<a href="${x.linkUrl}" target="_blank" class="inline-block bg-blue-600 px-8 py-4 rounded-2xl font-black text-sm shadow-lg mb-4 hover:bg-blue-500 transition">${x.linkText||'이동'}</a>`:''}<div class="text-[10px] text-gray-600 font-bold">${new Date(x.createdAt.seconds*1000).toLocaleDateString()} • ${x.writerName}</div>${currentUser.pin==='100'?`<div class="absolute top-6 right-6 flex gap-2"><button onclick="editNotice('${x.id}','${x.title}',\`${x.text}\`)" class="text-blue-500/50 hover:text-blue-500 text-xs border border-blue-500/20 px-2 py-1 rounded">수정</button><button onclick="deleteNotice('${x.id}')" class="text-red-500/50 hover:text-red-500 text-xs border border-red-500/20 px-2 py-1 rounded">삭제</button></div>`:''}</div><div id="notice-edit-${x.id}" class="hidden glass p-6 rounded-[30px] border border-white/20"><input id="edit-title-${x.id}" class="w-full bg-white/5 border border-white/10 p-2 rounded-xl mb-2" value="${x.title}"><textarea id="edit-text-${x.id}" class="w-full bg-white/5 border border-white/10 p-2 rounded-xl h-24 mb-2">${x.text}</textarea><div class="flex justify-end gap-2"><button onclick="saveNotice('${x.id}')" class="bg-blue-600 px-4 py-2 rounded-xl text-xs">저장</button><button onclick="cancelEditNotice('${x.id}')" class="bg-gray-600 px-4 py-2 rounded-xl text-xs">취소</button></div></div>`).join(''); }catch(e){l.innerHTML="로드실패";} };
+        window.editNotice=(id)=>{document.getElementById(`notice-view-${id}`).classList.add('hidden');document.getElementById(`notice-edit-${id}`).classList.remove('hidden');}; window.cancelEditNotice=(id)=>{document.getElementById(`notice-view-${id}`).classList.remove('hidden');document.getElementById(`notice-edit-${id}`).classList.add('hidden');}; window.saveNotice=async(id)=>{const t=document.getElementById(`edit-title-${id}`).value;const x=document.getElementById(`edit-text-${id}`).value;await setDoc(doc(db,"notices",id),{title:t,text:x},{merge:true});window.loadNotices();}; window.deleteNotice=async(id)=>{if(confirm("삭제?")){await deleteDoc(doc(db,"notices",id));window.loadNotices();}};
+        window.showPage = (id) => { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); document.getElementById('global-back-btn').style.display = (id === 'page-home' || id === 'page-login') ? 'none' : 'block'; if(id === 'page-chat-info') { document.getElementById('admin-notice-write').classList.toggle('hidden', currentUser?.pin !== '100'); window.loadNotices(); } if(id === 'page-stats') window.loadStats(); };
+        window.login = async () => { const p = document.getElementById('pin').value.trim(); const w = document.getElementById('pw').value.trim(); if(!p||!w)return; try { const snap = await getDoc(doc(db,"users",String(p))); if (snap.exists() && String(snap.data().password) === String(w)) { currentUser = { pin: String(p), ...snap.data() }; localStorage.setItem('game_archive_auth', JSON.stringify({ pin: String(p), pw: String(w) })); document.getElementById('admin-btn').classList.toggle('hidden', String(p) !== '100'); showPage('page-home'); } else alert("불일치"); } catch(e) {} };
         window.logout = () => { localStorage.removeItem('game_archive_auth'); location.reload(); };
         window.addEventListener('DOMContentLoaded', async () => { const auth = localStorage.getItem('game_archive_auth'); if (auth) { const d = JSON.parse(auth); try { const snap = await getDoc(doc(db,"users",String(d.pin))); if (snap.exists()) { currentUser = { pin: String(d.pin), ...snap.data() }; document.getElementById('user-welcome').innerText = `${currentUser.name}님`; document.getElementById('my-profile-icon').src = currentUser.iconUrl || DEFAULT_ICON; document.getElementById('admin-btn').classList.toggle('hidden', String(d.pin) !== '100'); showPage('page-home'); return; } } catch(e) {} } showPage('page-login'); });
         window.navTo = (cat) => { selectedCategory = cat; document.getElementById('rank-title').innerText = cat; renderList(); showPage('page-rank'); };
         window.openModal = (id) => { const el = document.getElementById(id); if(el) { el.classList.add('active'); history.pushState({modal: id}, '', ''); } };
         window.closeModal = () => { if(document.querySelector('.modal.active')) history.back(); };
         window.addEventListener('popstate', (e) => { const activeModals = document.querySelectorAll('.modal.active'); if(activeModals.length > 0) activeModals[activeModals.length-1].classList.remove('active'); else if(!document.getElementById('page-home').classList.contains('active')) showPage('page-home', false); });
-        window.renderList = async () => { const list = document.getElementById('rank-list'); const s = document.getElementById('game-search').value.toLowerCase(); try { const q = query(collection(db, "games"), where("category", "==", selectedCategory)); const [gS, rS] = await Promise.all([getDocs(q), getDocs(collection(db, "ratings"))]); const rt = rS.docs.map(d => d.data()); let gms = gS.docs.map(d => { const r = rt.filter(v => v.gameId === d.id); const scs = r.map(v => v.score).filter(v => v != null); const lvs = r.map(v => v.level).filter(v => v != null); return { id: d.id, ...d.data(), avgS: scs.length ? (scs.reduce((a,c)=>a+c,0)/scs.length).toFixed(1) : "0.0", avgL: lvs.length ? (lvs.reduce((a,c)=>a+c,0)/lvs.length).toFixed(1) : "0.0" }; }).filter(g => (document.getElementById('game-search').value||"").toLowerCase().split(" ").every(t => g.name.toLowerCase().includes(t))).sort((a,b)=>Number(b.avgS)-Number(a.avgS)); list.innerHTML = gms.map((g, i) => `<tr class="border-b border-white/5 font-bold"><td class="p-4 text-blue-400 w-10 font-black">${i < 3 ? '🥇' : '#'+(i+1)}</td><td class="p-4 text-left font-bold"><span class="text-sm font-black block">${g.name}</span><span class="text-[9px] text-gray-500 font-bold">SCORE: ${g.avgS} | LV: ${g.avgL}</span></td><td class="p-2 text-center w-24"><div class="flex flex-col gap-1"><button onclick="rateGame('${g.id}','score')" class="bg-yellow-500/10 text-yellow-400 text-[8px] py-1 rounded font-black border border-yellow-500/20">SCORE</button><button onclick="rateGame('${g.id}','level')" class="bg-red-500/10 text-red-400 text-[8px] py-1 rounded font-black border border-red-500/20">LEVEL</button></div></td><td class="p-4 w-20 text-center"><button onclick="openSchedules('${g.id}','${g.name}')" class="bg-green-600/20 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-lg text-[10px] font-black">기록</button></td></tr>`).join(''); } catch(e) {} };
         window.rateGame = async (gid, t) => { const v = prompt("값 입력:"); if(v){ await setDoc(doc(db,"ratings",`${gid}_${currentUser.pin}`),{gameId:gid,userPin:currentUser.pin,[t]:Number(v),updatedAt:serverTimestamp()}, {merge:true}); renderList(); }};
         window.openSchedules = async (id, name) => { activeGameId = id; activeGameName = name; document.getElementById('schedule-game-title').innerText = name; openModal('schedule-modal'); try { const snap = await getDocs(query(collection(db, "schedules"), where("gameId", "==", id))); const docs = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)); document.getElementById('schedule-list').innerHTML = docs.map(d => `<div onclick="openScheduleDetail('${d.id}')" class="bg-white/5 p-4 rounded-2xl border border-white/5 flex justify-between items-center cursor-pointer mb-1"><div class="text-sm text-green-300 font-bold">${d.name}</div><span class="text-blue-400 text-xs font-bold">▶</span></div>`).join('') || "기록 없음"; } catch(e) {} };
         window.openAddSchedule = async () => { selMembersGlobal = []; const selector = document.getElementById('member-selector'); selector.innerHTML = "로딩..."; openModal('add-schedule-modal'); const uSnap = await getDocs(collection(db, "users")); selector.innerHTML = uSnap.docs.map(d => `<div onclick="window.tM(this, '${d.id}')" class="member-chip font-bold">${d.data().name}</div>`).join(''); };
@@ -220,12 +298,11 @@
         window.enableRankEdit = async () => { if(!activeScheduleId) return; const slots = document.getElementById('rank-edit-slots'); const chips = document.getElementById('rank-edit-chips'); const uS = await getDocs(collection(db,"users")); const uMap = uS.docs.reduce((acc,doc)=>({...acc, [doc.id]:doc.data().name}), {}); tempRanks = [...(activeScheduleData.ranks || [])]; document.getElementById('rank-edit-title').innerText = activeGameName + " 수정"; openModal('rank-edit-modal'); const rUI = () => { if(selectedCategory === '보드게임') { slots.innerHTML = Array.from({length: activeScheduleData.members.length}).map((_,i) => `<div class="rank-slot ${tempRanks[i]?'filled':''}" onclick="window.remR(${i})"><b>${i+1}등:</b> ${uMap[tempRanks[i]] || '선택 대기'}</div>`).join(''); document.getElementById('rank-complete-btn').style.display = 'none'; } else { const winTxt = selectedCategory === '방탈출' ? '성공' : (selectedCategory === '지니어스' ? '우승' : '승리'); slots.innerHTML = `<div class='p-3 bg-white/5 rounded-2xl text-xs mb-2 font-bold'>${winTxt}자 선택</div><div class='grid grid-cols-2 gap-2'>${tempRanks.map(p=>`<div class='p-3 bg-blue-600/20 rounded-xl flex justify-between'><span>${uMap[p]}</span><button onclick="window.remR(${tempRanks.indexOf(p)})">✕</button></div>`).join('')}</div>`; document.getElementById('rank-complete-btn').style.display = 'block'; } chips.innerHTML = activeScheduleData.members.map(p => `<button onclick="window.addR('${p}')" class="member-chip ${tempRanks.includes(p)?'opacity-20 pointer-events-none':''} font-bold">${uMap[p]}</button>`).join(''); }; window.remR = (i) => { tempRanks.splice(i, 1); rUI(); }; window.addR = (p) => { if(!tempRanks.includes(p)) tempRanks.push(p); rUI(); if(selectedCategory === '보드게임' && tempRanks.length === activeScheduleData.members.length) window.saveRankResult(); }; window.saveRankResult = async () => { await updateDoc(doc(db, "schedules", activeScheduleId), { ranks: tempRanks }); closeModal(); openScheduleDetail(activeScheduleId); }; rUI(); };
         window.navToD = async (cat, gid, gname, sid) => { closeModal(); selectedCategory = cat; navTo(cat); await openSchedules(gid, gname); openScheduleDetail(sid); };
         window.confirmDelete = async () => { if(confirm("삭제하시겠습니까?")) { await deleteDoc(doc(db,"schedules",activeScheduleId)); closeModal(); openSchedules(activeGameId, activeGameName); } };
-        window.enableDateEdit = () => { const d = document.getElementById('detail-date-display'); const i = document.getElementById('detail-date-input'); d.classList.add('hidden'); i.classList.remove('hidden'); i.value = activeScheduleData.date || ""; i.focus(); };
+        window.enableDateEdit = () => { document.getElementById('detail-date-display').classList.add('hidden'); document.getElementById('detail-date-input').classList.remove('hidden'); document.getElementById('detail-date-input').value=activeScheduleData.date||""; document.getElementById('detail-date-input').focus(); };
         window.updateDate = async (v) => { try { await updateDoc(doc(db,"schedules",activeScheduleId), {date:v}); activeScheduleData.date=v; document.getElementById('detail-date-display').innerText="📅 "+v; document.getElementById('detail-date-display').classList.remove('hidden'); document.getElementById('detail-date-input').classList.add('hidden'); } catch(e){} };
         window.submitComment = async () => { const i = document.getElementById('comment-input'); if(!i.value.trim()) return; await updateDoc(doc(db,"schedules",activeScheduleId), {feed: arrayUnion({userPin:String(currentUser.pin),text:i.value.trim(),createdAt:new Date().toISOString()})}); i.value=""; openScheduleDetail(activeScheduleId); };
         window.deleteComment = async (idx) => { if(!confirm("삭제?")) return; const nF = [...activeScheduleData.feed]; nF.splice(idx,1); await updateDoc(doc(db,"schedules",activeScheduleId), {feed:nF}); openScheduleDetail(activeScheduleId); };
         window.saveCharacter = async () => { const c = document.getElementById('character-input').value.trim(); if(!c) return; const chars = activeScheduleData.characters || {}; chars[currentUser.pin] = c; await updateDoc(doc(db,"schedules",activeScheduleId), {characters: chars}); document.getElementById('character-input').value=""; openScheduleDetail(activeScheduleId); };
-        window.loadStats = async () => { try { const [rS, gS, uS] = await Promise.all([getDocs(collection(db, "ratings")), getDocs(collection(db, "games")), getDocs(collection(db, "users"))]); const uMap = uS.docs.reduce((acc, d) => ({...acc, [d.id]: d.data().name}), {}); const vC = rS.docs.map(d=>d.data()).reduce((acc, r) => { if(r.userPin) acc[r.userPin] = (acc[r.userPin]||0)+1; return acc; }, {}); document.getElementById('vote-king').innerHTML = Object.entries(vC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(v => `<div class='p-4 glass rounded-2xl flex justify-between items-center font-bold'><span>${uMap[v[0]] || '?'}</span><b class='text-blue-400'>${v[1]}회</b></div>`).join(''); const gC = gS.docs.map(d=>d.data()).reduce((acc, g) => { if(g.creatorPin) acc[g.creatorPin] = (acc[g.creatorPin]||0)+1; return acc; }, {}); document.getElementById('game-add-king').innerHTML = Object.entries(gC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(g => `<div class='p-4 glass rounded-2xl flex justify-between items-center font-bold'><span>${uMap[g[0]] || '?'}</span><b class='text-green-400'>${g[1]}개</b></div>`).join(''); } catch(e) {} };
         window.addGame = async () => { const n = prompt("게임 이름:"); if(n) { await addDoc(collection(db,"games"), {name:n, category:selectedCategory, creatorPin:currentUser.pin, createdAt:serverTimestamp()}); renderList(); } };
         const getResTxt = (cat, pin, ranks) => { const isWin = (ranks||[]).includes(String(pin)); if(cat==='보드게임') return isWin?`${ranks.indexOf(String(pin))+1}등`:'미기록'; if(cat==='방탈출') return isWin?'성공':'실패'; if(cat==='지니어스') return isWin?'우승':'참여'; if(cat==='머더 미스테리') return isWin?'승리':'패배'; return '참석'; };
         window.toggleProfileModal = async (s) => { if(s && currentUser) { document.getElementById('display-name').innerText = currentUser.name; document.getElementById('profile-preview').src = currentUser.iconUrl || DEFAULT_ICON; openModal('profile-modal'); const snap = await getDocs(query(collection(db, "schedules"), where("members", "array-contains", String(currentUser.pin)))); document.getElementById('my-history-list').innerHTML = snap.docs.map(d => `<div onclick="window.navToD('${d.data().gameCategory}','${d.data().gameId}','${d.data().gameName}','${d.id}')" class="bg-white/5 p-4 rounded-2xl border border-white/5 mb-1 cursor-pointer flex justify-between items-center font-bold"><div class="text-left font-bold"><div class="text-[9px] text-blue-400 font-black">${d.data().gameCategory} | <span class="text-yellow-400">${getResTxt(d.data().gameCategory, currentUser.pin, d.data().ranks)}</span></div><div class="text-sm font-black">${d.data().gameName}</div></div><span class="text-blue-400 text-xs font-bold">▶</span></div>`).join('') || "기록 없음"; } };
