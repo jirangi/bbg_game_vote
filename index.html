@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Game Archive v6.7.1</title>
+    <title>Game Archive v6.7.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -11,17 +11,19 @@
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .page { display: none; opacity: 0; transform: translateY(10px); transition: all 0.3s ease; width: 100%; max-width: 800px; margin: 0 auto; pointer-events: auto; }
         .page.active { display: block; opacity: 1; transform: translateY(0); }
-        /* [v6.7.1 수리] 모달이 active가 아닐 땐 클릭 이벤트 차단 */
+        /* 모달: 비활성 시 클릭 차단 */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; align-items: center; justify-content: center; padding: 20px; pointer-events: none; }
         .modal.active { display: flex; pointer-events: auto; }
         
         #global-back-btn { position: fixed; top: 24px; left: 20px; z-index: 30000 !important; background: #1e293b; color: #60a5fa; padding: 10px 18px; border-radius: 14px; border: 1px solid rgba(96, 165, 250, 0.3); font-weight: 900; display: none; cursor: pointer; pointer-events: auto; }
+        
         #admin-user-modal { z-index: 21000 !important; }
         #admin-modal { z-index: 20000 !important; }
         #rank-edit-modal, #add-schedule-modal { z-index: 15000 !important; } 
         #detail-modal { z-index: 14000 !important; }
         #schedule-modal { z-index: 13000 !important; }
         #profile-modal { z-index: 12000 !important; }
+        
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
         .member-chip { cursor: pointer; border: 1px solid rgba(255,255,255,0.1); padding: 10px 4px; border-radius: 12px; text-align: center; font-size: 11px; font-weight: 800; background: rgba(255,255,255,0.05); transition: 0.2s; }
@@ -49,14 +51,14 @@
         </div>
         <h1 class="text-4xl font-extrabold mb-10 italic text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 uppercase tracking-tighter">Game Archive</h1>
         <div class="flex flex-wrap justify-center gap-3 mb-10 px-4 font-bold">
-            <button onclick="showPage('page-stats')" class="bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-6 py-4 rounded-2xl font-extrabold shadow-lg">🏆 명예전당</button>
-            <button onclick="showPage('page-chat-info')" class="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-6 py-4 rounded-2xl font-extrabold shadow-lg">📢 단톡방 정보</button>
+            <button onclick="showPage('page-stats')" class="bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-6 py-4 rounded-2xl font-extrabold shadow-lg relative z-20">🏆 명예전당</button>
+            <button onclick="showPage('page-chat-info')" class="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-6 py-4 rounded-2xl font-extrabold shadow-lg relative z-20">📢 단톡방 정보</button>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4 font-bold">
-            <button onclick="navTo('보드게임')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition">🎲 보드게임</button>
-            <button onclick="navTo('지니어스')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition">🧠 지니어스</button>
-            <button onclick="navTo('방탈출')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition">🔑 방탈출</button>
-            <button onclick="navTo('머더 미스테리')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition">🕵️ 머더 미스테리</button>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4 font-bold relative z-10">
+            <button onclick="navTo('보드게임')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition relative active:scale-95">🎲 보드게임</button>
+            <button onclick="navTo('지니어스')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition relative active:scale-95">🧠 지니어스</button>
+            <button onclick="navTo('방탈출')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition relative active:scale-95">🔑 방탈출</button>
+            <button onclick="navTo('머더 미스테리')" class="glass rounded-3xl p-10 text-xl font-black hover:text-blue-400 transition relative active:scale-95">🕵️ 머더 미스테리</button>
         </div>
     </div>
 
@@ -110,33 +112,84 @@
         let currentUser = null; let selectedCategory = ""; let activeGameId = null; let activeGameName = ""; let activeScheduleId = null; let activeScheduleData = null; let tempRanks = []; let selMembersGlobal = []; let allUsers = {};
         let myPlayedGames = new Set(); let myManualChecks = new Set();
 
-        // [v6.7.1 긴급수리] 이벤트 전달 방식 변경 및 초기화 안전장치
-        window.loadMyGameStatus = async () => {
-            if(!currentUser) return;
+        // [v6.7.2 핵심 수정] 네비게이션 우선 처리 및 안전장치
+        window.navTo = (cat) => {
             try {
-                const sQ = query(collection(db, "schedules"), where("members", "array-contains", String(currentUser.pin)));
-                const sSnap = await getDocs(sQ);
-                myPlayedGames = new Set(sSnap.docs.map(d => d.data().gameId));
-                const cQ = query(collection(db, "user_game_checks"), where("userPin", "==", String(currentUser.pin)));
-                const cSnap = await getDocs(cQ);
-                myManualChecks = new Set(cSnap.docs.map(d => d.data().gameId));
-            } catch(e) {}
+                // 1. 화면 전환을 먼저 수행 (반응 속도 향상)
+                showPage('page-rank');
+                
+                // 2. 카테고리 설정 및 타이틀 변경
+                selectedCategory = cat;
+                const titleEl = document.getElementById('rank-title');
+                if(titleEl) titleEl.innerText = cat;
+                
+                // 3. 데이터 로딩 (비동기)
+                renderList();
+            } catch(e) {
+                console.error("Navigation error:", e);
+                alert("페이지 이동 중 오류가 발생했습니다.");
+            }
         };
 
-        window.toggleManualCheck = async (gid, el, event) => {
-            if(event) event.stopPropagation();
-            const isChecked = el.checked;
-            const docId = `${currentUser.pin}_${gid}`;
-            if(isChecked) myManualChecks.add(gid); else myManualChecks.delete(gid);
-            const row = el.closest('tr');
-            if(isChecked || myPlayedGames.has(gid)) row.classList.add('bg-blue-600/30'); else row.classList.remove('bg-blue-600/30');
-            try {
-                if (isChecked) await setDoc(doc(db, "user_game_checks", docId), { userPin: currentUser.pin, gameId: gid });
-                else await deleteDoc(doc(db, "user_game_checks", docId));
-            } catch(e) { el.checked = !isChecked; }
+        window.renderList = async () => { 
+            const list = document.getElementById('rank-list');
+            if(!list) return; // 방어 코드
+            
+            list.innerHTML = `<tr><td colspan="4" class="p-10 opacity-50 text-center font-bold">로딩 중...</td></tr>`;
+            
+            try { 
+                const s = (document.getElementById('game-search')?.value || "").toLowerCase(); 
+                const q = query(collection(db, "games"), where("category", "==", selectedCategory)); 
+                const [gS, rS] = await Promise.all([getDocs(q), getDocs(collection(db, "ratings"))]); 
+                const rt = rS.docs.map(d => d.data()); 
+                
+                let gms = gS.docs.map(d => { 
+                    const r = rt.filter(v => v.gameId === d.id); 
+                    const scs = r.map(v => v.score).filter(v => v != null); 
+                    const lvs = r.map(v => v.level).filter(v => v != null); 
+                    return { id: d.id, ...d.data(), avgS: scs.length ? (scs.reduce((a,c)=>a+c,0)/scs.length).toFixed(1) : "0.0", avgL: lvs.length ? (lvs.reduce((a,c)=>a+c,0)/lvs.length).toFixed(1) : "0.0" }; 
+                }).filter(g => g.name.toLowerCase().includes(s)).sort((a,b)=>Number(b.avgS)-Number(a.avgS)); 
+                
+                list.innerHTML = gms.map((g, i) => {
+                    // 데이터 안전 참조 (Set이 없어도 에러 안 나도록)
+                    const hasRecord = myPlayedGames?.has(g.id) || false;
+                    const isChecked = myManualChecks?.has(g.id) || false;
+                    const isPlayed = hasRecord || isChecked;
+                    const bgClass = isPlayed ? 'bg-blue-600/30' : 'border-b border-white/5';
+
+                    return `
+                    <tr class="${bgClass} font-bold transition duration-200">
+                        <td class="p-4 text-blue-400 w-10 font-black">${i < 3 ? '🥇' : '#'+(i+1)}</td>
+                        <td class="p-4 text-left cursor-pointer" onclick="toggleGameComments('${g.id}')">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-black">${g.name} <span class="text-[10px] text-gray-500">▼</span></span>
+                                <input type="checkbox" class="custom-checkbox" onclick="toggleManualCheck('${g.id}', this, event)" ${isChecked ? 'checked' : ''}>
+                            </div>
+                            <span class="text-[9px] text-gray-500 font-bold block mt-1">SCORE: ${g.avgS} | LV: ${g.avgL}</span>
+                        </td>
+                        <td class="p-2 text-center w-24"><div class="flex flex-col gap-1"><button onclick="rateGame('${g.id}','score')" class="bg-yellow-500/10 text-yellow-400 text-[8px] py-1 rounded font-black border border-yellow-500/20">SCORE</button><button onclick="rateGame('${g.id}','level')" class="bg-red-500/10 text-red-400 text-[8px] py-1 rounded font-black border border-red-500/20">LEVEL</button></div></td>
+                        <td class="p-4 w-20 text-center"><button onclick="openSchedules('${g.id}','${g.name}')" class="bg-green-600/20 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-lg text-[10px] font-black">기록</button></td>
+                    </tr>
+                    <tr id="comment-row-${g.id}" class="hidden bg-black/20">
+                        <td colspan="4" class="p-4">
+                            <div class="text-xs font-black text-gray-400 mb-2">COMMENTS & REVIEWS</div>
+                            <div id="comments-container-${g.id}" class="mb-4 max-h-40 overflow-y-auto custom-scrollbar"></div>
+                            <div class="flex gap-2">
+                                <input id="comment-input-${g.id}" class="flex-1 bg-white/5 border border-white/10 p-2 rounded-xl text-xs font-bold" placeholder="의견 남기기...">
+                                <button onclick="addGameComment('${g.id}')" class="bg-blue-600 px-4 rounded-xl text-xs font-black">작성</button>
+                            </div>
+                        </td>
+                    </tr>`;
+                }).join(''); 
+            } catch(e) { 
+                console.error(e);
+                list.innerHTML = `<tr><td colspan="4" class="p-10 opacity-50 text-center font-bold">로딩 실패</td></tr>`;
+            } 
         };
 
-        // ... [기존 기능 유지] ...
+        // ... [이하 v6.7.1 로직 유지] ...
+        window.loadMyGameStatus = async () => { if(!currentUser) return; try { const sQ = query(collection(db, "schedules"), where("members", "array-contains", String(currentUser.pin))); const sSnap = await getDocs(sQ); myPlayedGames = new Set(sSnap.docs.map(d => d.data().gameId)); const cQ = query(collection(db, "user_game_checks"), where("userPin", "==", String(currentUser.pin))); const cSnap = await getDocs(cQ); myManualChecks = new Set(cSnap.docs.map(d => d.data().gameId)); } catch(e) {} };
+        window.toggleManualCheck = async (gid, el, event) => { if(event) event.stopPropagation(); const isChecked = el.checked; const docId = `${currentUser.pin}_${gid}`; if(isChecked) myManualChecks.add(gid); else myManualChecks.delete(gid); const row = el.closest('tr'); if(isChecked || myPlayedGames.has(gid)) row.classList.add('bg-blue-600/30'); else row.classList.remove('bg-blue-600/30'); try { if (isChecked) await setDoc(doc(db, "user_game_checks", docId), { userPin: currentUser.pin, gameId: gid }); else await deleteDoc(doc(db, "user_game_checks", docId)); } catch(e) { el.checked = !isChecked; } };
         window.handleBack = () => { if(document.querySelector('.modal.active')) history.back(); else if(!document.getElementById('page-home').classList.contains('active') && !document.getElementById('page-login').classList.contains('active')) showPage('page-home', false); };
         window.openModal = (id) => { const el = document.getElementById(id); if(el) { el.classList.add('active'); history.pushState({modal: id}, '', ''); } };
         window.closeModal = () => { if(document.querySelector('.modal.active')) history.back(); };
@@ -146,12 +199,6 @@
         window.logout = () => { localStorage.removeItem('game_archive_auth'); location.reload(); };
         window.addEventListener('DOMContentLoaded', async () => { const auth = localStorage.getItem('game_archive_auth'); if (auth) { const d = JSON.parse(auth); try { const snap = await getDoc(doc(db,"users",String(d.pin))); if (snap.exists()) { currentUser = { pin: String(d.pin), ...snap.data() }; document.getElementById('user-welcome').innerText = `${currentUser.name}님`; document.getElementById('my-profile-icon').src = currentUser.iconUrl || DEFAULT_ICON; document.getElementById('admin-btn').classList.toggle('hidden', String(d.pin) !== '100'); await loadMyGameStatus(); showPage('page-home'); return; } } catch(e) {} } showPage('page-login'); });
         
-        window.renderList = async () => { 
-            const list = document.getElementById('rank-list'); try { const q = query(collection(db, "games"), where("category", "==", selectedCategory)); const [gS, rS] = await Promise.all([getDocs(q), getDocs(collection(db, "ratings"))]); const rt = rS.docs.map(d => d.data()); let gms = gS.docs.map(d => { const r = rt.filter(v => v.gameId === d.id); const scs = r.map(v => v.score).filter(v => v != null); const lvs = r.map(v => v.level).filter(v => v != null); return { id: d.id, ...d.data(), avgS: scs.length ? (scs.reduce((a,c)=>a+c,0)/scs.length).toFixed(1) : "0.0", avgL: lvs.length ? (lvs.reduce((a,c)=>a+c,0)/lvs.length).toFixed(1) : "0.0" }; }).filter(g => (document.getElementById('game-search').value||"").toLowerCase().split(" ").every(t => g.name.toLowerCase().includes(t))).sort((a,b)=>Number(b.avgS)-Number(a.avgS)); 
-            list.innerHTML = gms.map((g, i) => { const hasRecord = myPlayedGames.has(g.id); const isChecked = myManualChecks.has(g.id); const isPlayed = hasRecord || isChecked; const bgClass = isPlayed ? 'bg-blue-600/30' : 'border-b border-white/5'; 
-            return `<tr class="${bgClass} font-bold transition duration-200"><td class="p-4 text-blue-400 w-10 font-black">${i < 3 ? '🥇' : '#'+(i+1)}</td><td class="p-4 text-left cursor-pointer" onclick="toggleGameComments('${g.id}')"><div class="flex items-center gap-2"><span class="text-sm font-black">${g.name} <span class="text-[10px] text-gray-500">▼</span></span><input type="checkbox" class="custom-checkbox" onclick="toggleManualCheck('${g.id}', this, event)" ${isChecked ? 'checked' : ''}></div><span class="text-[9px] text-gray-500 font-bold block mt-1">SCORE: ${g.avgS} | LV: ${g.avgL}</span></td><td class="p-2 text-center w-24"><div class="flex flex-col gap-1"><button onclick="rateGame('${g.id}','score')" class="bg-yellow-500/10 text-yellow-400 text-[8px] py-1 rounded font-black border border-yellow-500/20">SCORE</button><button onclick="rateGame('${g.id}','level')" class="bg-red-500/10 text-red-400 text-[8px] py-1 rounded font-black border border-red-500/20">LEVEL</button></div></td><td class="p-4 w-20 text-center"><button onclick="openSchedules('${g.id}','${g.name}')" class="bg-green-600/20 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-lg text-[10px] font-black">기록</button></td></tr><tr id="comment-row-${g.id}" class="hidden bg-black/20"><td colspan="4" class="p-4"><div class="text-xs font-black text-gray-400 mb-2">COMMENTS & REVIEWS</div><div id="comments-container-${g.id}" class="mb-4 max-h-40 overflow-y-auto custom-scrollbar"></div><div class="flex gap-2"><input id="comment-input-${g.id}" class="flex-1 bg-white/5 border border-white/10 p-2 rounded-xl text-xs font-bold" placeholder="의견 남기기..."><button onclick="addGameComment('${g.id}')" class="bg-blue-600 px-4 rounded-xl text-xs font-black">작성</button></div></td></tr>`; }).join(''); } catch(e) {} };
-
-        // ... [나머지 공지, 유저 관리 등] ...
         window.openAdminUserMode = () => { openModal('admin-user-modal'); loadUserList(); };
         window.loadUserList = async () => { const list = document.getElementById('user-list-container'); list.innerHTML = "로딩 중..."; try { const q = query(collection(db, "users")); const snap = await getDocs(q); const users = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => (b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)); list.innerHTML = users.map(u => `<div class="bg-white/5 p-3 rounded-xl flex justify-between items-center text-xs font-bold"><span>${u.name}</span><span class="text-blue-400">PIN: ${u.id}</span></div>`).join(''); } catch(e) { list.innerHTML = "실패"; } };
         window.addUser = async () => { const name = document.getElementById('new-user-name').value.trim(); let pin = document.getElementById('new-user-pin').value.trim(); if(!name) return alert("이름 입력"); try { if(!pin) { const snap = await getDocs(collection(db, "users")); const pins = snap.docs.map(d => parseInt(d.id)).filter(n => !isNaN(n)); const maxPin = pins.length > 0 ? Math.max(...pins) : 99; pin = String(maxPin + 1); } else { const snap = await getDoc(doc(db, "users", pin)); if(snap.exists()) return alert("중복 PIN"); } await setDoc(doc(db, "users", pin), { name: name, password: "1234", createdAt: serverTimestamp() }); alert(`${name}님 추가됨 (PIN: ${pin})`); document.getElementById('new-user-name').value = ""; document.getElementById('new-user-pin').value = ""; loadUserList(); } catch(e) { alert("실패"); } };
@@ -180,13 +227,4 @@
         window.enableDateEdit = () => { document.getElementById('detail-date-display').classList.add('hidden'); document.getElementById('detail-date-input').classList.remove('hidden'); document.getElementById('detail-date-input').value=activeScheduleData.date||""; document.getElementById('detail-date-input').focus(); };
         window.updateDate = async (v) => { try { await updateDoc(doc(db,"schedules",activeScheduleId), {date:v}); activeScheduleData.date=v; document.getElementById('detail-date-display').innerText="📅 "+v; document.getElementById('detail-date-display').classList.remove('hidden'); document.getElementById('detail-date-input').classList.add('hidden'); } catch(e){} };
         window.submitComment = async () => { const i = document.getElementById('comment-input'); if(!i.value.trim()) return; await updateDoc(doc(db,"schedules",activeScheduleId), {feed: arrayUnion({userPin:String(currentUser.pin),text:i.value.trim(),createdAt:new Date().toISOString()})}); i.value=""; openScheduleDetail(activeScheduleId); };
-        window.deleteComment = async (idx) => { if(!confirm("삭제?")) return; const nF = [...activeScheduleData.feed]; nF.splice(idx,1); await updateDoc(doc(db,"schedules",activeScheduleId), {feed:nF}); openScheduleDetail(activeScheduleId); };
-        window.saveCharacter = async () => { const c = document.getElementById('character-input').value.trim(); if(!c) return; const chars = activeScheduleData.characters || {}; chars[currentUser.pin] = c; await updateDoc(doc(db,"schedules",activeScheduleId), {characters: chars}); document.getElementById('character-input').value=""; openScheduleDetail(activeScheduleId); };
-        window.addGame = async () => { const n = prompt("게임 이름:"); if(n) { await addDoc(collection(db,"games"), {name:n, category:selectedCategory, creatorPin:currentUser.pin, createdAt:serverTimestamp()}); renderList(); } };
-        window.loadStats = async () => { try { const [rS, gS, uS, cS] = await Promise.all([getDocs(collection(db, "ratings")), getDocs(collection(db, "games")), getDocs(collection(db, "users")), getDocs(collection(db, "game_comments"))]); const uMap = uS.docs.reduce((acc, d) => ({...acc, [d.id]: d.data().name}), {}); const gMap = gS.docs.reduce((acc, d) => ({...acc, [d.id]: d.data().name}), {}); const vC = rS.docs.map(d=>d.data()).reduce((acc, r) => { if(r.userPin) acc[r.userPin] = (acc[r.userPin]||0)+1; return acc; }, {}); document.getElementById('vote-king').innerHTML = Object.entries(vC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(v => `<div class='p-4 glass rounded-2xl flex justify-between items-center font-bold'><span>${uMap[v[0]] || '?'}</span><b class='text-blue-400'>${v[1]}회</b></div>`).join(''); const gC = gS.docs.map(d=>d.data()).reduce((acc, g) => { if(g.creatorPin) acc[g.creatorPin] = (acc[g.creatorPin]||0)+1; return acc; }, {}); document.getElementById('game-add-king').innerHTML = Object.entries(gC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(g => `<div class='p-4 glass rounded-2xl flex justify-between items-center font-bold'><span>${uMap[g[0]] || '?'}</span><b class='text-green-400'>${g[1]}개</b></div>`).join(''); const comments = cS.docs.map(d => ({...d.data(), id: d.id})).sort((a,b) => (b.likes?.length||0) - (a.likes?.length||0)).slice(0, 3); document.getElementById('best-reviews').innerHTML = comments.map(c => `<div class="glass p-4 rounded-2xl text-left border border-purple-500/20"><div class="flex justify-between items-center mb-2"><span class="text-[10px] text-gray-400 font-bold">${gMap[c.gameId] || '삭제된 게임'}</span><span class="text-xs text-yellow-400 font-black">👍 ${(c.likes||[]).length}</span></div><div class="text-sm font-bold text-white mb-2 line-clamp-2">"${c.text}"</div><div class="text-[10px] text-blue-300 text-right">- ${c.userName}</div></div>`).join('') || "<p class='text-xs text-gray-500'>아직 베스트 댓글이 없습니다.</p>"; } catch(e) {} };
-        const getResTxt = (cat, pin, ranks) => { const isWin = (ranks||[]).includes(String(pin)); if(cat==='보드게임') return isWin?`${ranks.indexOf(String(pin))+1}등`:'미기록'; if(cat==='방탈출') return isWin?'성공':'실패'; if(cat==='지니어스') return isWin?'우승':'참여'; if(cat==='머더 미스테리') return isWin?'승리':'패배'; return '참석'; };
-        window.toggleProfileModal = async (s) => { if(s && currentUser) { document.getElementById('display-name').innerText = currentUser.name; document.getElementById('profile-preview').src = currentUser.iconUrl || DEFAULT_ICON; openModal('profile-modal'); const snap = await getDocs(query(collection(db, "schedules"), where("members", "array-contains", String(currentUser.pin)))); document.getElementById('my-history-list').innerHTML = snap.docs.map(d => `<div onclick="window.navToD('${d.data().gameCategory}','${d.data().gameId}','${d.data().gameName}','${d.id}')" class="bg-white/5 p-4 rounded-2xl border border-white/5 mb-1 cursor-pointer flex justify-between items-center font-bold"><div class="text-left font-bold"><div class="text-[9px] text-blue-400 font-black">${d.data().gameCategory} | <span class="text-yellow-400">${getResTxt(d.data().gameCategory, currentUser.pin, d.data().ranks)}</span></div><div class="text-sm font-black">${d.data().gameName}</div></div><span class="text-blue-400 text-xs font-bold">▶</span></div>`).join('') || "기록 없음"; } };
-        window.navToD = async (cat, gid, gname, sid) => { closeModal(); selectedCategory = cat; navTo(cat); await openSchedules(gid, gname); openScheduleDetail(sid); };
-    </script>
-</body>
-</html>
+        window.deleteComment = async (idx) =>
