@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Game Archive v6.8.0</title>
+    <title>Game Archive v6.9.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -17,7 +17,7 @@
         #global-back-btn { position: fixed; top: 24px; left: 20px; z-index: 30000 !important; background: #1e293b; color: #60a5fa; padding: 10px 18px; border-radius: 14px; border: 1px solid rgba(96, 165, 250, 0.3); font-weight: 900; display: none; cursor: pointer; pointer-events: auto; }
         
         /* 모달 우선순위 */
-        #score-modal { z-index: 16000 !important; }
+        #score-modal, #level-modal { z-index: 16000 !important; }
         #admin-user-modal { z-index: 21000 !important; }
         #admin-modal { z-index: 20000 !important; }
         #detail-modal { z-index: 14000 !important; }
@@ -26,6 +26,8 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
         .member-chip { cursor: pointer; border: 1px solid rgba(255,255,255,0.1); padding: 10px 4px; border-radius: 12px; text-align: center; font-size: 11px; font-weight: 800; background: rgba(255,255,255,0.05); transition: 0.2s; }
         .member-chip.selected { background: #3b82f6 !important; border-color: #60a5fa !important; color: white !important; }
+        .rank-slot { cursor: pointer; border: 2px dashed rgba(255,255,255,0.1); padding: 12px; border-radius: 16px; margin-bottom: 8px; transition: 0.2s; }
+        .rank-slot.filled { border-style: solid; border-color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
         .custom-checkbox { appearance: none; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 4px; cursor: pointer; position: relative; }
         .custom-checkbox:checked { background-color: #3b82f6; border-color: #3b82f6; }
         .custom-checkbox:checked::after { content: '✔'; position: absolute; font-size: 10px; color: white; top: -1px; left: 2px; font-weight: bold; }
@@ -75,13 +77,23 @@
     <div id="score-modal" class="modal" onclick="if(event.target===this) closeModal()">
         <div class="glass w-full max-w-xs p-8 rounded-[40px] flex flex-col items-center font-bold text-center" onclick="event.stopPropagation()">
             <h3 class="text-xl font-black text-yellow-400 mb-2 uppercase">점수 평가</h3>
-            <p class="text-xs text-gray-400 mb-6">0~100 사이 숫자를 입력하세요.<br>(두 자리 입력 시 자동 저장)</p>
+            <p class="text-xs text-gray-400 mb-6">0~100 사이 (두 자리 자동 저장)</p>
             <input type="number" id="score-input" class="w-24 h-24 bg-white/5 border-2 border-yellow-500/50 rounded-3xl text-4xl font-black text-center text-yellow-400 outline-none focus:border-yellow-400 transition" placeholder="-" oninput="handleScoreInput(this)">
             <button onclick="closeModal()" class="mt-6 text-gray-500 text-xs font-black uppercase">취소</button>
         </div>
     </div>
 
-    <div id="page-chat-info" class="page pt-24 text-center font-bold"><h2 class="text-3xl font-black text-blue-400 mb-10 italic uppercase">단톡방 정보 📢</h2><div class="px-4 space-y-6"><div id="admin-notice-write" class="hidden glass p-6 rounded-[30px] border border-green-500/20 text-left"><div class="mb-3 text-xs text-green-400 font-black uppercase">✨ New Notice</div><input id="notice-title" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none text-sm font-bold mb-2 placeholder-gray-500" placeholder="제목"><textarea id="notice-input" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none text-sm h-20 resize-none font-bold mb-3 placeholder-gray-500" placeholder="내용..."></textarea><div class="flex gap-2 mb-3"><input id="notice-link-text" class="w-1/3 bg-white/5 border border-white/10 p-3 rounded-xl outline-none text-xs font-bold placeholder-gray-500" placeholder="버튼명"><input id="notice-link-url" class="w-2/3 bg-white/5 border border-white/10 p-3 rounded-xl outline-none text-xs font-bold placeholder-gray-500" placeholder="URL"></div><div class="border-t border-white/10 pt-3"><div class="flex justify-between items-center mb-2"><span class="text-xs text-yellow-400 font-black">📊 투표 만들기</span><label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="vote-multi" class="w-4 h-4 rounded bg-white/10 border-none"><span class="text-[10px] text-gray-400">중복 투표 가능</span></label></div><div id="vote-inputs" class="space-y-2 mb-2"><input class="vote-option-input w-full bg-white/5 border border-white/10 p-2 rounded-xl text-xs font-bold placeholder-gray-600" placeholder="투표 버튼 1"><input class="vote-option-input w-full bg-white/5 border border-white/10 p-2 rounded-xl text-xs font-bold placeholder-gray-600" placeholder="투표 버튼 2"></div><button onclick="addVoteInput()" class="w-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 py-2 rounded-xl text-[10px] font-black">+ 투표 버튼 추가</button></div><button id="notice-submit-btn" class="w-full bg-green-600 py-3 rounded-xl font-black text-xs mt-4 shadow-lg">공지 등록</button></div><div id="notice-list" class="space-y-6 pb-10"></div></div></div>
+    <div id="level-modal" class="modal" onclick="if(event.target===this) closeModal()">
+        <div class="glass w-full max-w-xs p-8 rounded-[40px] flex flex-col items-center font-bold text-center" onclick="event.stopPropagation()">
+            <h3 class="text-xl font-black text-red-400 mb-2 uppercase">난이도 평가</h3>
+            <p class="text-xs text-gray-400 mb-6">0.0 ~ 5.0 (0.1 단위)</p>
+            <input type="number" id="level-input" class="w-32 h-24 bg-white/5 border-2 border-red-500/50 rounded-3xl text-4xl font-black text-center text-red-400 outline-none focus:border-red-400 transition mb-4" placeholder="-" step="0.1">
+            <button onclick="submitLevel()" class="w-full bg-red-600 py-3 rounded-xl font-black text-xs text-white shadow-lg">등록하기</button>
+            <button onclick="closeModal()" class="mt-4 text-gray-500 text-xs font-black uppercase">취소</button>
+        </div>
+    </div>
+
+    <div id="page-chat-info" class="page pt-24 text-center font-bold"><h2 class="text-3xl font-black text-blue-400 mb-10 italic uppercase">단톡방 정보 📢</h2><div class="px-4 space-y-6"><div id="admin-notice-write" class="hidden glass p-6 rounded-[30px] border border-green-500/20 text-left"><div class="mb-3 text-xs text-green-400 font-black uppercase">✨ New Notice</div><input id="notice-title" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none text-sm font-bold mb-2 placeholder-gray-500" placeholder="제목"><textarea id="notice-input" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none text-sm h-20 resize-none font-bold mb-3 placeholder-gray-500" placeholder="내용을 입력하세요..."></textarea><div class="flex gap-2 mb-3"><input id="notice-link-text" class="w-1/3 bg-white/5 border border-white/10 p-3 rounded-xl outline-none text-xs font-bold placeholder-gray-500" placeholder="버튼명"><input id="notice-link-url" class="w-2/3 bg-white/5 border border-white/10 p-3 rounded-xl outline-none text-xs font-bold placeholder-gray-500" placeholder="URL"></div><div class="border-t border-white/10 pt-3"><div class="flex justify-between items-center mb-2"><span class="text-xs text-yellow-400 font-black">📊 투표 만들기</span><label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="vote-multi" class="w-4 h-4 rounded bg-white/10 border-none"><span class="text-[10px] text-gray-400">중복 투표 가능</span></label></div><div id="vote-inputs" class="space-y-2 mb-2"><input class="vote-option-input w-full bg-white/5 border border-white/10 p-2 rounded-xl text-xs font-bold placeholder-gray-600" placeholder="투표 버튼 1"><input class="vote-option-input w-full bg-white/5 border border-white/10 p-2 rounded-xl text-xs font-bold placeholder-gray-600" placeholder="투표 버튼 2"></div><button onclick="addVoteInput()" class="w-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 py-2 rounded-xl text-[10px] font-black">+ 투표 버튼 추가</button></div><button id="notice-submit-btn" class="w-full bg-green-600 py-3 rounded-xl font-black text-xs mt-4 shadow-lg">공지 등록</button></div><div id="notice-list" class="space-y-6 pb-10"></div></div></div>
     <div id="page-stats" class="page pt-24 text-center font-bold"><h2 class="text-3xl font-black text-yellow-400 mb-10 italic uppercase">명예전당 🏆</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-6 px-4 mb-6"><div class="space-y-4"><h3 class="text-blue-400 font-black italic">🗳️ Voting King</h3><div id="vote-king" class="space-y-3"></div></div><div class="space-y-4"><h3 class="text-green-400 font-black italic">🆕 Creator King</h3><div id="game-add-king" class="space-y-3"></div></div></div><div class="px-4"><h3 class="text-purple-400 font-black italic mb-4">💬 Best Reviews</h3><div id="best-reviews" class="space-y-3"></div></div></div>
     <div id="page-login" class="page pt-20 text-center font-bold active"><h1 class="text-4xl font-black mb-10 italic text-blue-500">GAME ARCHIVE</h1><div class="glass p-8 rounded-[40px] mx-4 space-y-4 font-bold"><input type="number" id="pin" placeholder="PIN 번호" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none text-center font-bold"><input type="password" id="pw" placeholder="PASSWORD" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none text-center font-bold"><button onclick="login()" class="w-full bg-blue-600 py-4 rounded-2xl font-black text-white font-bold">입장하기</button></div></div>
 
@@ -103,39 +115,57 @@
         let currentUser = null; let selectedCategory = ""; let activeGameId = null; let activeGameName = ""; let activeScheduleId = null; let activeScheduleData = null; let tempRanks = []; let selMembersGlobal = []; let allUsers = {};
         let myPlayedGames = new Set(); let myManualChecks = new Set(); let currentRateGameId = null;
 
-        // [v6.8.0] 점수 입력 모달 엔진
+        // [v6.9.0] 통합 평가(점수/난이도) 엔진
         window.rateGame = (gid, type) => {
-            if(type === 'level') return alert("난이도 평가는 준비 중입니다."); // 일단 점수만
             currentRateGameId = gid;
-            const input = document.getElementById('score-input');
-            input.value = "";
-            openModal('score-modal');
-            input.focus();
+            if (type === 'score') {
+                const input = document.getElementById('score-input');
+                input.value = "";
+                openModal('score-modal');
+                input.focus();
+            } else if (type === 'level') {
+                const input = document.getElementById('level-input');
+                input.value = "";
+                openModal('level-modal');
+                input.focus();
+            }
         };
 
         window.handleScoreInput = async (el) => {
             const val = el.value;
             if (val.length >= 2) {
-                // 2자리 이상 입력 시 자동 저장
                 const score = parseInt(val);
                 if (!isNaN(score) && score >= 0 && score <= 100) {
-                    try {
-                        await setDoc(doc(db,"ratings",`${currentRateGameId}_${currentUser.pin}`),{
-                            gameId: currentRateGameId,
-                            userPin: currentUser.pin,
-                            score: score,
-                            updatedAt: serverTimestamp()
-                        }, {merge:true});
-                        closeModal();
-                        renderList(); // 리스트 갱신 (내 점수 표시)
-                    } catch(e) { alert("저장 실패"); }
-                } else {
-                    if(score > 100) el.value = 100; // 100 초과 방지
-                }
+                    await saveRating('score', score);
+                    closeModal();
+                } else if(score > 100) el.value = 100;
             }
         };
 
-        // [v6.8.0] 리스트 렌더링 수정 (진한 글씨 + 내 점수 버튼 표시)
+        window.submitLevel = async () => {
+            const val = document.getElementById('level-input').value;
+            if (val) {
+                const level = parseFloat(val);
+                if (!isNaN(level) && level >= 0 && level <= 5) {
+                    await saveRating('level', level);
+                    closeModal();
+                } else alert("0.0 ~ 5.0 사이로 입력하세요.");
+            }
+        };
+
+        async function saveRating(type, value) {
+            try {
+                await setDoc(doc(db,"ratings",`${currentRateGameId}_${currentUser.pin}`),{
+                    gameId: currentRateGameId,
+                    userPin: currentUser.pin,
+                    [type]: value,
+                    updatedAt: serverTimestamp()
+                }, {merge:true});
+                renderList();
+            } catch(e) { alert("저장 실패"); }
+        }
+
+        // [v6.9.0] 렌더링 수정 (진한 글씨, 버튼 상태 반영)
         window.renderList = async () => { 
             const list = document.getElementById('rank-list'); 
             try { 
@@ -148,27 +178,26 @@
                     const r = rt.filter(v => v.gameId === d.id); 
                     const scs = r.map(v => v.score).filter(v => v != null); 
                     const lvs = r.map(v => v.level).filter(v => v != null); 
-                    // 내 점수 찾기
                     const myRate = r.find(v => v.userPin === currentUser.pin);
-                    const myScore = myRate ? myRate.score : null;
 
                     return { 
                         id: d.id, ...d.data(), 
                         avgS: scs.length ? (scs.reduce((a,c)=>a+c,0)/scs.length).toFixed(1) : "0.0", 
                         avgL: lvs.length ? (lvs.reduce((a,c)=>a+c,0)/lvs.length).toFixed(1) : "0.0",
-                        myScore: myScore
+                        myScore: myRate?.score,
+                        myLevel: myRate?.level
                     }; 
                 }).filter(g => g.name.toLowerCase().includes(s)).sort((a,b)=>Number(b.avgS)-Number(a.avgS)); 
                 
                 list.innerHTML = gms.map((g, i) => {
-                    const hasRecord = myPlayedGames?.has(g.id);
-                    const isChecked = myManualChecks?.has(g.id);
-                    const isPlayed = hasRecord || isChecked;
+                    const isPlayed = myPlayedGames?.has(g.id) || myManualChecks?.has(g.id);
                     const bgClass = isPlayed ? 'bg-blue-600/30' : 'border-b border-white/5';
                     
-                    // 내 점수가 있으면 '85점', 없으면 '점수주기'
-                    const scoreBtnText = g.myScore !== null && g.myScore !== undefined ? `${g.myScore}점` : '점수주기';
-                    const scoreBtnClass = g.myScore !== null && g.myScore !== undefined ? 'bg-yellow-500 text-black border-yellow-500' : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
+                    const scoreTxt = g.myScore != null ? `${g.myScore}점` : '점수주기';
+                    const scoreCls = g.myScore != null ? 'bg-yellow-500 text-black border-yellow-500' : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
+                    
+                    const levelTxt = g.myLevel != null ? `${g.myLevel}` : '난이도';
+                    const levelCls = g.myLevel != null ? 'bg-red-500 text-white border-red-500' : 'bg-red-500/10 text-red-400 border-red-500/20';
 
                     return `
                     <tr class="${bgClass} font-bold transition duration-200">
@@ -176,50 +205,37 @@
                         <td class="p-4 text-left cursor-pointer" onclick="toggleGameComments('${g.id}')">
                             <div class="flex items-center gap-2">
                                 <span class="text-sm font-black">${g.name} <span class="text-[10px] text-gray-500">▼</span></span>
-                                <input type="checkbox" class="custom-checkbox" onclick="toggleManualCheck('${g.id}', this, event)" ${isChecked ? 'checked' : ''}>
+                                <input type="checkbox" class="custom-checkbox" onclick="toggleManualCheck('${g.id}', this, event)" ${isPlayed && myManualChecks.has(g.id) ? 'checked' : ''}>
                             </div>
-                            <span class="text-[10px] text-gray-200 font-bold block mt-1 opacity-80">SCORE: ${g.avgS} | LV: ${g.avgL}</span>
+                            <span class="text-[10px] text-white font-black block mt-1 opacity-90">SCORE: ${g.avgS} | LV: ${g.avgL}</span>
                         </td>
                         <td class="p-2 text-center w-24">
                             <div class="flex flex-col gap-1">
-                                <button onclick="rateGame('${g.id}','score')" class="${scoreBtnClass} text-[9px] py-1.5 rounded font-black border transition w-full">${scoreBtnText}</button>
-                                <button onclick="rateGame('${g.id}','level')" class="bg-red-500/10 text-red-400 text-[9px] py-1.5 rounded font-black border border-red-500/20 w-full opacity-50">LEVEL</button>
+                                <button onclick="rateGame('${g.id}','score')" class="${scoreCls} text-[9px] py-1.5 rounded font-black border transition w-full">${scoreTxt}</button>
+                                <button onclick="rateGame('${g.id}','level')" class="${levelCls} text-[9px] py-1.5 rounded font-black border transition w-full">${levelTxt}</button>
                             </div>
                         </td>
                         <td class="p-4 w-20 text-center"><button onclick="openSchedules('${g.id}','${g.name}')" class="bg-green-600/20 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-lg text-[10px] font-black">기록</button></td>
                     </tr>
-                    <tr id="comment-row-${g.id}" class="hidden bg-black/20">
-                        <td colspan="4" class="p-4">
-                            <div class="text-xs font-black text-gray-400 mb-2">COMMENTS & REVIEWS</div>
-                            <div id="comments-container-${g.id}" class="mb-4 max-h-40 overflow-y-auto custom-scrollbar"></div>
-                            <div class="flex gap-2">
-                                <input id="comment-input-${g.id}" class="flex-1 bg-white/5 border border-white/10 p-2 rounded-xl text-xs font-bold" placeholder="의견 남기기...">
-                                <button onclick="addGameComment('${g.id}')" class="bg-blue-600 px-4 rounded-xl text-xs font-black">작성</button>
-                            </div>
-                        </td>
-                    </tr>`;
+                    <tr id="comment-row-${g.id}" class="hidden bg-black/20"><td colspan="4" class="p-4"><div class="text-xs font-black text-gray-400 mb-2">COMMENTS & REVIEWS</div><div id="comments-container-${g.id}" class="mb-4 max-h-40 overflow-y-auto custom-scrollbar"></div><div class="flex gap-2"><input id="comment-input-${g.id}" class="flex-1 bg-white/5 border border-white/10 p-2 rounded-xl text-xs font-bold" placeholder="의견 남기기..."><button onclick="addGameComment('${g.id}')" class="bg-blue-600 px-4 rounded-xl text-xs font-black">작성</button></div></td></tr>`;
                 }).join(''); 
             } catch(e) {} 
         };
 
-        // ... [기존 로직 유지] ...
+        // ... [이하 v6.7.3 로직 유지] ...
         window.navTo = (cat) => { try { showPage('page-rank'); selectedCategory = cat; const t = document.getElementById('rank-title'); if(t) t.innerText = cat; renderList(); } catch(e) { console.error(e); } };
         window.handleBack = () => { if(document.querySelector('.modal.active')) history.back(); else if(!document.getElementById('page-home').classList.contains('active') && !document.getElementById('page-login').classList.contains('active')) showPage('page-home', false); };
         window.openModal = (id) => { const el = document.getElementById(id); if(el) { el.classList.add('active'); history.pushState({modal: id}, '', ''); } };
         window.closeModal = () => { if(document.querySelector('.modal.active')) history.back(); };
         window.addEventListener('popstate', (e) => { const activeModals = document.querySelectorAll('.modal.active'); if(activeModals.length > 0) activeModals[activeModals.length-1].classList.remove('active'); else if(!document.getElementById('page-home').classList.contains('active') && !document.getElementById('page-login').classList.contains('active')) showPage('page-home', false); });
-        
         window.login = async () => { const p = document.getElementById('pin').value.trim(); const w = document.getElementById('pw').value.trim(); if(!p||!w)return; try { const snap = await getDoc(doc(db,"users",String(p))); if (snap.exists() && String(snap.data().password) === String(w)) { currentUser = { pin: String(p), ...snap.data() }; localStorage.setItem('game_archive_auth', JSON.stringify({ pin: String(p), pw: String(w) })); document.getElementById('admin-btn').classList.toggle('hidden', String(p) !== '100'); await loadMyGameStatus(); showPage('page-home'); } else alert("불일치"); } catch(e) {} };
         window.logout = () => { localStorage.removeItem('game_archive_auth'); location.reload(); };
         window.addEventListener('DOMContentLoaded', async () => { const auth = localStorage.getItem('game_archive_auth'); if (auth) { const d = JSON.parse(auth); try { const snap = await getDoc(doc(db,"users",String(d.pin))); if (snap.exists()) { currentUser = { pin: String(d.pin), ...snap.data() }; document.getElementById('user-welcome').innerText = `${currentUser.name}님`; document.getElementById('my-profile-icon').src = currentUser.iconUrl || DEFAULT_ICON; document.getElementById('admin-btn').classList.toggle('hidden', String(d.pin) !== '100'); await loadMyGameStatus(); showPage('page-home'); return; } } catch(e) {} } showPage('page-login'); });
-        
         window.loadMyGameStatus = async () => { if(!currentUser) return; try { const sQ = query(collection(db, "schedules"), where("members", "array-contains", String(currentUser.pin))); const sSnap = await getDocs(sQ); myPlayedGames = new Set(sSnap.docs.map(d => d.data().gameId)); const cQ = query(collection(db, "user_game_checks"), where("userPin", "==", String(currentUser.pin))); const cSnap = await getDocs(cQ); myManualChecks = new Set(cSnap.docs.map(d => d.data().gameId)); } catch(e) {} };
         window.toggleManualCheck = async (gid, el, event) => { if(event) event.stopPropagation(); const isChecked = el.checked; const docId = `${currentUser.pin}_${gid}`; if(isChecked) myManualChecks.add(gid); else myManualChecks.delete(gid); const row = el.closest('tr'); if(isChecked || myPlayedGames.has(gid)) row.classList.add('bg-blue-600/30'); else row.classList.remove('bg-blue-600/30'); try { if (isChecked) await setDoc(doc(db, "user_game_checks", docId), { userPin: currentUser.pin, gameId: gid }); else await deleteDoc(doc(db, "user_game_checks", docId)); } catch(e) { el.checked = !isChecked; } };
-        
         window.openAdminUserMode = () => { openModal('admin-user-modal'); loadUserList(); };
         window.loadUserList = async () => { const list = document.getElementById('user-list-container'); list.innerHTML = "로딩 중..."; try { const q = query(collection(db, "users")); const snap = await getDocs(q); const users = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => (b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)); list.innerHTML = users.map(u => `<div class="bg-white/5 p-3 rounded-xl flex justify-between items-center text-xs font-bold"><span>${u.name}</span><span class="text-blue-400">PIN: ${u.id}</span></div>`).join(''); } catch(e) { list.innerHTML = "실패"; } };
         window.addUser = async () => { const name = document.getElementById('new-user-name').value.trim(); let pin = document.getElementById('new-user-pin').value.trim(); if(!name) return alert("이름 입력"); try { if(!pin) { const snap = await getDocs(collection(db, "users")); const pins = snap.docs.map(d => parseInt(d.id)).filter(n => !isNaN(n)); const maxPin = pins.length > 0 ? Math.max(...pins) : 99; pin = String(maxPin + 1); } else { const snap = await getDoc(doc(db, "users", pin)); if(snap.exists()) return alert("중복 PIN"); } await setDoc(doc(db, "users", pin), { name: name, password: "1234", createdAt: serverTimestamp() }); alert(`${name}님 추가됨 (PIN: ${pin})`); document.getElementById('new-user-name').value = ""; document.getElementById('new-user-pin').value = ""; loadUserList(); } catch(e) { alert("실패"); } };
-        
         window.enableEditNotice = (id) => { const view = document.getElementById(`notice-view-${id}`); const edit = document.getElementById(`notice-edit-${id}`); if(view && edit) { view.classList.add('hidden'); edit.classList.remove('hidden'); } };
         window.cancelEditNotice = (id) => { document.getElementById(`notice-view-${id}`).classList.remove('hidden'); document.getElementById(`notice-edit-${id}`).classList.add('hidden'); };
         window.loadNotices = async () => { const list = document.getElementById('notice-list'); try { const uSnap = await getDocs(collection(db, "users")); allUsers = uSnap.docs.reduce((acc, d) => ({...acc, [d.id]: d.data().name}), {}); const snap = await getDocs(query(collection(db, "notices"))); const notices = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0)); list.innerHTML = notices.map(n => { const date = n.createdAt ? new Date(n.createdAt.seconds*1000).toLocaleDateString() : "-"; let voteHTML = ""; if(n.voteOptions && n.voteOptions.length > 0) { voteHTML = `<div class="mt-4 space-y-2">` + n.voteOptions.map(opt => { const isVoted = (opt.voters || []).includes(currentUser.pin); const count = (opt.voters || []).length; const voterNames = currentUser.pin === '100' ? (opt.voters || []).map(p => allUsers[p] || p).join(', ') : ""; return `<div><button onclick="castVote('${n.id}', ${opt.id}, ${n.multiVote})" class="w-full p-3 rounded-xl flex justify-between items-center text-xs font-bold transition border ${isVoted ? 'bg-yellow-500/20 border-yellow-500 text-yellow-400' : 'bg-white/5 border-white/10 hover:bg-white/10'}"><span>${opt.text}</span><span>${count}명</span></button>${voterNames ? `<div class="text-[9px] text-gray-500 mt-1 pl-2">↳ ${voterNames}</div>` : ''}</div>`; }).join('') + `</div>`; } return `<div id="notice-card-${n.id}" class="glass p-8 rounded-[40px] text-left border border-white/10 shadow-2xl relative group"><div id="notice-view-${n.id}"><h3 class="text-blue-300 font-black mb-4 text-lg">${n.title || '공지사항'}</h3><p class="text-sm text-gray-400 leading-relaxed mb-4 whitespace-pre-wrap">${n.text}</p>${n.linkUrl ? `<a href="${n.linkUrl}" target="_blank" class="inline-block bg-blue-600 px-8 py-4 rounded-2xl font-black text-sm shadow-lg hover:bg-blue-500 transition w-full text-center mb-2">${n.linkText || '바로가기'}</a>` : ''}${voteHTML}<div class="text-[10px] text-gray-600 font-bold mt-4">${date} • ${n.writerName}</div>${currentUser.pin === '100' ? `<div class="absolute top-6 right-6 flex gap-2"><button onclick="enableEditNotice('${n.id}')" class="text-blue-500/50 hover:text-blue-500 text-xs font-black border border-blue-500/20 px-2 py-1 rounded">수정</button><button onclick="deleteNotice('${n.id}')" class="text-red-500/50 hover:text-red-500 text-xs font-black border border-red-500/20 px-2 py-1 rounded">삭제</button></div>` : ''}</div><div id="notice-edit-${n.id}" class="hidden space-y-2"><input id="edit-title-${n.id}" class="w-full bg-white/5 border border-white/10 p-2 rounded-xl text-sm font-bold" value="${n.title}"><textarea id="edit-text-${n.id}" class="w-full bg-white/5 border border-white/10 p-2 rounded-xl text-sm font-bold h-24">${n.text}</textarea><div class="flex gap-2"><input id="edit-link-txt-${n.id}" class="w-1/3 bg-white/5 border border-white/10 p-2 rounded-xl text-xs font-bold" value="${n.linkText||''}" placeholder="버튼명"><input id="edit-link-url-${n.id}" class="w-2/3 bg-white/5 border border-white/10 p-2 rounded-xl text-xs font-bold" value="${n.linkUrl||''}" placeholder="URL"></div><div class="flex gap-2 justify-end"><button onclick="saveNotice('${n.id}')" class="bg-blue-600 px-4 py-2 rounded-xl text-xs font-bold">저장</button><button onclick="cancelEditNotice('${n.id}')" class="bg-gray-600 px-4 py-2 rounded-xl text-xs font-bold">취소</button></div></div></div>`; }).join('') || `<p class="text-xs text-gray-500 font-bold">등록된 공지가 없습니다.</p>`; } catch(e) { console.error(e); } };
@@ -227,7 +243,6 @@
         if(document.getElementById('notice-submit-btn')) document.getElementById('notice-submit-btn').addEventListener('click', async () => { const t = document.getElementById('notice-title').value.trim(); const x = document.getElementById('notice-input').value.trim(); const lt = document.getElementById('notice-link-text').value.trim(); const lu = document.getElementById('notice-link-url').value.trim(); const mv = document.getElementById('vote-multi').checked; const vos = Array.from(document.querySelectorAll('.vote-option-input')).map((i,idx)=>({id:idx,text:i.value.trim(),voters:[]})).filter(o=>o.text!==""); if(!t||!x)return alert("입력하세요"); try{ await addDoc(collection(db,"notices"),{title:t,text:x,writerName:currentUser.name,createdAt:serverTimestamp(),linkText:lt,linkUrl:lu,voteOptions:vos,multiVote:mv}); document.getElementById('notice-title').value="";document.getElementById('notice-input').value="";document.getElementById('notice-link-text').value="";document.getElementById('notice-link-url').value="";window.loadNotices(); }catch(e){alert("실패");} });
         window.castVote = async (nid, oid, multi) => { try{ const r = doc(db,"notices",nid); const s = await getDoc(r); if(!s.exists())return; let ops = s.data().voteOptions; const me = String(currentUser.pin); const t = ops.find(o=>o.id===oid); if(t.voters.includes(me)) t.voters = t.voters.filter(p=>p!==me); else { if(!multi) ops.forEach(o=>o.voters=o.voters.filter(p=>p!==me)); t.voters.push(me); } await updateDoc(r,{voteOptions:ops}); window.loadNotices(); }catch(e){} };
         window.saveNotice=async(id)=>{const t=document.getElementById(`edit-title-${id}`).value;const x=document.getElementById(`edit-text-${id}`).value;const lt=document.getElementById(`edit-link-txt-${id}`).value;const lu=document.getElementById(`edit-link-url-${id}`).value;await setDoc(doc(db,"notices",id),{title:t,text:x,linkText:lt,linkUrl:lu},{merge:true});window.loadNotices();}; window.deleteNotice=async(id)=>{if(confirm("삭제?")){await deleteDoc(doc(db,"notices",id));window.loadNotices();}};
-        window.showPage = (id) => { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); document.getElementById('global-back-btn').style.display = (id === 'page-home' || id === 'page-login') ? 'none' : 'block'; if(id === 'page-chat-info') { document.getElementById('admin-notice-write').classList.toggle('hidden', currentUser?.pin !== '100'); window.loadNotices(); } if(id === 'page-stats') window.loadStats(); };
         window.toggleGameComments = async (gid) => { const row = document.getElementById(`comment-row-${gid}`); if(row.classList.contains('hidden')) { row.classList.remove('hidden'); loadGameComments(gid); } else { row.classList.add('hidden'); } };
         window.loadGameComments = async (gid) => { const c = document.getElementById(`comments-container-${gid}`); c.innerHTML = "로딩..."; try { const q = query(collection(db, "game_comments"), where("gameId", "==", gid)); const snap = await getDocs(q); const coms = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)); c.innerHTML = coms.map(d => `<div class="bg-white/5 p-3 rounded-xl mb-2 flex justify-between items-start text-left"><div class="flex-1"><div class="flex items-center gap-2 mb-1"><span class="text-xs font-black text-blue-300">${d.userName}</span></div><p class="text-sm font-bold text-gray-300 whitespace-pre-wrap">${d.text}</p></div><div class="flex flex-col items-end gap-1"><button onclick="likeGameComment('${d.id}','${gid}')" class="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg hover:bg-white/20"><span class="text-xs">👍</span><span class="text-[10px] font-bold text-yellow-400">${(d.likes||[]).length}</span></button>${(d.userPin===currentUser.pin || currentUser.pin==='100')?`<button onclick="deleteGameComment('${d.id}','${gid}')" class="text-[10px] text-red-500 font-bold hover:underline">삭제</button>`:''}</div></div>`).join('')||"댓글 없음"; } catch(e) { c.innerHTML = "실패"; } };
         window.addGameComment = async (gid) => { const i = document.getElementById(`comment-input-${gid}`); const t = i.value.trim(); if(!t) return; await addDoc(collection(db,"game_comments"),{gameId:gid,userPin:currentUser.pin,userName:currentUser.name,text:t,likes:[],createdAt:serverTimestamp()}); i.value=""; loadGameComments(gid); };
